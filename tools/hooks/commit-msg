@@ -1,0 +1,27 @@
+#!/bin/sh
+# Refuse agent-attribution trailers in this repository's history.
+#
+# This is a GATE, not a reminder. The operator asked for the same thing on
+# golivea_odoo and it was only ever a stated preference -- ten commits reached
+# published history carrying the trailers anyway, and that is still an open item
+# in the daftar ledger. A preference nothing enforces is a preference that gets
+# forgotten on the commit where it matters.
+#
+# A human co-author is legitimate and passes. Only agent attribution is refused.
+set -eu
+MSG="$1"
+
+BAD=$(grep -nEi \
+  '^Co-authored-by:.*(claude|anthropic|copilot|chatgpt|gpt-|cursor|codex|devin)|^Claude-Session:|^(Assisted|Generated)-by:.*(claude|anthropic)|Generated with \[?Claude Code|🤖' \
+  "$MSG" || true)
+
+if [ -n "$BAD" ]; then
+  echo "commit-msg: agent attribution is not carried in this repository's history." >&2
+  echo "" >&2
+  echo "$BAD" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "Remove those lines and commit again. The work is the operator's; who or" >&2
+  echo "what typed it is not a fact this history records." >&2
+  exit 1
+fi
+exit 0
