@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_province_list" model="ir.ui.view">
+    <field name="name">ikiku.province.list</field>
+    <field name="model">ikiku.province</field>
+    <field name="arch" type="xml">
+      <list string="استان‌ها"><field name="name"/><field name="code"/><field name="centre"/></list>
+    </field>
+  </record>
+  <record id="action_province" model="ir.actions.act_window">
+    <field name="name">استان‌ها</field>
+    <field name="res_model">ikiku.province</field>
+    <field name="view_mode">list</field>
+  </record>
+
+  <record id="view_season_form" model="ir.ui.view">
+    <field name="name">ikiku.season.form</field>
+    <field name="model">ikiku.season</field>
+    <field name="arch" type="xml">
+      <form string="فصل">
+        <sheet>
+          <div class="oe_title"><h1><field name="name"/></h1></div>
+          <group>
+            <group>
+              <field name="calendar"/>
+              <field name="start_month"/>
+              <field name="start_day"/>
+              <field name="duration_days"/>
+            </group>
+            <group>
+              <field name="demand_factor"/>
+              <field name="province_ids" widget="many2many_tags"/>
+            </group>
+          </group>
+          <field name="note"/>
+          <field name="window_ids">
+            <list editable="bottom" decoration-muted="not confirmed">
+              <field name="jalali_year"/>
+              <field name="date_start"/>
+              <field name="date_end"/>
+              <field name="confirmed"/>
+            </list>
+          </field>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_season" model="ir.actions.act_window">
+    <field name="name">فصل‌های تقاضا</field>
+    <field name="res_model">ikiku.season</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="0">
+    <record id="rule_resource_own" model="ir.rule">
+      <field name="name">نیرو: پروندهٔ خود</field>
+      <field name="model_id" ref="model_ikiku_resource"/>
+      <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
+    <record id="rule_availability_own" model="ir.rule">
+      <field name="name">در دسترس بودن: فقط نیروی خود</field>
+      <field name="model_id" ref="model_ikiku_availability"/>
+      <field name="domain_force">[('resource_id.partner_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
+    <!-- بند ۷: a business may see availability windows, and only of ACTIVE
+         resources. It never reaches the person's contact details. -->
+    <record id="rule_availability_business" model="ir.rule">
+      <field name="name">در دسترس بودن: کسب‌وکارِ تأییدشده</field>
+      <field name="model_id" ref="model_ikiku_availability"/>
+      <field name="domain_force">[('resource_id.state', '=', 'active')]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
+    </record>
+    <record id="rule_resume_own" model="ir.rule">
+      <field name="name">سابقه: فقط نیروی خود</field>
+      <field name="model_id" ref="model_ikiku_resume_line"/>
+      <field name="domain_force">[('resource_id.partner_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
+  </data>
+</odoo>

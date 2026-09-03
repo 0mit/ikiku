@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <record id="vis_res_partner_name" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">name</field>
+      <field name="visibility">public</field>
+      <field name="reason">نامِ حرفه‌ای بخشی از پروندهٔ عمومی است.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_province_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">استان، نه نشانی. برای یافتنِ کار لازم است.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_city" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_city</field>
+      <field name="visibility">public</field>
+      <field name="reason">شهر، نه نشانی.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_standing" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_standing</field>
+      <field name="visibility">public</field>
+      <field name="reason">بند ۸: هر عددی که نشان می‌دهیم راهِ رسیدنش پیداست.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_is_verified" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_is_verified</field>
+      <field name="visibility">public</field>
+      <field name="reason">اینکه هویت تأیید شده یا نه، خودش یک واقعیتِ عمومی است.</field>
+    </record>
+    <record id="vis_res_partner_function" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">function</field>
+      <field name="visibility">public</field>
+      <field name="reason">عنوانِ حرفه‌ای.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_mobile" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_mobile</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">بند ۷: راهِ تماس از طریقِ پلتفرم، نه شمارهٔ خام.</field>
+    </record>
+    <record id="vis_res_partner_phone" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">phone</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
+    <record id="vis_res_partner_mobile" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">mobile</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
+    <record id="vis_res_partner_email" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">email</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
+    <record id="vis_res_partner_street" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">street</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">نشانیِ خانه هرگز عمومی نیست.</field>
+    </record>
+    <record id="vis_res_partner_street2" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">street2</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
+    <record id="vis_res_partner_zip" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">zip</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_nid_hash" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_nid_hash</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">اثرِ کدِ ملی فقط برای جلوگیری از تکرار است.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_nid_checked_on" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_nid_checked_on</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">تاریخِ بررسی هم داده‌ای دربارهٔ فرد است.</field>
+    </record>
+  </data>
+</odoo>

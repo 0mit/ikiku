@@ -1,0 +1,406 @@
+<title>iKiKu Build Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Vazirmatn:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --ground:#F1F3F2; --sheet:#FBFCFB; --ink:#14191B; --ink-2:#566065; --ink-3:#8C9599;
+    --rule:#D5DBD9; --rule-soft:#E6EAE9; --cobalt:#1B4C9E; --copper:#A8632A;
+    --iron:#171B1D; --iron-ink:#E7ECEA; --iron-ink-2:#98A2A6; --iron-rule:#2E3639;
+    --ok-bg:#E7EEF8; --ok-ink:#17417F;
+    --no-bg:#F6E8E4; --no-ink:#8E3A1E;
+    --code-bg:#EAEEEC;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --ground:#0E1112; --sheet:#15191A; --ink:#E9EEEC; --ink-2:#9AA5A8; --ink-3:#6C7679;
+    --rule:#2A3134; --rule-soft:#1E2426; --cobalt:#7FAAF0; --copper:#D2905A;
+    --iron:#080A0B; --iron-ink:#E9EEEC; --iron-ink-2:#8E989C; --iron-rule:#232A2C;
+    --ok-bg:#16232F; --ok-ink:#8FB6EF;
+    --no-bg:#2A1B16; --no-ink:#DE9C80;
+    --code-bg:#1D2224;
+  }}
+  :root[data-theme="dark"]{
+    --ground:#0E1112; --sheet:#15191A; --ink:#E9EEEC; --ink-2:#9AA5A8; --ink-3:#6C7679;
+    --rule:#2A3134; --rule-soft:#1E2426; --cobalt:#7FAAF0; --copper:#D2905A;
+    --iron:#080A0B; --iron-ink:#E9EEEC; --iron-ink-2:#8E989C; --iron-rule:#232A2C;
+    --ok-bg:#16232F; --ok-ink:#8FB6EF;
+    --no-bg:#2A1B16; --no-ink:#DE9C80;
+    --code-bg:#1D2224;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .fa{font-family:"Vazirmatn","IBM Plex Sans",Tahoma,sans-serif;direction:rtl;unicode-bidi:isolate;}
+  code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.87em;}
+  code{background:var(--code-bg);padding:.08em .34em;border-radius:2px;}
+
+  .sheet{
+    max-width:56rem;margin:0 auto;background:var(--sheet);
+    border-inline:1px solid var(--rule-soft);
+    padding:0 clamp(1.1rem,4vw,3.75rem) 4.5rem;
+  }
+  .flame{height:3px;background:var(--cobalt);}
+
+  /* masthead */
+  .mast{padding:clamp(2.25rem,6vw,3.75rem) 0 2rem;border-bottom:1px solid var(--rule);}
+  .eyebrow{
+    font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink-3);display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin:0 0 1.75rem;
+  }
+  .eyebrow .dot{width:4px;height:4px;border-radius:50%;background:var(--copper);flex:none;}
+  .eyebrow span{flex:none;}
+  .doc span{flex:none;}
+  h1{font-size:clamp(2rem,5.5vw,2.9rem);line-height:1.15;font-weight:600;letter-spacing:-.022em;margin:0;text-wrap:balance;}
+  .sub{font-size:1.12rem;color:var(--ink-2);max-width:40rem;margin:1rem 0 0;text-wrap:pretty;}
+  .settled{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:0;
+    margin-top:2rem;border-top:1px solid var(--rule-soft);
+  }
+  .settled div{padding:.9rem 1.1rem .9rem 0;border-bottom:1px solid var(--rule-soft);}
+  .settled dt{font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--copper);font-weight:600;margin:0 0 .2rem;}
+  .settled dd{margin:0;font-size:.94rem;font-weight:500;}
+  .settled dd small{display:block;color:var(--ink-3);font-weight:400;font-size:.82rem;line-height:1.5;margin-top:.15rem;}
+
+  /* sections */
+  section{padding-top:3.5rem;}
+  h2{
+    font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--copper);margin:0 0 1.2rem;
+    display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.8rem;
+  }
+  h2::after{content:"";height:1px;background:var(--rule);}
+  h3{font-size:1.3rem;font-weight:600;letter-spacing:-.012em;margin:0 0 .7rem;line-height:1.3;text-wrap:balance;}
+  h4{font-size:1rem;font-weight:600;margin:2rem 0 .5rem;}
+  p{margin:0 0 1rem;max-width:40rem;text-wrap:pretty;}
+  .lead{font-size:1.06rem;}
+  ul.plain{list-style:none;margin:0 0 1rem;padding:0;max-width:40rem;display:flex;flex-direction:column;gap:.6rem;}
+  ul.plain li{position:relative;padding-left:1.5rem;}
+  ul.plain li::before{content:"—";position:absolute;left:0;top:0;color:var(--copper);font-weight:600;}
+  strong{font-weight:600;}
+  .note{border-left:3px solid var(--copper);padding-left:1rem;margin:1.5rem 0;max-width:40rem;color:var(--ink-2);font-size:.95rem;}
+  .note b{color:var(--ink);}
+
+  /* tables */
+  .scroll{overflow-x:auto;margin:1.25rem 0 .5rem;}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:34rem;}
+  th{
+    text-align:left;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:600;padding:0 1rem .55rem 0;border-bottom:1px solid var(--rule);
+  }
+  td{padding:.7rem 1rem .7rem 0;border-bottom:1px solid var(--rule-soft);vertical-align:top;}
+  td:last-child,th:last-child{padding-right:0;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.m{font-family:"IBM Plex Mono",monospace;font-size:.82rem;white-space:nowrap;}
+  .tag{display:inline-block;font-size:.68rem;font-weight:600;letter-spacing:.04em;padding:.14rem .42rem;border-radius:2px;white-space:nowrap;}
+  .tag.ok{background:var(--ok-bg);color:var(--ok-ink);}
+  .tag.no{background:var(--no-bg);color:var(--no-ink);}
+
+  /* lifecycle strip */
+  .life{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1.5rem 0;}
+  .life div{background:var(--sheet);padding:.95rem 1rem;}
+  .life .st{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--cobalt);font-weight:500;display:block;margin-bottom:.3rem;}
+  .life .wh{font-size:.87rem;font-weight:600;display:block;}
+  .life .de{font-size:.78rem;color:var(--ink-2);display:block;margin-top:.25rem;line-height:1.5;}
+  .life div.risk .st{color:var(--copper);}
+
+  /* iron block */
+  .iron{background:var(--iron);color:var(--iron-ink);padding:clamp(1.75rem,4vw,2.75rem);margin-top:3.5rem;}
+  .iron h2{color:var(--copper);}
+  .iron h2::after{background:var(--iron-rule);}
+  .iron p{color:var(--iron-ink);}
+  .iron ul.plain li::before{color:var(--copper);}
+  .iron .note{border-left-color:var(--copper);color:var(--iron-ink-2);}
+  .iron .note b{color:var(--iron-ink);}
+  .iron code{background:#20272A;color:var(--iron-ink);}
+
+  /* phases */
+  .phase{display:grid;grid-template-columns:2.5rem 1fr;gap:0 1rem;padding:1.5rem 0;border-top:1px solid var(--rule-soft);}
+  .phase:first-of-type{border-top:none;}
+  .pn{font-family:"IBM Plex Mono",monospace;font-size:1.05rem;font-weight:600;color:var(--copper);font-variant-numeric:tabular-nums;}
+  .phase h3{font-size:1.12rem;margin-bottom:.4rem;}
+  .phase p{font-size:.94rem;color:var(--ink-2);margin-bottom:.55rem;}
+
+  .doc{
+    margin-top:3.5rem;padding-top:1.1rem;border-top:1px solid var(--rule);
+    display:flex;flex-wrap:wrap;gap:.35rem 1.5rem;font-size:.75rem;color:var(--ink-3);
+  }
+  .doc b{color:var(--ink-2);font-weight:600;}
+  a{color:var(--cobalt);}
+  a:focus-visible{outline:2px solid var(--cobalt);outline-offset:3px;}
+  @media (max-width:600px){ body{font-size:15px;} }
+</style>
+
+<div class="sheet">
+  <div class="flame"></div>
+
+  <header class="mast">
+    <div class="eyebrow">
+      <span>iKiKu</span><span class="dot"></span><span>MVP architecture</span>
+      <span class="dot"></span><span>Odoo 19 Community</span>
+    </div>
+    <h1>Build map for the first release</h1>
+    <p class="sub">How the manifest becomes schema. Every reuse claim below was checked against the <code>license</code> field of the module's own <code>__manifest__.py</code> — 656 of the 1,455 shipped modules are LGPL-3, and iKiKu uses only those.</p>
+
+    <div class="settled">
+      <div><dt>Edition</dt><dd>Community, LGPL-3<small>Settled.</small></dd></div>
+      <div><dt>Article 7</dt><dd>Ratified<small>Record public, calendar not.</small></dd></div>
+      <div><dt>Employment</dt><dd>The business employs<small>Settled. iKiKu records and acts as a union — never the employer.</small></dd></div>
+      <div><dt>Cost</dt><dd>Shared, by person-days<small>Settled. Recovery, not commission.</small></dd></div>
+      <div><dt>Licence</dt><dd>AGPL-3.0 + charter<small>Settled. Trademark does what a licence cannot.</small></dd></div>
+      <div><dt>MVP boundary</dt><dd>Assumed, not confirmed<small>Phases below. Move the line and I redraw.</small></dd></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>The spine</h2>
+    <h3>One tree, two layers, and a promotion path</h3>
+    <p class="lead">Everything you asked for — generalize hard, never lose the specific, don't get locked into building features — is one mechanism, and it is the mechanism daftar already uses: <strong>a standard layer plus per-tenant overlays, held as data, with one interpreter.</strong></p>
+    <ul class="plain">
+      <li><strong>Standard layer.</strong> One versioned tree of competencies, hygiene protocols and procedure steps, owned by the platform's technical masters. Portable across every business. This is Tier-0.</li>
+      <li><strong>Overlay.</strong> A business declares only its <em>deltas</em> — its own recipes, its own order of work, its own tolerances. An overlay never redefines the standard, it points at a node and adds to it.</li>
+      <li><strong>Candidates.</strong> Anything a business says that does not resolve into the tree is stored intact as a candidate node, never discarded and never bent into a term that nearly fits.</li>
+      <li><strong>Promotion.</strong> A candidate that recurs across businesses above a threshold is proposed to a master, who promotes it into the standard with a version bump. That is the whole generalization engine, and it runs on real usage rather than on a taxonomy meeting.</li>
+    </ul>
+    <div class="note"><b>Why this answers "don't tie us to developing features":</b> a new sector — a bakery, a hotel, a workshop — is a new subtree of data, not a new module. The gate that validates the tree is generic and names no term. You add verticals by writing rows.</div>
+  </section>
+
+  <section>
+    <h2>What Community already gives you</h2>
+    <p>Verified locally against <code>odoo/addons/*/__manifest__.py</code>. Nothing in this table needs to be written.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Module</th><th>License</th><th>What it carries for iKiKu</th></tr></thead>
+        <tbody>
+          <tr><td class="m">hr_skills</td><td><span class="tag ok">LGPL-3</span></td><td><code>hr.skill</code> / <code>hr.skill.type</code> / <code>hr.skill.level</code> — the three-level competency tree. <code>hr.job.skill</code> links a job position to the skills it requires. <code>hr.individual.skill.mixin</code> attaches skills to <em>our</em> model — it only asks for <code>_linked_field_name()</code> — so no <code>hr.employee</code> is ever created.</td></tr>
+          <tr><td class="m">hr_skills_slides</td><td><span class="tag no">not usable</span></td><td><strong>Withdrawn.</strong> It writes <code>hr.resume.line</code>, whose <code>employee_id</code> is <code>required=True</code> on <code>hr.employee</code>. Reusing it would make this database assert the co-op employs every resource, which the employment decision makes false. <code>ikiku.resume.line</code> is ours; the academy link is now a small custom bridge.</td></tr>
+          <tr><td class="m">resource</td><td><span class="tag ok">LGPL-3</span></td><td><code>resource.resource</code>, <code>resource.calendar</code>, <code>calendar.attendance</code>, <code>calendar.leaves</code> — working hours, exceptions, and the interval maths Planning is built on.</td></tr>
+          <tr><td class="m">website_slides</td><td><span class="tag ok">LGPL-3</span></td><td>The knowledge base: courses, sections, slides, video, <code>slide.question</code> / <code>slide.answer</code> quizzes, per-member progress.</td></tr>
+          <tr><td class="m">survey</td><td><span class="tag ok">LGPL-3</span></td><td>Evaluations <em>and</em> certification — <code>certification</code>, a PDF certificate, and a <code>gamification.badge</code>. The academies' instrument.</td></tr>
+          <tr><td class="m">project</td><td><span class="tag ok">LGPL-3</span></td><td>The decentralized call centre. Verification tasks and schedule checks are <code>project.task</code> in staged queues, assigned and timed.</td></tr>
+          <tr><td class="m">website · portal · auth_signup</td><td><span class="tag ok">LGPL-3</span></td><td>Public site, the four portals, signup, and the record-rule machinery that separates them.</td></tr>
+          <tr><td class="m">mail</td><td><span class="tag ok">LGPL-3</span></td><td><code>mail.tracking.value</code> gives field-level change history with author and timestamp. That is your provenance trail — do not write an audit log.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>What is proprietary, and what replaces it</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Wanted</th><th>License</th><th>Replacement</th></tr></thead>
+        <tbody>
+          <tr><td class="m">planning</td><td><span class="tag no">OEEL-1</span></td><td><strong>Custom, and the largest single cost.</strong> Build <code>ikiku.slot</code> on <code>resource.calendar</code> — the interval engine underneath is Community.</td></tr>
+          <tr><td class="m">helpdesk</td><td><span class="tag no">OEEL-1</span></td><td><code>project.task</code> with stages. Costs you SLA widgets, nothing structural.</td></tr>
+          <tr><td class="m">appointment</td><td><span class="tag no">OEEL-1</span></td><td>Not needed. Bookings are matched and confirmed, not self-scheduled.</td></tr>
+          <tr><td class="m">sign</td><td><span class="tag no">OEEL-1</span></td><td>Deferred. A booking acknowledged publicly by both parties is stronger evidence than a PDF signature, and it is what <span class="fa">بند ۳</span> already asks for.</td></tr>
+          <tr><td class="m">documents</td><td><span class="tag no">OEEL-1</span></td><td><code>ir.attachment</code> plus an access policy. You want <em>fewer</em> stored documents anyway — see the ID rule below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Custom modules</h2>
+    <p>Four, not twelve. Each one earns its boundary; anything that would become a fifth belongs as data inside the first.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Module</th><th>Holds</th></tr></thead>
+        <tbody>
+          <tr><td class="m">ikiku_base</td><td>Spec tree + overlays + candidates. Visibility policy. Jalali, provinces, seasons. Assertion/verification/dispute ledger. Identity and standing on <code>res.partner</code>.</td></tr>
+          <tr><td class="m">ikiku_supply</td><td>Resource profile, skills on the mixin, <code>ikiku.resume.line</code>, availability windows.</td></tr>
+          <tr><td class="m">ikiku_demand</td><td>Business, positions as overlays, declared demand, the hint-and-steer <code>steer()</code> entry point.</td></tr>
+          <tr><td class="m">ikiku_match</td><td>Proposals with stored score components, bookings, the public register, the T-14/T-3/T-24 re-checks and the replacement path.</td></tr>
+          <tr><td class="m">ikiku_coop</td><td><strong>Added after this map was drawn</strong>, when the cost decision arrived: periodic cost, shared across businesses by person-days.</td></tr>
+          <tr><td class="m">ikiku_portal</td><td>The Persian RTL portal, the public profile, the jobs board, the public booking register and the cost page.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><b>The employment question is settled, and it simplified things.</b> Resources are employed by the businesses they are placed with; iKiKu records, verifies and — through the dispute procedure — acts as their union. So there is no employment contract, no payroll and no <code>hr.employee</code> in this codebase, and no labour-supply licensing exposure. <code>employer_business_id</code> on every booking names who the employer actually is.</div>
+  </section>
+
+  <section>
+    <h2>Article 7 as data</h2>
+    <h3>Three visibility classes, one interpreter</h3>
+    <p>Ratified today: the professional record is public, the calendar is not. This is not per-field code — it is a policy table that the portal serializer reads, the same way the daftar gate reads its vocabulary.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Class</th><th>Who sees it</th><th>What lives there</th></tr></thead>
+        <tbody>
+          <tr><td class="m">public</td><td>Anyone, no login</td><td>Skills and levels, certifications, verified work history at <em>business</em> granularity, ratings with their full chain, court rulings, and the <strong>fact</strong> of a booking: this person is committed, these dates, this province.</td></tr>
+          <tr><td class="m">counterparty</td><td>Verified, logged-in businesses</td><td>Availability windows, contact through a platform relay — never a raw number.</td></tr>
+          <tr><td class="m">restricted</td><td>Platform staff, with a logged reason</td><td>National ID, home address, phone, and the venue and hours of any future shift.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h4>The publication rule for a booking</h4>
+    <ul class="plain">
+      <li>On confirmation, publish immediately: <span class="fa">«این نیرو از ۱۲ تا ۲۰ مرداد ۱۴۰۵ در استان فارس متعهد است»</span> — committed, dates, province. No venue, no hours.</li>
+      <li>The venue becomes public when the shift <em>starts</em> — or earlier if both parties opt in.</li>
+      <li><strong>Cancellation is public the moment it happens.</strong> This is where the enforcement actually lives: a commitment cannot be quietly withdrawn, by either side.</li>
+    </ul>
+    <div class="note"><b>National ID is never stored.</b> Store a salted hash for deduplication and the verification verdict — not the number, and never a scan of the card. A verified national-ID database of named workers is a honeypot, and in this country it is the single asset most worth stealing from you.</div>
+  </section>
+
+  <section>
+    <h2>Matching</h2>
+    <h3>Three months out, and checked three times before anyone travels</h3>
+    <p>A business declares demand for a window starting roughly a quarter ahead; the matcher searches resources whose declared availability covers it. The MVP horizon is <code>[today + 3mo, today + 6mo]</code>.</p>
+    <div class="life">
+      <div><span class="st">draft</span><span class="wh">Demand</span><span class="de">Position, seats, province, Jalali window, season tag, must-have vs nice-to-have competencies.</span></div>
+      <div><span class="st">proposed</span><span class="wh">Ranked set</span><span class="de">Candidates with their score components stored on the record.</span></div>
+      <div><span class="st">confirmed</span><span class="wh">Booking</span><span class="de">Human-validated on both sides. Published the same second.</span></div>
+      <div class="risk"><span class="st">T-14d · T-3d · T-24h</span><span class="wh">Re-check</span><span class="de">A task per checkpoint to the call centre: is this person still on schedule?</span></div>
+      <div class="risk"><span class="st">at_risk → replaced</span><span class="wh">Replacement</span><span class="de">A failed check reopens the ranked pool. The original booking is never deleted — it is closed with a reason, publicly.</span></div>
+    </div>
+
+    <h4>The ranking must be readable, which rules out a model</h4>
+    <p>The manifest says no hidden formula: <span class="fa">«هر عددی که نشان می‌دهیم، راهِ رسیدن به آن هم پیداست»</span>. So the MVP ranker is additive with visible weights, and every proposal stores its own components — competency match, verified history depth, geographic distance, season load, standing. A learned ranker cannot satisfy that sentence and should not be attempted later either without changing the manifest first.</p>
+  </section>
+
+  <section>
+    <h2>Verification</h2>
+    <h3>Assertions and verdicts, never a bare star</h3>
+    <ul class="plain">
+      <li><strong><code>ikiku.assertion</code></strong> — a claim about someone: subject, claim type (a spec node or a résumé line), value, who asserted it, when, and by what method — self, co-worker, employer, academy, platform, document.</li>
+      <li><strong><code>ikiku.verification</code></strong> — a verdict on one assertion: verifier, confirm / dispute / cannot-say, evidence, and the verifier's own standing <em>at the time they said it</em>, frozen.</li>
+      <li><strong>Strength is derived, never stored as a number someone can nudge.</strong> The profile shows the chain, not a score alone.</li>
+      <li><strong><code>dispute_id</code> exists from day one</strong>, even though the court is phase 2. A rating that cannot point at its defence is a rating that violates <span class="fa">بند ۴</span>, and adding the column later means backfilling every row that was never defensible.</li>
+    </ul>
+    <div class="note"><b>Anti-Sybil, cheaply and explainably:</b> a verification's weight comes from the verifier's own verified standing. Two accounts that only verify each other converge toward zero weight without anyone being banned, and the rule fits in one sentence on a public page — which the manifest requires it to.</div>
+  </section>
+
+  <section>
+    <h2>Hint and steer</h2>
+    <h3>Ask in their language, store in ours</h3>
+    <p>Three rules, applied identically on the business side, the resource side and the internal side.</p>
+    <ul class="plain">
+      <li><strong>Never a bare free-text field.</strong> Every open question is paired with a resolution step: the person types freely, the system proposes standard nodes, the person confirms.</li>
+      <li><strong>The remainder is kept.</strong> Whatever does not resolve becomes a candidate node attached to the record, verbatim. Nothing is dropped to make the form validate.</li>
+      <li><strong>One question per screen, six screens maximum.</strong> These users are on phones, often mid-shift.</li>
+    </ul>
+    <p>Worked example, business side: the owner types <span class="fa">«یکی که ظرف بشوره و شیفت شب وایسه»</span>. The wizard proposes <code>kitchen/dishwashing</code> and <code>shift/night</code>, shows them in Persian with plain descriptions, and asks for confirmation. What it cannot resolve — a house term, an unusual tolerance — is stored as a candidate and reaches a master's promotion queue if three other businesses say something close to it.</p>
+  </section>
+
+  <section>
+    <h2>Jalali</h2>
+    <h3>An axis, not a display setting</h3>
+    <ul class="plain">
+      <li><strong>Store Gregorian and UTC. Always.</strong> Convert only at the boundary — portal rendering and portal input. A Jalali string in a database column is a defect.</li>
+      <li><strong>Vendor the converter.</strong> It is about sixty lines of arithmetic. A pip dependency that has to be fetched through a filtered network is a build that fails at the worst moment.</li>
+      <li><strong><code>ikiku.season</code> per province</strong>, materialized into concrete date ranges per year: Nowruz (1–13 Farvardin), the summer peak, Ramadan, Muharram, Arbaeen. Demand in Kish in Dey is not demand in Tabriz in Dey, and the platform has to know that before it ranks anyone.</li>
+      <li><strong>Ramadan and Muharram drift.</strong> They are Hijri, roughly eleven days earlier each Gregorian year, and Iran's determination is observational. Compute a tabular Hijri date, then let a human override it per year. Do not pretend the arithmetic is authoritative.</li>
+      <li>Backoffice may stay Gregorian for staff. The two Persian portals and the public site are Jalali throughout, with a Jalali picker.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Anti-duplication register</h2>
+    <p>You asked for every mechanism that prevents duplication. Here they are as one list, so a future session can check itself against it.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Risk</th><th>Mechanism</th></tr></thead>
+        <tbody>
+          <tr><td>Two profiles, one person</td><td>Normalized <code>+98</code> mobile as the establishing anchor; salted national-ID hash as the second. Fuzzy name+phone check at signup.</td></tr>
+          <tr><td>A model per vertical</td><td>One spec tree as data. A bakery is a subtree.</td></tr>
+          <tr><td>A table per claim type</td><td>One assertion / verification pair for every claim in the system.</td></tr>
+          <tr><td>Access logic per field</td><td>One visibility policy table, read by one serializer.</td></tr>
+          <tr><td>A queue per staff activity</td><td>One <code>project.task</code> queue, staged by type.</td></tr>
+          <tr><td>A hand-written audit log</td><td><code>mail.tracking.value</code>, already there.</td></tr>
+          <tr><td>The standard restated inside an overlay</td><td>An overlay may only point at a node and add. Enforced, not asked for.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="iron">
+    <h2>Deployment: what Iran actually permits</h2>
+    <p>These are not preferences. Each one has already cost somebody a day.</p>
+    <ul class="plain">
+      <li><strong>Not Odoo.sh, not GCP.</strong> Your own ledger records the measurement: every Odoo.sh build host resolves to <code>35.241.236.166</code> and times out on both 22 and 443, while <code>odoo.com</code> answers in 0.20s. The platform address is blocked, not your egress. iKiKu is self-hosted, in-country or on a provider that answers from Iran.</li>
+      <li><strong>Self-host the fonts.</strong> Vazirmatn is SIL OFL — ship it with the assets. No production page should depend on <code>fonts.googleapis.com</code> resolving. <em>The two documents you are reading do use it, because they are hosted outside; the product must not.</em></li>
+      <li><strong>Audit Community for CDN references</strong> before launch — themes and map widgets reach for Google endpoints, and each one is a page that half-loads for an Iranian user with no error anyone will report.</li>
+      <li><strong>Video is not YouTube.</strong> <code>website_slides</code> embeds YouTube and Google Drive by default; both are unreliable or blocked here. Self-host, or embed Aparat and extend the slide type.</li>
+      <li><strong>OTP through an Iranian SMS gateway.</strong> Phone is your establishing anchor, so this is on the critical path for signup, not an integration for later.</li>
+    </ul>
+    <div class="note"><b>The manifest constrains hosting too.</b> <span class="fa">بند ۷</span> says the restricted class holds national IDs and future shift locations. That data should not sit on infrastructure whose operator can be compelled without you knowing. Where it lands is a founding decision, not an ops ticket.</div>
+  </section>
+
+  <section>
+    <h2>Phases</h2>
+    <p>My assumed boundary, since you have not set one. Move it and I will redraw.</p>
+
+    <div class="phase">
+      <div class="pn">01</div>
+      <div>
+        <h3>The loop that proves the idea</h3>
+        <p>Spec tree and hint-and-steer intake. Both Persian portals. The verification ledger and the public professional record. Availability, matching at the three-month horizon, publicly acknowledged bookings, and the pre-shift re-check with replacement. Public site listing open positions and public profiles.</p>
+        <p>One province, one city, one academy partner. This is enough to test whether businesses trust a verified stranger — which is the only question that matters.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="pn">02</div>
+      <div>
+        <h3>What makes it worth staying for</h3>
+        <p>Knowledge base and learning on <code>website_slides</code> + <code>survey</code>. Academy portal, cohorts, certification. The internal court with its full procedure. The call centre at scale. Season and demand analytics per province.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="pn">03</div>
+      <div>
+        <h3>Non-negotiables that must ship in phase 1 anyway</h3>
+        <p>Each of these is cheap now and either expensive or impossible later: the <strong>visibility classes</strong>, the <strong><code>dispute_id</code> column</strong>, the <strong>Jalali axis</strong>, the <strong>stored score components</strong>, and <strong>phone-based identity</strong>. Retrofitting any one of them means rewriting history you have already published — and the manifest forbids rewriting published history.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Built</h2>
+    <h3>Phase 1 is written, and not yet installed anywhere</h3>
+    <p>Six modules, 23 models, about 2,100 lines of Python and 1,900 of XML, all
+      depending only on LGPL-3 Odoo. Every module carries <code>'license': 'AGPL-3'</code>.</p>
+    <ul class="plain">
+      <li><strong>The calendar is verified.</strong> <code>jalali.py</code> is vendored and checked
+        against five known dates including Nowruz 1405 and 22 Bahman 1357, with a round-trip
+        assertion each way. It caught a real error: both published documents were dated
+        ۱۳ شهریور ۱۴۰۴ when today is ۱۲ شهریور ۱۴۰۵ — wrong day and wrong year. Corrected.</li>
+      <li><strong>What was NOT possible here.</strong> This machine has no PostgreSQL and no
+        <code>psycopg2</code> or <code>werkzeug</code>, so Odoo was never booted and the modules
+        have <em>never been installed</em>. What ran was <code>tools/validate.py</code> — manifest
+        files exist, ACLs resolve to declared models, every view field exists on the model of the
+        subview it sits in, no model lacks an ACL — plus <code>compileall</code> and an XML parse
+        of all 25 files. 0 errors, 0 warnings. That is not the same as a green install, and the
+        first <code>-i ikiku_portal</code> will find things the checker cannot.</li>
+      <li><strong>Fonts are not in the tree.</strong> <code>tools/fetch_fonts.sh</code> pulls
+        Vazirmatn from GitHub; it has not been run, because production must not depend on a CDN
+        answering from inside Iran and this environment should not be the one to fetch it.</li>
+      <li><strong>Set <code>ikiku.nid_salt</code> before any signup.</strong> Without it,
+        <code>hash_national_id</code> raises rather than falling back — a national ID must never be
+        stored under a guessable salt, and failing loudly is the only safe default.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Still open</h2>
+    <ul class="plain">
+      <li><strong>First province and first academy.</strong> Phase 1 is scoped to one of each, and
+        which one you pick decides which seasons matter first. The season table ships with Nowruz,
+        summer and Yalda computed, and Ramadan and Muharram deliberately unconfirmed.</li>
+      <li><strong>The MVP boundary itself</strong> — still my assumption, not your decision.</li>
+      <li><strong>The آیکی citation.</strong> The مرام‌نامه credits you for it rather than a
+        dictionary, because no reachable Yazdi glossary has it.</li>
+    </ul>
+  </section>
+
+  <div class="doc">
+    <span><b>Document</b> iKiKu build map</span>
+    <span><b>Version</b> 0.1 — draft</span>
+    <span><b>Date</b> 2026-09-03 / ۱۲ شهریور ۱۴۰۵</span>
+    <span><b>Basis</b> Odoo 19 Community, LGPL-3 modules only</span>
+    <span><b>Companion</b> <span class="fa">مرام‌نامهٔ ایکیکو</span> v0.1</span>
+  </div>
+</div>

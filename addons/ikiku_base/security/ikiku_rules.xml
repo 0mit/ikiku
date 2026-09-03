@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="0">
+
+    <!-- A resource sees the assertions about themselves and the ones they made.
+         Everything else about other people reaches them only through the public
+         record, which the portal serialises through the visibility policy. -->
+    <record id="rule_assertion_own" model="ir.rule">
+      <field name="name">ادعا: خودِ فرد و گویندهٔ ادعا</field>
+      <field name="model_id" ref="model_ikiku_assertion"/>
+      <field name="domain_force">['|', ('resource_id', '=', user.partner_id.id), ('asserted_by_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <record id="rule_assertion_staff" model="ir.rule">
+      <field name="name">ادعا: کارکنان پلتفرم همه را می‌بینند</field>
+      <field name="model_id" ref="model_ikiku_assertion"/>
+      <field name="domain_force">[(1, '=', 1)]</field>
+      <field name="groups" eval="[(4, ref('group_ikiku_staff'))]"/>
+    </record>
+
+    <record id="rule_verification_own" model="ir.rule">
+      <field name="name">راست‌آزمایی: رأیِ خود، یا رأی‌های عمومی</field>
+      <field name="model_id" ref="model_ikiku_verification"/>
+      <field name="domain_force">['|', ('verifier_id', '=', user.partner_id.id), ('is_public', '=', True)]</field>
+      <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <!-- بند ۴: a party to a case can always read their own case. -->
+    <record id="rule_dispute_party" model="ir.rule">
+      <field name="name">پرونده: طرفینِ پرونده</field>
+      <field name="model_id" ref="model_ikiku_dispute"/>
+      <field name="domain_force">['|', '|', ('opener_id', '=', user.partner_id.id), ('respondent_id', '=', user.partner_id.id), ('is_public', '=', True)]</field>
+      <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+    </record>
+
+    <record id="rule_overlay_own_business" model="ir.rule">
+      <field name="name">لایهٔ محلی: فقط کسب‌وکارِ خود</field>
+      <field name="model_id" ref="model_ikiku_spec_overlay"/>
+      <field name="domain_force">[('business_id', '=', user.partner_id.commercial_partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('group_ikiku_business'))]"/>
+    </record>
+
+  </data>
+</odoo>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_ikiku_proposal" name="پیشنهادها" parent="ikiku_base.menu_ikiku_root"
+            action="action_proposal" sequence="8"/>
+  <menuitem id="menu_ikiku_booking" name="گمارش‌ها" parent="ikiku_base.menu_ikiku_root"
+            action="action_booking" sequence="9"/>
+</odoo>

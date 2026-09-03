@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_ikiku_resource" name="نیروها" parent="ikiku_base.menu_ikiku_root"
+            action="action_resource" sequence="5"/>
+</odoo>

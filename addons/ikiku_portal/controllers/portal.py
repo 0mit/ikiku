@@ -1,0 +1,207 @@
+# Part of iKiKu. Licensed under AGPL-3.0.
+"""Hint and steer, one question per screen.
+
+Three rules, applied on both sides of the portal:
+  1. Never a bare free-text field. Free text is always followed by a resolution
+     step where the system PROPOSES standard nodes and the person confirms.
+  2. The remainder is kept. Whatever does not resolve is written to
+     ikiku.spec.candidate verbatim, never dropped to make a form validate.
+  3. Six screens maximum. These users are on phones, often mid-shift.
+"""
+from odoo import http
+from odoo.http import request
+
+from odoo.addons.ikiku_base.models.jalali import jalali_to_gregorian
+
+
+def _parse_jalali(value):
+    """Portal input is Jalali; storage is Gregorian. Convert at the boundary."""
+    if not value:
+        return False
+    parts = value.replace('-', '/').split('/')
+    if len(parts) != 3:
+        return False
+    try:
+        jy, jm, jd = (int(p) for p in parts)
+        gy, gm, gd = jalali_to_gregorian(jy, jm, jd)
+        return '%04d-%02d-%02d' % (gy, gm, gd)
+    except (ValueError, IndexError):
+        return False
+
+
+class IkikuPortal(http.Controller):
+
+    # ------------------------------------------------------------- resources
+    @http.route('/ikiku/join', type='http', auth='user', website=True, sitemap=False)
+    def join(self, **kw):
+        partner = request.env.user.partner_id
+        resource = request.env['ikiku.resource'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        return request.render('ikiku_portal.resource_intake', {
+            'resource': resource,
+            'partner': partner,
+            'provinces': request.env['ikiku.province'].sudo().search([]),
+            'step': kw.get('step', '1'),
+        })
+
+    @http.route('/ikiku/join/submit', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def join_submit(self, **post):
+        partner = request.env.user.partner_id
+        Resource = request.env['ikiku.resource'].sudo()
+        if post.get('mobile'):
+            partner.sudo().ikiku_mobile = partner.normalise_mobile(post['mobile'])
+        partner.sudo().write({
+            'ikiku_province_id': int(post['province_id']) if post.get('province_id') else False,
+            'ikiku_city': post.get('city'),
+        })
+        resource = Resource.search([('partner_id', '=', partner.id)], limit=1)
+        vals = {'headline': post.get('headline'), 'bio': post.get('bio')}
+        if resource:
+            resource.write(vals)
+        else:
+            vals['partner_id'] = partner.id
+            resource = Resource.create(vals)
+        request.env.user.sudo().groups_id = [
+            (4, request.env.ref('ikiku_base.group_ikiku_resource').id)]
+        return request.redirect('/ikiku/join/skills')
+
+    @http.route('/ikiku/join/skills', type='http', auth='user', website=True, sitemap=False)
+    def join_skills(self, **kw):
+        partner = request.env.user.partner_id
+        resource = request.env['ikiku.resource'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        raw = kw.get('raw', '')
+        proposals = request.env['ikiku.spec.node'].sudo().resolve_text(raw) if raw \
+            else request.env['ikiku.spec.node'].sudo().browse()
+        return request.render('ikiku_portal.resource_skills', {
+            'resource': resource, 'raw': raw, 'proposals': proposals,
+            'families': request.env['ikiku.spec.node'].sudo().search(
+                [('kind', '=', 'competency')]),
+        })
+
+    @http.route('/ikiku/join/skills/confirm', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def join_skills_confirm(self, **post):
+        partner = request.env.user.partner_id
+        resource = request.env['ikiku.resource'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        raw = (post.get('raw') or '').strip()
+        node_id = int(post['node_id']) if post.get('node_id') else False
+        if node_id:
+            node = request.env['ikiku.spec.node'].sudo().browse(node_id)
+            resource.sudo().claim_skill(node)
+            # Rule 2: if the tree did not propose what they picked, the words
+            # they used are new information about how people actually speak.
+            proposed = request.env['ikiku.spec.node'].sudo().resolve_text(raw)
+            if raw and node not in proposed:
+                request.env['ikiku.spec.candidate'].sudo().record(
+                    raw, partner=partner, source='ikiku.resource', res_id=resource.id)
+        elif raw:
+            # Nothing matched at all. Keep it anyway -- this is exactly the
+            # signal the standard needs in order to grow.
+            request.env['ikiku.spec.candidate'].sudo().record(
+                raw, partner=partner, source='ikiku.resource', res_id=resource.id)
+        return request.redirect('/ikiku/join/availability')
+
+    @http.route('/ikiku/join/availability', type='http', auth='user', website=True,
+                sitemap=False)
+    def join_availability(self, **kw):
+        partner = request.env.user.partner_id
+        resource = request.env['ikiku.resource'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        return request.render('ikiku_portal.resource_availability', {
+            'resource': resource,
+            'provinces': request.env['ikiku.province'].sudo().search([]),
+        })
+
+    @http.route('/ikiku/join/availability/save', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def join_availability_save(self, **post):
+        partner = request.env.user.partner_id
+        resource = request.env['ikiku.resource'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        start, end = _parse_jalali(post.get('date_start')), _parse_jalali(post.get('date_end'))
+        if start and end:
+            request.env['ikiku.availability'].sudo().create({
+                'resource_id': resource.id,
+                'date_start': start, 'date_end': end,
+                'province_id': int(post['province_id']),
+                'city': post.get('city'),
+                'can_relocate': bool(post.get('can_relocate')),
+                'hours_per_week': int(post.get('hours_per_week') or 40),
+            })
+        if resource.state == 'draft' and resource.skill_ids or resource.assertion_ids:
+            resource.sudo().state = 'submitted'
+        return request.redirect('/ikiku/me')
+
+    @http.route('/ikiku/me', type='http', auth='user', website=True, sitemap=False)
+    def me(self, **kw):
+        partner = request.env.user.partner_id
+        resource = request.env['ikiku.resource'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        bookings = request.env['ikiku.booking'].sudo().search(
+            [('resource_id', '=', resource.id)]) if resource else []
+        return request.render('ikiku_portal.resource_home', {
+            'resource': resource, 'bookings': bookings})
+
+    # ------------------------------------------------------------ businesses
+    @http.route('/ikiku/business/position/new', type='http', auth='user', website=True,
+                sitemap=False)
+    def position_new(self, **kw):
+        raw = kw.get('raw', '')
+        proposals = request.env['ikiku.spec.node'].sudo().resolve_text(raw) if raw \
+            else request.env['ikiku.spec.node'].sudo().browse()
+        return request.render('ikiku_portal.business_position', {
+            'raw': raw, 'proposals': proposals,
+            'all_nodes': request.env['ikiku.spec.node'].sudo().search(
+                [('kind', 'in', ('competency', 'family'))]),
+        })
+
+    @http.route('/ikiku/business/position/save', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def position_save(self, **post):
+        partner = request.env.user.partner_id.commercial_partner_id
+        business = request.env['ikiku.business'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        if not business:
+            business = request.env['ikiku.business'].sudo().create({'partner_id': partner.id})
+            request.env.user.sudo().groups_id = [
+                (4, request.env.ref('ikiku_base.group_ikiku_business').id)]
+        node = request.env['ikiku.spec.node'].sudo().browse(int(post['node_id']))
+        request.env['ikiku.position'].sudo().steer(
+            business, post.get('raw') or node.name, chosen_node=node)
+        return request.redirect('/ikiku/business')
+
+    @http.route('/ikiku/business', type='http', auth='user', website=True, sitemap=False)
+    def business_home(self, **kw):
+        partner = request.env.user.partner_id.commercial_partner_id
+        business = request.env['ikiku.business'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        demands = request.env['ikiku.demand'].sudo().search(
+            [('business_id', '=', business.id)]) if business else []
+        return request.render('ikiku_portal.business_home', {
+            'business': business, 'demands': demands,
+            'provinces': request.env['ikiku.province'].sudo().search([]),
+        })
+
+    @http.route('/ikiku/business/demand/save', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def demand_save(self, **post):
+        partner = request.env.user.partner_id.commercial_partner_id
+        business = request.env['ikiku.business'].sudo().search(
+            [('partner_id', '=', partner.id)], limit=1)
+        start, end = _parse_jalali(post.get('date_start')), _parse_jalali(post.get('date_end'))
+        if business and start and end:
+            demand = request.env['ikiku.demand'].sudo().create({
+                'business_id': business.id,
+                'position_id': int(post['position_id']),
+                'seats': int(post.get('seats') or 1),
+                'date_start': start, 'date_end': end,
+                'province_id': int(post['province_id']),
+                'city': post.get('city'),
+                'note': post.get('note'),
+                'state': 'open',
+            })
+            request.env['ikiku.proposal'].sudo().build_for_demand(demand)
+        return request.redirect('/ikiku/business')

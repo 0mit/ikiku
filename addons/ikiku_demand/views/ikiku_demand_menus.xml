@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_ikiku_business" name="کسب‌وکارها" parent="ikiku_base.menu_ikiku_root"
+            action="action_business" sequence="6"/>
+  <menuitem id="menu_ikiku_demand" name="نیازها" parent="ikiku_base.menu_ikiku_root"
+            action="action_demand" sequence="7"/>
+</odoo>

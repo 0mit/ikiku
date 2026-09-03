@@ -1,0 +1,24 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_province_all,province all,model_ikiku_province,base.group_user,1,0,0,0
+access_province_master,province master,model_ikiku_province,group_ikiku_master,1,1,1,1
+access_province_portal,province portal,model_ikiku_province,base.group_portal,1,0,0,0
+access_season_all,season all,model_ikiku_season,base.group_user,1,0,0,0
+access_season_master,season master,model_ikiku_season,group_ikiku_master,1,1,1,1
+access_season_window_all,season window all,model_ikiku_season_window,base.group_user,1,0,0,0
+access_season_window_staff,season window staff,model_ikiku_season_window,group_ikiku_staff,1,1,1,1
+access_spec_node_portal,spec node portal,model_ikiku_spec_node,base.group_portal,1,0,0,0
+access_spec_node_user,spec node user,model_ikiku_spec_node,base.group_user,1,0,0,0
+access_spec_node_master,spec node master,model_ikiku_spec_node,group_ikiku_master,1,1,1,1
+access_spec_overlay_business,spec overlay business,model_ikiku_spec_overlay,group_ikiku_business,1,1,1,1
+access_spec_overlay_staff,spec overlay staff,model_ikiku_spec_overlay,group_ikiku_staff,1,1,1,1
+access_spec_candidate_portal,spec candidate portal,model_ikiku_spec_candidate,base.group_portal,1,0,1,0
+access_spec_candidate_staff,spec candidate staff,model_ikiku_spec_candidate,group_ikiku_staff,1,1,1,0
+access_spec_candidate_master,spec candidate master,model_ikiku_spec_candidate,group_ikiku_master,1,1,1,1
+access_visibility_policy_user,visibility policy user,model_ikiku_visibility_policy,base.group_user,1,0,0,0
+access_visibility_policy_master,visibility policy master,model_ikiku_visibility_policy,group_ikiku_master,1,1,1,1
+access_assertion_portal,assertion portal,model_ikiku_assertion,base.group_portal,1,0,1,0
+access_assertion_staff,assertion staff,model_ikiku_assertion,group_ikiku_staff,1,1,1,0
+access_verification_portal,verification portal,model_ikiku_verification,base.group_portal,1,0,1,0
+access_verification_staff,verification staff,model_ikiku_verification,group_ikiku_staff,1,1,1,0
+access_dispute_portal,dispute portal,model_ikiku_dispute,base.group_portal,1,1,1,0
+access_dispute_staff,dispute staff,model_ikiku_dispute,group_ikiku_staff,1,1,1,0

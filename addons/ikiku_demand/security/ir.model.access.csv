@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_business_portal,business portal,model_ikiku_business,base.group_portal,1,1,1,0
+access_business_staff,business staff,model_ikiku_business,ikiku_base.group_ikiku_staff,1,1,1,0
+access_position_portal,position portal,model_ikiku_position,base.group_portal,1,1,1,1
+access_position_staff,position staff,model_ikiku_position,ikiku_base.group_ikiku_staff,1,1,1,0
+access_demand_portal,demand portal,model_ikiku_demand,base.group_portal,1,1,1,1
+access_demand_staff,demand staff,model_ikiku_demand,ikiku_base.group_ikiku_staff,1,1,1,0
+access_demand_resource,demand read for resources,model_ikiku_demand,ikiku_base.group_ikiku_resource,1,0,0,0

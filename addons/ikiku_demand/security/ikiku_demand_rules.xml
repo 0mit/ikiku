@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="0">
+    <record id="rule_business_own" model="ir.rule">
+      <field name="name">کسب‌وکار: پروندهٔ خود</field>
+      <field name="model_id" ref="model_ikiku_business"/>
+      <field name="domain_force">[('partner_id', '=', user.partner_id.commercial_partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
+    </record>
+    <record id="rule_position_own" model="ir.rule">
+      <field name="name">جایگاه: فقط کسب‌وکارِ خود</field>
+      <field name="model_id" ref="model_ikiku_position"/>
+      <field name="domain_force">[('business_id.partner_id', '=', user.partner_id.commercial_partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
+    </record>
+    <record id="rule_demand_own" model="ir.rule">
+      <field name="name">اعلام نیاز: فقط کسب‌وکارِ خود</field>
+      <field name="model_id" ref="model_ikiku_demand"/>
+      <field name="domain_force">[('business_id.partner_id', '=', user.partner_id.commercial_partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
+    </record>
+    <!-- Open positions are public by design: the manifest publishes the work,
+         not the worker's calendar. -->
+    <record id="rule_demand_open_for_resources" model="ir.rule">
+      <field name="name">اعلام نیاز: نیروها فقط نیازهای باز را می‌بینند</field>
+      <field name="model_id" ref="model_ikiku_demand"/>
+      <field name="domain_force">[('state', 'in', ('open', 'proposed'))]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
+  </data>
+</odoo>

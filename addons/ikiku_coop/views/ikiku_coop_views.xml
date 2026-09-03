@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_cost_period_form" model="ir.ui.view">
+    <field name="name">ikiku.cost.period.form</field>
+    <field name="model">ikiku.cost.period</field>
+    <field name="arch" type="xml">
+      <form string="دورهٔ هزینه">
+        <header>
+          <button name="action_allocate" type="object" string="تقسیم میان کسب‌وکارها"
+                  class="btn-primary" invisible="state == 'closed'"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <div class="oe_title"><h1><field name="name"/></h1></div>
+          <div class="alert alert-info" role="alert">
+            ایکیکو از فاصلهٔ میان کارگر و کارفرما نان نمی‌خورد. آنچه اینجا تقسیم می‌شود
+            هزینهٔ واقعیِ اداره‌کردنِ پلتفرم است — بر پایهٔ روز-نفر، که از همان
+            گمارش‌های عمومی قابلِ شمردن است.
+          </div>
+          <group>
+            <group>
+              <field name="date_start"/><field name="date_start_fa"/>
+              <field name="date_end"/><field name="date_end_fa"/>
+              <field name="currency_id"/>
+              <field name="total_cost"/>
+            </group>
+            <group>
+              <field name="total_person_days" readonly="1"/>
+              <field name="business_count" readonly="1"/>
+              <field name="rate_per_person_day" readonly="1"/>
+              <field name="previous_period_id" readonly="1"/>
+              <field name="rate_change_pct" readonly="1"
+                     help="منفی یعنی سهمِ هر روز-نفر نسبت به دورهٔ پیش کمتر شده."/>
+              <field name="is_public"/>
+            </group>
+          </group>
+          <field name="cost_note" placeholder="ریزِ هزینه‌ها: میزبانی، مرکز تماس، ..."/>
+          <field name="share_ids">
+            <list decoration-success="paid">
+              <field name="business_id"/><field name="person_days"/>
+              <field name="share_pct"/><field name="amount"/><field name="paid"/>
+            </list>
+          </field>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="view_cost_period_list" model="ir.ui.view">
+    <field name="name">ikiku.cost.period.list</field>
+    <field name="model">ikiku.cost.period</field>
+    <field name="arch" type="xml">
+      <list string="دوره‌های هزینه" decoration-success="rate_change_pct &lt; 0">
+        <field name="name"/><field name="date_start_fa" string="از"/>
+        <field name="date_end_fa" string="تا"/><field name="total_cost"/>
+        <field name="total_person_days"/><field name="business_count"/>
+        <field name="rate_per_person_day"/><field name="rate_change_pct"/>
+        <field name="state"/><field name="currency_id" column_invisible="1"/>
+      </list>
+    </field>
+  </record>
+  <record id="action_cost_period" model="ir.actions.act_window">
+    <field name="name">هزینهٔ مشترک</field>
+    <field name="res_model">ikiku.cost.period</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <menuitem id="menu_ikiku_coop" name="هزینهٔ مشترک" parent="ikiku_base.menu_ikiku_root"
+            action="action_cost_period" sequence="40"/>
+</odoo>

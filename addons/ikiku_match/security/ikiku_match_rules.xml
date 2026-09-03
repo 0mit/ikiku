@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="0">
+    <record id="rule_proposal_business" model="ir.rule">
+      <field name="name">پیشنهاد: کسب‌وکارِ صاحبِ نیاز</field>
+      <field name="model_id" ref="model_ikiku_proposal"/>
+      <field name="domain_force">[('demand_id.business_id.partner_id', '=', user.partner_id.commercial_partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
+    </record>
+    <record id="rule_proposal_resource" model="ir.rule">
+      <field name="name">پیشنهاد: نیرو پیشنهادهای خودش را می‌بیند</field>
+      <field name="model_id" ref="model_ikiku_proposal"/>
+      <field name="domain_force">[('resource_id.partner_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
+    <record id="rule_booking_business" model="ir.rule">
+      <field name="name">گمارش: کارفرما</field>
+      <field name="model_id" ref="model_ikiku_booking"/>
+      <field name="domain_force">[('employer_business_id.partner_id', '=', user.partner_id.commercial_partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
+    </record>
+    <record id="rule_booking_resource" model="ir.rule">
+      <field name="name">گمارش: نیرو</field>
+      <field name="model_id" ref="model_ikiku_booking"/>
+      <field name="domain_force">[('resource_id.partner_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
+  </data>
+</odoo>

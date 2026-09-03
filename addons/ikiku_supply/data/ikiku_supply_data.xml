@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <record id="vis_resource_name" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">name</field>
+      <field name="visibility">public</field>
+      <field name="reason">بند ۲: آبرو به نامِ خودِ فرد نوشته می‌شود.</field>
+    </record>
+    <record id="vis_resource_headline" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">headline</field>
+      <field name="visibility">public</field>
+      <field name="reason">معرفیِ حرفه‌ای.</field>
+    </record>
+    <record id="vis_resource_province" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">province_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">استان لازمهٔ یافتنِ کار است؛ نشانی نیست.</field>
+    </record>
+    <record id="vis_resource_standing" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">standing</field>
+      <field name="visibility">public</field>
+      <field name="reason">بند ۸: عدد بدونِ راهِ رسیدن به آن نمایش داده نمی‌شود.</field>
+    </record>
+    <record id="vis_resource_verified" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">is_verified</field>
+      <field name="visibility">public</field>
+      <field name="reason">وضعیتِ تأیید خودش واقعیتی عمومی است.</field>
+    </record>
+    <record id="vis_resource_avail" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">availability_ids</field>
+      <field name="visibility">counterparty</field>
+      <field name="reason">بند ۷: برنامهٔ زمانی عمومی نیست. فقط کسب‌وکارِ تأییدشده.</field>
+    </record>
+    <record id="vis_resource_partner" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">partner_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">رکوردِ شخص، راهِ رسیدن به تماس و نشانی است.</field>
+    </record>
+  </data>
+</odoo>

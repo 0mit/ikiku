@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cost_period_portal,cost period portal,model_ikiku_cost_period,base.group_portal,1,0,0,0
+access_cost_period_staff,cost period staff,model_ikiku_cost_period,ikiku_base.group_ikiku_staff,1,1,1,0
+access_cost_share_portal,cost share portal,model_ikiku_cost_share,base.group_portal,1,0,0,0
+access_cost_share_staff,cost share staff,model_ikiku_cost_share,ikiku_base.group_ikiku_staff,1,1,1,1

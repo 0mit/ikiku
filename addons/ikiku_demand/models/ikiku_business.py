@@ -1,0 +1,110 @@
+# Part of iKiKu. Licensed under AGPL-3.0.
+"""The business: the employer, and the owner of its own overlay.
+
+A position is NOT a free-form job ad. It is an overlay: it must resolve to one
+node of the standard tree, and whatever the owner said that did not resolve is
+kept verbatim as a candidate. That is the whole generalisation engine, and it
+runs on real hiring rather than on a taxonomy meeting.
+"""
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
+
+
+class IkikuBusiness(models.Model):
+    _name = 'ikiku.business'
+    _description = "کسب‌وکار"
+    _inherit = ['mail.thread', 'ikiku.publishable']
+    _order = 'name'
+
+    partner_id = fields.Many2one('res.partner', string="شخصیت حقوقی", required=True,
+                                 ondelete='restrict', index=True, tracking=True)
+    name = fields.Char(related='partner_id.name', store=True, readonly=False, string="نام")
+    slug = fields.Char("نشانیِ عمومی", copy=False, index=True)
+    province_id = fields.Many2one(related='partner_id.ikiku_province_id',
+                                  store=True, readonly=False, string="استان")
+    city = fields.Char(related='partner_id.ikiku_city', store=True, readonly=False, string="شهر")
+    kind = fields.Selection([
+        ('cafe', "کافه"), ('restaurant', "رستوران"),
+        ('bakery', "نانوایی/قنادی"), ('other', "دیگر"),
+    ], string="نوع", default='cafe', required=True)
+    seats = fields.Integer("ظرفیت سالن")
+    is_verified = fields.Boolean(related='partner_id.ikiku_is_verified', store=True,
+                                 string="تأییدشده")
+    state = fields.Selection([
+        ('draft', "پیش‌نویس"), ('active', "فعال"), ('suspended', "معلق"),
+    ], default='draft', required=True, tracking=True, string="وضعیت")
+    position_ids = fields.One2many('ikiku.position', 'business_id', string="جایگاه‌ها")
+    overlay_ids = fields.One2many('ikiku.spec.overlay', 'business_id', string="لایه‌های محلی")
+
+    _partner_uniq = models.Constraint('UNIQUE(partner_id)', "برای هر کسب‌وکار یک پرونده.")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        for rec in records:
+            if not rec.slug:
+                rec.slug = 'b-%d' % rec.id
+        return records
+
+
+class IkikuPosition(models.Model):
+    _name = 'ikiku.position'
+    _description = "جایگاه شغلی"
+    _order = 'business_id, name'
+
+    name = fields.Char("عنوانِ محلی", required=True,
+                       help="هرچه خودتان می‌نامیدش. تغییرش نمی‌دهیم.")
+    business_id = fields.Many2one('ikiku.business', required=True, ondelete='cascade',
+                                  index=True, string="کسب‌وکار")
+    spec_node_id = fields.Many2one(
+        'ikiku.spec.node', string="گرهٔ استاندارد", required=True,
+        domain="[('kind', 'in', ('competency', 'family'))]",
+        help="این جایگاه به کدام مهارتِ استاندارد می‌رسد؟ بدون آن، نیرویی که "
+             "جای دیگری آموزش دیده نمی‌فهمد این کار چیست.")
+    raw_request = fields.Text("آنچه نوشتید",
+                              help="متنِ آزادِ اولیه. نگه داشته می‌شود تا اگر استاندارد "
+                                   "چیزی را از دست داده باشد، پیدا شود.")
+    candidate_id = fields.Many2one('ikiku.spec.candidate', string="نامزدِ استاندارد",
+                                   readonly=True)
+    overlay_id = fields.Many2one('ikiku.spec.overlay', string="لایهٔ محلی")
+    required_node_ids = fields.Many2many(
+        'ikiku.spec.node', 'ikiku_position_required_rel', 'position_id', 'node_id',
+        string="مهارت‌های الزامی")
+    nice_node_ids = fields.Many2many(
+        'ikiku.spec.node', 'ikiku_position_nice_rel', 'position_id', 'node_id',
+        string="مهارت‌های مطلوب")
+    active = fields.Boolean(default=True)
+
+    @api.constrains('required_node_ids', 'nice_node_ids')
+    def _check_no_double_listing(self):
+        for rec in self:
+            both = rec.required_node_ids & rec.nice_node_ids
+            if both:
+                raise ValidationError(
+                    "یک مهارت نمی‌تواند هم الزامی باشد هم مطلوب: %s"
+                    % ', '.join(both.mapped('name')))
+
+    @api.model
+    def steer(self, business, raw_text, chosen_node=None):
+        """Hint and steer. Ask in their language, store in ours.
+
+        The person types freely; we PROPOSE standard nodes; they confirm. What
+        does not resolve is recorded as a candidate rather than discarded, so
+        the standard can grow toward what businesses actually say.
+        """
+        Node = self.env['ikiku.spec.node']
+        proposals = Node.resolve_text(raw_text)
+        if chosen_node is None:
+            return {'proposals': proposals, 'raw': raw_text}
+        position = self.create({
+            'name': raw_text[:64],
+            'business_id': business.id,
+            'spec_node_id': chosen_node.id,
+            'raw_request': raw_text,
+        })
+        if chosen_node not in proposals:
+            # The tree did not see this coming. Keep the words.
+            position.candidate_id = self.env['ikiku.spec.candidate'].record(
+                raw_text, business=business.partner_id,
+                source='ikiku.position', res_id=position.id)
+        return position

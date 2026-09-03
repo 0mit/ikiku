@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <!-- Helpdesk is OEEL-1. The call centre is a Community project instead. -->
+    <record id="project_call_centre" model="project.project">
+      <field name="name">مرکز تماسِ ایکیکو</field>
+      <field name="description">صفِ راست‌آزمایی و بازبینیِ پیش از شروع.</field>
+    </record>
+  </data>
+</odoo>

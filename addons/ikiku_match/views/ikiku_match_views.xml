@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_proposal_list" model="ir.ui.view">
+    <field name="name">ikiku.proposal.list</field>
+    <field name="model">ikiku.proposal</field>
+    <field name="arch" type="xml">
+      <list string="پیشنهادها" default_order="score_total desc">
+        <field name="demand_id"/><field name="resource_id"/>
+        <field name="score_competency"/><field name="score_history"/>
+        <field name="score_standing"/><field name="score_proximity"/>
+        <field name="score_season"/><field name="score_total"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_proposal_form" model="ir.ui.view">
+    <field name="name">ikiku.proposal.form</field>
+    <field name="model">ikiku.proposal</field>
+    <field name="arch" type="xml">
+      <form string="پیشنهاد">
+        <header>
+          <button name="action_accept" type="object" string="پذیرش و ثبتِ گمارش"
+                  class="btn-primary" invisible="state != 'proposed'"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <group>
+            <group><field name="demand_id"/><field name="resource_id"/>
+                   <field name="availability_id"/></group>
+            <group><field name="score_total" readonly="1"/></group>
+          </group>
+          <separator string="چگونه به این عدد رسیدیم"/>
+          <div class="alert alert-info" role="alert">
+            هیچ فرمولِ پنهانی در کار نیست. وزن‌ها ثابت و اعلام‌شده‌اند و هر جزء
+            روی همین رکورد ذخیره شده است.
+          </div>
+          <field name="explanation" readonly="1" widget="text"/>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_proposal" model="ir.actions.act_window">
+    <field name="name">پیشنهادها</field>
+    <field name="res_model">ikiku.proposal</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="view_booking_list" model="ir.ui.view">
+    <field name="name">ikiku.booking.list</field>
+    <field name="model">ikiku.booking</field>
+    <field name="arch" type="xml">
+      <list string="گمارش‌ها" decoration-danger="state in ('at_risk','cancelled')"
+            decoration-success="state == 'done'">
+        <field name="public_ref"/><field name="resource_id"/>
+        <field name="employer_business_id"/>
+        <field name="date_start_fa" string="از"/><field name="date_end_fa" string="تا"/>
+        <field name="province_id"/><field name="venue_disclosed"/><field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_booking_form" model="ir.ui.view">
+    <field name="name">ikiku.booking.form</field>
+    <field name="model">ikiku.booking</field>
+    <field name="arch" type="xml">
+      <form string="گمارش">
+        <header><field name="state" widget="statusbar"/></header>
+        <sheet>
+          <div class="oe_title"><h1><field name="public_ref" readonly="1"/></h1></div>
+          <div class="alert alert-info" role="alert">
+            بند ۷ — تعهد از همین لحظه عمومی است؛ محلِ کار تا آغازِ کار عمومی نیست،
+            مگر هر دو طرف بخواهند. لغو هم همان لحظه عمومی می‌شود.
+          </div>
+          <group>
+            <group>
+              <field name="resource_id"/><field name="employer_business_id"/>
+              <field name="demand_id"/><field name="proposal_id"/>
+            </group>
+            <group>
+              <field name="date_start_fa"/><field name="date_end_fa"/>
+              <field name="province_id"/>
+              <field name="venue_public"/>
+              <field name="venue_disclosed" readonly="1"/>
+              <field name="published_on" readonly="1"/>
+            </group>
+          </group>
+          <field name="cancel_reason" invisible="state != 'cancelled'" readonly="1"/>
+          <notebook>
+            <page string="بازبینی‌ها">
+              <field name="check_ids">
+                <list editable="bottom" decoration-danger="state == 'failed'">
+                  <field name="checkpoint"/><field name="due_date"/>
+                  <field name="state"/><field name="note"/><field name="task_id"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="action_booking" model="ir.actions.act_window">
+    <field name="name">گمارش‌ها</field>
+    <field name="res_model">ikiku.booking</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

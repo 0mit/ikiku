@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_ikiku_root" name="ایکیکو" sequence="10"
+            web_icon="ikiku_base,static/description/icon.png"/>
+
+  <menuitem id="menu_ikiku_ledger" name="دفتر" parent="menu_ikiku_root" sequence="20"/>
+  <menuitem id="menu_ikiku_assertion" parent="menu_ikiku_ledger"
+            action="action_assertion" sequence="10"/>
+  <menuitem id="menu_ikiku_dispute" parent="menu_ikiku_ledger"
+            action="action_dispute" sequence="20"/>
+
+  <menuitem id="menu_ikiku_standard" name="استاندارد" parent="menu_ikiku_root" sequence="30"
+            groups="ikiku_base.group_ikiku_staff"/>
+  <menuitem id="menu_ikiku_spec_node" parent="menu_ikiku_standard"
+            action="action_spec_node" sequence="10"/>
+  <menuitem id="menu_ikiku_spec_candidate" parent="menu_ikiku_standard"
+            action="action_spec_candidate" sequence="20"/>
+
+  <menuitem id="menu_ikiku_config" name="پیکربندی" parent="menu_ikiku_root" sequence="90"
+            groups="ikiku_base.group_ikiku_master"/>
+  <menuitem id="menu_ikiku_province" parent="menu_ikiku_config"
+            action="action_province" sequence="10"/>
+  <menuitem id="menu_ikiku_season" parent="menu_ikiku_config"
+            action="action_season" sequence="20"/>
+  <menuitem id="menu_ikiku_visibility" parent="menu_ikiku_config"
+            action="action_visibility_policy" sequence="30"/>
+</odoo>
