@@ -6,7 +6,7 @@
     'category': 'Website',
     'version': '19.0.0.1.0',
     'license': 'AGPL-3',
-    'depends': ['ikiku_match', 'website', 'portal'],
+    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal'],
     'data': [
         'views/ikiku_portal_templates.xml',
         'views/ikiku_public_templates.xml',
