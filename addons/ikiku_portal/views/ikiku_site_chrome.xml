@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- Odoo's default footer is placeholder copy ("We are a team of passionate people…",
+       a +1 555 phone, info@yourcompany). Replaced whole, not patched. -->
+  <template id="footer" inherit_id="website.footer_custom" name="ایکیکو — پانوشت">
+    <xpath expr="//div[@id='footer']" position="replace">
+      <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+        <section class="ikiku ikiku__footer">
+          <div class="ikiku__wide ikiku__footer-grid">
+            <div>
+              <h5>ایکیکو</h5>
+              <p>آیکی؟ کو؟ — نیروی حرفه‌ایِ کافه و رستوران و کسب‌وکارها، پیش از موعد و با
+                تعهدِ آشکار، به هم می‌رسند.</p>
+            </div>
+            <div>
+              <h5>ورود</h5>
+              <ul class="list-unstyled">
+                <li><a href="/ikiku/ki">کی؟ — برای نیروی کار</a></li>
+                <li><a href="/ikiku/ku">کو؟ — برای کسب‌وکار</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5>در روشنایی</h5>
+              <ul class="list-unstyled">
+                <li><a href="/ikiku/manifest">مرام‌نامه</a></li>
+                <li><a href="/ikiku/jobs">کارهای باز</a></li>
+                <li><a href="/ikiku/bookings">دفترِ عمومیِ تعهدها</a></li>
+                <li><a href="/ikiku/costs">هزینهٔ مشترک</a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </xpath>
+  </template>
+
+  <!-- The header's "text element" is a +1 555 placeholder phone in every variant. iKiKu
+       publishes no phone number, so the element is removed rather than filled in. -->
+  <template id="header_text_element" inherit_id="website.header_text_element" name="ایکیکو — بدونِ تلفنِ نمونه">
+    <xpath expr="//li" position="replace"/>
+  </template>
+
+  <!-- The header button led to /contactus, whose form mails a company address that does
+       not exist. It leads to the two doors instead. The classes stay: the primary views
+       header_call_to_action_large and _sidebar address the link by oe_unremovable. -->
+  <template id="header_call_to_action" inherit_id="website.header_call_to_action" name="ایکیکو — دکمهٔ پیوستن">
+    <xpath expr="//a[hasclass('btn_cta')]" position="replace">
+      <a href="/#ikiku-doors" class="oe_unremovable btn btn-primary btn_cta">پیوستن</a>
+    </xpath>
+  </template>
+
+  <!-- website.footer_copyright_company_name (priority 15) prints the literal words
+       "Company name"; this runs after it. بندِ ۱۰: the code is open. -->
+  <template id="footer_copyright" inherit_id="website.layout" priority="20" name="ایکیکو — حقِ نشر">
+    <xpath expr="//footer//span[hasclass('o_footer_copyright_name')]" position="replace">
+      <span class="o_footer_copyright_name me-2 small"><t t-out="res_company.name"/> · کدِ باز، AGPL-3</span>
+    </xpath>
+  </template>
+
+</odoo>

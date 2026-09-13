@@ -6,10 +6,13 @@
     'category': 'Website',
     'version': '19.0.0.1.0',
     'license': 'AGPL-3',
-    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal'],
+    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal', 'auth_signup'],
     'data': [
         'views/ikiku_portal_templates.xml',
         'views/ikiku_public_templates.xml',
+        'views/ikiku_site_templates.xml',
+        'views/ikiku_site_chrome.xml',
+        'data/ikiku_site_data.xml',
     ],
     'assets': {
         'web.assets_frontend': [

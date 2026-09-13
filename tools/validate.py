@@ -157,9 +157,23 @@ def check_view_fields(models):
                 _walk(arch, model, models, "%s/%s" % (mod, fn))
 
 
+def check_manifest_copy():
+    """The site publishes addons/ikiku_portal/data/MANIFEST.fa.md, because the container
+    only mounts addons/. It must be the law in docs/ byte for byte, or the site would
+    publish a مرام‌نامه that is not the مرام‌نامه."""
+    law = os.path.join(ROOT, '..', 'docs', 'MANIFEST.fa.md')
+    copy = os.path.join(ROOT, 'ikiku_portal', 'data', 'MANIFEST.fa.md')
+    if not os.path.isfile(copy):
+        errors.append("ikiku_portal: data/MANIFEST.fa.md is missing")
+    elif open(law, 'rb').read() != open(copy, 'rb').read():
+        errors.append("ikiku_portal: data/MANIFEST.fa.md differs from docs/MANIFEST.fa.md -- "
+                      "cp docs/MANIFEST.fa.md addons/ikiku_portal/data/MANIFEST.fa.md")
+
+
 def main():
     models = collect_models()
     check_manifest_files()
+    check_manifest_copy()
     check_acls(models)
     check_view_fields(models)
     print("models declared: %d" % len([m for m in models if m.startswith('ikiku.')]))

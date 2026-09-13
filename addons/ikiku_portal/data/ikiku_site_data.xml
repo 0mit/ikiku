@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- NOT noupdate on purpose: runs on install and on every -u, and is idempotent.
+       Opens signup, sets the iKiKu menus, replaces Odoo's placeholder company name. -->
+  <function model="website" name="_ikiku_setup_site"/>
+</odoo>

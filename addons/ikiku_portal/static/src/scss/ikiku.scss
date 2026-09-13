@@ -74,4 +74,44 @@
        color: var(--ik-ink-2); border-bottom: 1px solid var(--ik-rule);
        padding: 0 .5rem .5rem 0; }
   td { padding: .6rem .5rem .6rem 0; border-bottom: 1px solid var(--ik-rule); }
+
+  // The site: home, the two doors, the manifest, the footer.
+  &__wide { max-width: 64rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  &__kicker { font-size: .8rem; letter-spacing: .08em; color: var(--ik-copper);
+              font-weight: 700; margin-bottom: .25rem; }
+  &__ask { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 700; line-height: 1.3;
+           margin: 0 0 .75rem; }
+  &__lede { font-size: 1.15rem; max-width: 40rem; }
+  &__hero { padding: 1rem 0; }
+
+  &__doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+             gap: 1rem; margin: 1.5rem 0 2.5rem; }
+  &__door { display: flex; flex-direction: column; gap: .5rem; padding: 1.5rem;
+            background: #fff; border: 1px solid var(--ik-rule); border-radius: 6px;
+            color: var(--ik-ink); text-decoration: none; }
+  &__door:hover, &__door:focus-visible { border-color: var(--ik-cobalt); color: var(--ik-ink); }
+  &__door-ask { font-size: 2.5rem; font-weight: 700; color: var(--ik-cobalt); line-height: 1.2; }
+  &__door-who { font-size: 1.2rem; }
+  &__door-go { margin-top: auto; color: var(--ik-cobalt); font-weight: 700; }
+
+  &__section { margin: 2.5rem 0; }
+  &__steps, &__tenets, &__ledgers { padding-inline-start: 1.25rem; }
+  &__steps li, &__tenets li, &__ledgers li { margin-bottom: .6rem; }
+  &__link { font-weight: 700; }
+
+  &__actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+  a.ikiku__go { display: inline-block; text-decoration: none; }
+  a.ikiku__go:hover { color: #fff; opacity: .92; }
+  &__secondary { display: inline-block; text-decoration: none; margin-top: 1.25rem;
+                 border: 1px solid var(--ik-cobalt); color: var(--ik-cobalt);
+                 border-radius: 4px; padding: .75rem 1.4rem; font-weight: 700; }
+
+  &__manifest h1 { font-size: 2.25rem; }
+  &__manifest h2 { margin-top: 2rem; }
+  &__manifest hr { margin: 2rem 0; border-color: var(--ik-rule); }
+
+  &__footer { background: var(--ik-ground); border-top: 1px solid var(--ik-rule); }
+  &__footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+                   gap: 1.5rem; padding-bottom: 1.5rem; }
+  &__footer h5 { font-weight: 700; }
 }
