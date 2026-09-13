@@ -62,7 +62,7 @@ class IkikuPortal(http.Controller):
         else:
             vals['partner_id'] = partner.id
             resource = Resource.create(vals)
-        request.env.user.sudo().groups_id = [
+        request.env.user.sudo().group_ids = [
             (4, request.env.ref('ikiku_base.group_ikiku_resource').id)]
         return request.redirect('/ikiku/join/skills')
 
@@ -166,7 +166,7 @@ class IkikuPortal(http.Controller):
             [('partner_id', '=', partner.id)], limit=1)
         if not business:
             business = request.env['ikiku.business'].sudo().create({'partner_id': partner.id})
-            request.env.user.sudo().groups_id = [
+            request.env.user.sudo().group_ids = [
                 (4, request.env.ref('ikiku_base.group_ikiku_business').id)]
         node = request.env['ikiku.spec.node'].sudo().browse(int(post['node_id']))
         request.env['ikiku.position'].sudo().steer(
