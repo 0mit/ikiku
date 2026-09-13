@@ -17,6 +17,24 @@
   font-weight: 700; font-display: swap;
 }
 
+// The whole site is Persian, so Vazirmatn is the face of the whole site — not only inside .ikiku.
+// The website theme sets "Inter Tight" on h1–h6 directly and Inter through --font-sans-serif,
+// which beat the font inherited from .ikiku and dropped Persian titles to a fallback face.
+// Odoo's own font option would import Google Fonts, which production in Iran must not depend on,
+// so the self-hosted face is set here. The `body` prefix outranks the theme's `h1, .h1` rule.
+:root {
+  --font-sans-serif: 'Vazirmatn', Tahoma, sans-serif;
+  --body-font-family: 'Vazirmatn', Tahoma, sans-serif;
+  --btn-font-family: 'Vazirmatn', Tahoma, sans-serif;
+}
+body,
+body :is(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
+         .display-1, .display-2, .display-3, .display-4, .display-5, .display-6,
+         .btn, .navbar, .nav-link, .dropdown-menu, .form-control, .form-select,
+         input, select, textarea, button) {
+  font-family: 'Vazirmatn', Tahoma, sans-serif;
+}
+
 .ikiku {
   --ik-cobalt: #1B4C9E;
   --ik-copper: #A8632A;
