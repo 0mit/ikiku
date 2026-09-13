@@ -25,8 +25,12 @@
   --ik-rule: #D5DBD9;
   --ik-ground: #F1F3F2;
 
-  direction: rtl;
-  text-align: right;
+  // NO `direction` and NO left/right here, on purpose. Odoo builds the RTL bundle by running
+  // rtlcss over every frontend stylesheet, which mirrors direction, left/right and 4-value
+  // paddings. `direction: rtl; text-align: right` came out of it as ltr/left and put every page
+  // left-to-right (seen live 2026-09-13). The page's own dir="rtl" drives the layout; only
+  // logical values (start/end, *-inline-*) are used below, and rtlcss leaves those alone.
+  text-align: start;
   font-family: 'Vazirmatn', Tahoma, sans-serif;
   line-height: 1.9;
   color: var(--ik-ink);
@@ -70,10 +74,11 @@
   &__withheld { color: var(--ik-copper); font-size: .85rem; }
 
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: right; font-size: .75rem; letter-spacing: .06em;
+  th { text-align: start; font-size: .75rem; letter-spacing: .06em;
        color: var(--ik-ink-2); border-bottom: 1px solid var(--ik-rule);
-       padding: 0 .5rem .5rem 0; }
-  td { padding: .6rem .5rem .6rem 0; border-bottom: 1px solid var(--ik-rule); }
+       padding-block: 0 .5rem; padding-inline: .5rem 0; }
+  td { padding-block: .6rem; padding-inline: .5rem 0; border-bottom: 1px solid var(--ik-rule); }
+  ol { list-style-type: persian; }
 
   // The site: home, the two doors, the manifest, the footer.
   &__wide { max-width: 64rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
@@ -114,4 +119,7 @@
   &__footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
                    gap: 1.5rem; padding-bottom: 1.5rem; }
   &__footer h5 { font-weight: 700; }
+
+  &__brand { font-family: 'Vazirmatn', Tahoma, sans-serif; font-weight: 700; font-size: 1.5rem;
+             color: var(--ik-ink); line-height: 1; }
 }

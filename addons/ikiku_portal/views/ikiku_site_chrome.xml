@@ -35,6 +35,14 @@
     </xpath>
   </template>
 
+  <!-- The header brand showed Odoo's default "Your Logo" SVG. iKiKu has no logo yet, so the
+       brand is the site's name, set in the site's own face. -->
+  <template id="header_brand" inherit_id="website.option_header_brand_logo" name="ایکیکو — نامِ سایت">
+    <xpath expr="//span[@t-field='website.logo']" position="replace">
+      <span class="ikiku__brand ikiku" t-out="website.name"/>
+    </xpath>
+  </template>
+
   <!-- The header's "text element" is a +1 555 placeholder phone in every variant. iKiKu
        publishes no phone number, so the element is removed rather than filled in. -->
   <template id="header_text_element" inherit_id="website.header_text_element" name="ایکیکو — بدونِ تلفنِ نمونه">
