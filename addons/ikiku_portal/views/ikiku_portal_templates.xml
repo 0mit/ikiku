@@ -213,7 +213,8 @@
       <div class="ikiku"><div class="ikiku__shell">
         <t t-if="business">
           <h1 class="ikiku__question" t-out="business.name"/>
-          <p><a href="/ikiku/business/position/new">تعریف جایگاهِ تازه</a></p>
+          <p><a href="/ikiku/business/position/new">تعریف جایگاهِ تازه</a> ·
+             <a href="/ikiku/business/name">تغییرِ نام</a></p>
           <h3>اعلام نیاز</h3>
           <div class="ikiku__note">
             نیازِ سه ماه بعد را همین حالا اعلام کنید. هرچه زودتر، انتخابِ بیشتر.
@@ -257,8 +258,28 @@
           </t>
         </t>
         <t t-else="">
-          <p><a href="/ikiku/business/position/new">نخستین جایگاهِ خود را تعریف کنید</a></p>
+          <p><a href="/ikiku/business/name">نخست نامِ کسب‌وکارتان را بنویسید</a></p>
         </t>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="business_name" name="ایکیکو — نام کسب‌وکار">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <h1 class="ikiku__question">نامِ کسب‌وکارتان چیست؟</h1>
+        <p class="ikiku__help">
+          همان نامی که روی سردرِ کافه یا رستورانتان است. جایگاه‌ها و نیازهایتان با این نام
+          شناخته می‌شوند، نه با نامِ خودتان.
+        </p>
+        <div t-if="error" class="ikiku__note">نام را خالی نگذارید.</div>
+        <form action="/ikiku/business/name/save" method="post">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <input class="ikiku__field" name="name" required="required" maxlength="120"
+                 t-att-value="business.name if business else ''"
+                 placeholder="مثلاً: کافه نارنج"/>
+          <button class="ikiku__go" type="submit" t-out="'ذخیرهٔ نام' if business else 'ادامه'"/>
+        </form>
       </div></div>
     </t>
   </template>

@@ -88,7 +88,7 @@ class IkikuSite(http.Controller):
         has_record = not request.env.user._is_public() and request.env['ikiku.business'].sudo().search_count(
             [('partner_id', '=', partner.id)], limit=1)
         return self._door('ikiku_portal.door_ku',
-                          '/ikiku/business' if has_record else '/ikiku/business/position/new')
+                          '/ikiku/business' if has_record else '/ikiku/business/name')
 
     @http.route('/ikiku/manifest', type='http', auth='public', website=True)
     def manifest(self, **kw):

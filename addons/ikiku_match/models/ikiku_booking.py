@@ -63,7 +63,7 @@ class IkikuBooking(models.Model):
     date_start_fa = fields.Char(compute='_compute_fa', string="از (شمسی)")
     date_end_fa = fields.Char(compute='_compute_fa', string="تا (شمسی)")
 
-    @api.depends('resource_id', 'date_start', 'employer_business_id')
+    @api.depends('resource_id', 'date_start', 'employer_business_id.name')
     def _compute_name(self):
         for rec in self:
             rec.name = "%s @ %s — %s" % (

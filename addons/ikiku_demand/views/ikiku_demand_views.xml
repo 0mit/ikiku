@@ -7,7 +7,7 @@
       <form string="کسب‌وکار">
         <header><field name="state" widget="statusbar"/></header>
         <sheet>
-          <div class="oe_title"><h1><field name="name"/></h1></div>
+          <div class="oe_title"><h1><field name="name" placeholder="نامِ کافه یا رستوران"/></h1></div>
           <group>
             <group>
               <field name="partner_id"/><field name="kind"/><field name="seats"/>

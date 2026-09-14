@@ -35,7 +35,7 @@ class IkikuDemand(models.Model):
     date_start_fa = fields.Char(compute='_compute_fa', string="از (شمسی)")
     date_end_fa = fields.Char(compute='_compute_fa', string="تا (شمسی)")
 
-    @api.depends('business_id', 'position_id', 'date_start')
+    @api.depends('business_id.name', 'position_id.name', 'date_start')
     def _compute_name(self):
         for rec in self:
             rec.name = "%s — %s — %s" % (

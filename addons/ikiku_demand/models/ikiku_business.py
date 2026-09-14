@@ -16,9 +16,14 @@ class IkikuBusiness(models.Model):
     _inherit = ['mail.thread', 'ikiku.publishable']
     _order = 'name'
 
-    partner_id = fields.Many2one('res.partner', string="شخصیت حقوقی", required=True,
-                                 ondelete='restrict', index=True, tracking=True)
-    name = fields.Char(related='partner_id.name', store=True, readonly=False, string="نام")
+    partner_id = fields.Many2one('res.partner', string="دارنده", required=True,
+                                 ondelete='restrict', index=True, tracking=True,
+                                 help="کسی که حسابِ این کسب‌وکار را دارد.")
+    # The business's own name, not the holder's: a portal signup gives the
+    # business the person's partner, so a related name put the holder's personal
+    # name on every position, demand and booking of the business.
+    name = fields.Char("نام کسب‌وکار", required=True, tracking=True,
+                       help="همان نامی که روی سردر است.")
     slug = fields.Char("نشانیِ عمومی", copy=False, index=True)
     province_id = fields.Many2one(related='partner_id.ikiku_province_id',
                                   store=True, readonly=False, string="استان")

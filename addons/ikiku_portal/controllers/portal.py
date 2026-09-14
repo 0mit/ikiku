@@ -146,9 +146,39 @@ class IkikuPortal(http.Controller):
             'resource': resource, 'bookings': bookings})
 
     # ------------------------------------------------------------ businesses
+    def _business(self):
+        partner = request.env.user.partner_id.commercial_partner_id
+        return request.env['ikiku.business'].sudo().search([('partner_id', '=', partner.id)], limit=1)
+
+    @http.route('/ikiku/business/name', type='http', auth='user', website=True, sitemap=False)
+    def business_name(self, **kw):
+        """The first question of کو؟, and the way to change the answer later."""
+        return request.render('ikiku_portal.business_name', {
+            'business': self._business(), 'error': kw.get('error')})
+
+    @http.route('/ikiku/business/name/save', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def business_name_save(self, **post):
+        name = ' '.join((post.get('name') or '').split())
+        if not name:
+            return request.redirect('/ikiku/business/name?error=1')
+        business = self._business()
+        if business:
+            business.name = name
+            return request.redirect('/ikiku/business')
+        request.env['ikiku.business'].sudo().create({
+            'partner_id': request.env.user.partner_id.commercial_partner_id.id,
+            'name': name,
+        })
+        request.env.user.sudo().group_ids = [
+            (4, request.env.ref('ikiku_base.group_ikiku_business').id)]
+        return request.redirect('/ikiku/business/position/new')
+
     @http.route('/ikiku/business/position/new', type='http', auth='user', website=True,
                 sitemap=False)
     def position_new(self, **kw):
+        if not self._business():
+            return request.redirect('/ikiku/business/name')
         raw = kw.get('raw', '')
         proposals = request.env['ikiku.spec.node'].sudo().resolve_text(raw) if raw \
             else request.env['ikiku.spec.node'].sudo().browse()
@@ -161,13 +191,9 @@ class IkikuPortal(http.Controller):
     @http.route('/ikiku/business/position/save', type='http', auth='user', methods=['POST'],
                 website=True, csrf=True)
     def position_save(self, **post):
-        partner = request.env.user.partner_id.commercial_partner_id
-        business = request.env['ikiku.business'].sudo().search(
-            [('partner_id', '=', partner.id)], limit=1)
+        business = self._business()
         if not business:
-            business = request.env['ikiku.business'].sudo().create({'partner_id': partner.id})
-            request.env.user.sudo().group_ids = [
-                (4, request.env.ref('ikiku_base.group_ikiku_business').id)]
+            return request.redirect('/ikiku/business/name')
         node = request.env['ikiku.spec.node'].sudo().browse(int(post['node_id']))
         request.env['ikiku.position'].sudo().steer(
             business, post.get('raw') or node.name, chosen_node=node)
