@@ -20,6 +20,9 @@ class ResPartner(models.Model):
     _inherit = ['res.partner', 'ikiku.publishable']
 
     ikiku_mobile = fields.Char("موبایل (لنگرِ هویت)", index=True, copy=False)
+    ikiku_mobile_verified_on = fields.Datetime(
+        "تأییدِ موبایل", copy=False, readonly=True, groups='ikiku_base.group_ikiku_staff',
+        help="وقتی صاحبِ شماره کدِ پیامک را وارد کرد. مالکیتِ شماره را نشان می‌دهد، نه هویت را.")
     ikiku_nid_hash = fields.Char("اثرِ کدِ ملی", index=True, copy=False, groups='ikiku_base.group_ikiku_staff',
                                  help="درهم‌سازیِ نمک‌دار. خودِ کدِ ملی هرگز ذخیره نمی‌شود.")
     ikiku_nid_checked_on = fields.Date("تاریخِ بررسیِ کدِ ملی", groups='ikiku_base.group_ikiku_staff')
@@ -36,6 +39,14 @@ class ResPartner(models.Model):
         'UNIQUE(ikiku_mobile)', "این شمارهٔ موبایل قبلاً ثبت شده است.")
     _ikiku_nid_uniq = models.Constraint(
         'UNIQUE(ikiku_nid_hash)', "این کدِ ملی قبلاً ثبت شده است.")
+
+    def write(self, vals):
+        """A number changed without its proof is no longer the number that was proven."""
+        if 'ikiku_mobile' in vals and 'ikiku_mobile_verified_on' not in vals:
+            changed = self.filtered(lambda partner: partner.ikiku_mobile != vals['ikiku_mobile'])
+            if changed:
+                super(ResPartner, changed.sudo()).write({'ikiku_mobile_verified_on': False})
+        return super().write(vals)
 
     @api.depends('ikiku_is_verified', 'ikiku_assertion_ids.state')
     def _compute_ikiku_standing(self):

@@ -6,8 +6,10 @@
     'category': 'Website',
     'version': '19.0.0.1.0',
     'license': 'AGPL-3',
-    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal', 'auth_signup'],
+    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal', 'auth_signup', 'sms_kavenegar'],
     'data': [
+        'security/ir.model.access.csv',
+        'data/ikiku_otp_data.xml',
         'views/ikiku_portal_templates.xml',
         'views/ikiku_public_templates.xml',
         'views/ikiku_site_templates.xml',
@@ -17,6 +19,7 @@
     'assets': {
         'web.assets_frontend': [
             'ikiku_portal/static/src/scss/ikiku.scss',
+            'ikiku_portal/static/src/js/ikiku_otp.js',
         ],
     },
     'installable': True,

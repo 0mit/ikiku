@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ikiku_mobile_challenge_staff,ikiku mobile challenge staff,model_ikiku_mobile_challenge,ikiku_base.group_ikiku_staff,1,0,0,0
+access_ikiku_mobile_challenge_system,ikiku mobile challenge system,model_ikiku_mobile_challenge,base.group_system,1,1,1,1

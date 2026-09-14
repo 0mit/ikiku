@@ -10,6 +10,7 @@
           نشانیِ خانه‌تان را نمی‌پرسیم و ثبت نمی‌کنیم. فقط استان و شهر،
           چون کار در جایی است.
         </p>
+        <div t-if="error" class="ikiku__note" t-out="error"/>
         <form action="/ikiku/join/submit" method="post">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
           <p><label for="mobile">شمارهٔ موبایل</label>
@@ -17,7 +18,9 @@
                     t-att-value="partner.ikiku_mobile or ''"
                     placeholder="۰۹۱۲۳۴۵۶۷۸۹" required="required"/></p>
           <p class="ikiku__muted">شماره لنگرِ هویتِ شماست تا کسی نتواند دو بار ثبت‌نام کند.
-             روی پروندهٔ عمومی نمایش داده نمی‌شود.</p>
+             روی پروندهٔ عمومی نمایش داده نمی‌شود.
+             <t t-if="mobile_verified">این شماره با پیامک تأیید شده است.</t>
+             <t t-elif="otp_enabled">پس از «ادامه» کدی به همین شماره پیامک می‌شود.</t></p>
 
           <p><label for="headline">یک خط دربارهٔ خودتان</label>
              <input class="ikiku__field" type="text" id="headline" name="headline"
@@ -35,6 +38,37 @@
                     t-att-value="partner.ikiku_city or ''"/></p>
           <button class="ikiku__go" type="submit">ادامه</button>
         </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="resource_verify" name="ایکیکو — تأییدِ شماره">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <div class="ikiku__step">گامِ ۱ از ۳ · تأییدِ شماره</div>
+        <h1 class="ikiku__question">کدی را که پیامک شد بنویسید</h1>
+        <p class="ikiku__help">
+          یک کدِ شش‌رقمی به <bdi dir="ltr" t-out="masked"/> فرستاده می‌شود. تا دو دقیقه صبر
+          می‌کنیم و نتیجه را همین‌جا می‌بینید.
+        </p>
+        <div t-if="error" class="ikiku__note" t-out="error"/>
+        <p id="ikiku-otp" class="ikiku__note" data-state-url="/ikiku/join/verify/state"
+           t-att-data-state="status['state']" t-att-data-wait="status['wait_left']"
+           t-att-data-resend="status['resend_in']" t-out="status['text']"/>
+        <form action="/ikiku/join/verify/submit" method="post">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <input class="ikiku__field" name="code" dir="ltr" inputmode="numeric"
+                 autocomplete="one-time-code" maxlength="6" required="required"
+                 placeholder="------"/>
+          <button class="ikiku__go" type="submit">تأیید</button>
+        </form>
+        <form action="/ikiku/join/verify/resend" method="post">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <button class="ikiku__secondary" type="submit" data-otp-resend=""
+                  t-att-disabled="status['resend_in'] and 'disabled'">فرستادنِ دوباره</button>
+        </form>
+        <p><a href="/ikiku/join">شماره را اشتباه نوشتم</a></p>
+        <noscript><p class="ikiku__muted">اگر وضعیت عوض نشد، صفحه را تازه کنید.</p></noscript>
       </div></div>
     </t>
   </template>

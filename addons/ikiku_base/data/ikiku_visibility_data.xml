@@ -43,6 +43,12 @@
       <field name="visibility">restricted</field>
       <field name="reason">بند ۷: راهِ تماس از طریقِ پلتفرم، نه شمارهٔ خام.</field>
     </record>
+    <record id="vis_res_partner_ikiku_mobile_verified_on" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_mobile_verified_on</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">بند ۷: دربارهٔ شمارهٔ تماس است، و مالکیتِ شماره را نشان می‌دهد نه هویت را.</field>
+    </record>
     <record id="vis_res_partner_phone" model="ikiku.visibility.policy">
       <field name="model_name">res.partner</field>
       <field name="field_name">phone</field>

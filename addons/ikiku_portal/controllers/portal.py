@@ -8,10 +8,18 @@ Three rules, applied on both sides of the portal:
      ikiku.spec.candidate verbatim, never dropped to make a form validate.
   3. Six screens maximum. These users are on phones, often mid-shift.
 """
+from urllib.parse import urlencode
+
 from odoo import http
+from odoo.exceptions import ValidationError
 from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import jalali_to_gregorian
+from odoo.addons.ikiku_portal.models.mobile_challenge import MESSAGES
+
+
+def _mask(mobile):
+    return mobile[:6] + '***' + mobile[-4:] if mobile and len(mobile) > 10 else mobile
 
 
 def _parse_jalali(value):
@@ -42,16 +50,22 @@ class IkikuPortal(http.Controller):
             'partner': partner,
             'provinces': request.env['ikiku.province'].sudo().search([]),
             'step': kw.get('step', '1'),
+            'error': MESSAGES.get(kw.get('error')),
+            'otp_enabled': request.env['ikiku.mobile.challenge'].sudo()._enabled(),
+            'mobile_verified': bool(partner.sudo().ikiku_mobile_verified_on),
         })
 
     @http.route('/ikiku/join/submit', type='http', auth='user', methods=['POST'],
                 website=True, csrf=True)
     def join_submit(self, **post):
         partner = request.env.user.partner_id
+        partner_sudo = partner.sudo()
         Resource = request.env['ikiku.resource'].sudo()
-        if post.get('mobile'):
-            partner.sudo().ikiku_mobile = partner.normalise_mobile(post['mobile'])
-        partner.sudo().write({
+        try:
+            mobile = partner.normalise_mobile(post.get('mobile'))
+        except ValidationError:
+            return request.redirect('/ikiku/join?' + urlencode({'error': 'mobile'}))
+        partner_sudo.write({
             'ikiku_province_id': int(post['province_id']) if post.get('province_id') else False,
             'ikiku_city': post.get('city'),
         })
@@ -64,7 +78,59 @@ class IkikuPortal(http.Controller):
             resource = Resource.create(vals)
         request.env.user.sudo().group_ids = [
             (4, request.env.ref('ikiku_base.group_ikiku_resource').id)]
+        if mobile and not (mobile == partner_sudo.ikiku_mobile and partner_sudo.ikiku_mobile_verified_on):
+            Challenge = request.env['ikiku.mobile.challenge'].sudo()
+            if Challenge._enabled():
+                # The number becomes the anchor only once its owner types the code.
+                _challenge, error = Challenge.start(partner, mobile)
+                if error:
+                    return request.redirect('/ikiku/join?' + urlencode({'error': error}))
+                return request.redirect('/ikiku/join/verify')
+            # Without SMS the number is written as typed and stays unproven, as before.
+            if request.env['res.partner'].sudo().with_context(active_test=False).search_count(
+                    [('ikiku_mobile', '=', mobile), ('id', '!=', partner.id)], limit=1):
+                return request.redirect('/ikiku/join?' + urlencode({'error': 'held'}))
+            partner_sudo.ikiku_mobile = mobile
         return request.redirect('/ikiku/join/skills')
+
+    @http.route('/ikiku/join/verify', type='http', auth='user', website=True, sitemap=False)
+    def join_verify(self, **kw):
+        challenge = request.env['ikiku.mobile.challenge'].sudo()._latest(request.env.user.partner_id)
+        if not challenge:
+            return request.redirect('/ikiku/join')
+        return request.render('ikiku_portal.resource_verify', {
+            'challenge': challenge,
+            'status': challenge._payload(),
+            'masked': _mask(challenge.mobile),
+            'error': MESSAGES.get(kw.get('error')),
+        })
+
+    @http.route('/ikiku/join/verify/state', type='http', auth='user', methods=['GET'], sitemap=False)
+    def join_verify_state(self, **kw):
+        challenge = request.env['ikiku.mobile.challenge'].sudo()._latest(request.env.user.partner_id)
+        return request.make_json_response(challenge._payload() if challenge else {'state': 'none'})
+
+    @http.route('/ikiku/join/verify/submit', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def join_verify_submit(self, code=None, **post):
+        challenge = request.env['ikiku.mobile.challenge'].sudo()._latest(request.env.user.partner_id)
+        if not challenge:
+            return request.redirect('/ikiku/join')
+        error = challenge.check(code)
+        if error:
+            return request.redirect('/ikiku/join/verify?' + urlencode({'error': error}))
+        return request.redirect('/ikiku/join/skills')
+
+    @http.route('/ikiku/join/verify/resend', type='http', auth='user', methods=['POST'],
+                website=True, csrf=True)
+    def join_verify_resend(self, **post):
+        Challenge = request.env['ikiku.mobile.challenge'].sudo()
+        partner = request.env.user.partner_id
+        latest = Challenge._latest(partner)
+        if not latest or not Challenge._enabled():
+            return request.redirect('/ikiku/join')
+        _challenge, error = Challenge.start(partner, latest.mobile)
+        return request.redirect('/ikiku/join/verify' + ('?' + urlencode({'error': error}) if error else ''))
 
     @http.route('/ikiku/join/skills', type='http', auth='user', website=True, sitemap=False)
     def join_skills(self, **kw):

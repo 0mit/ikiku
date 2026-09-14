@@ -73,6 +73,7 @@ class IkikuSite(http.Controller):
             'signup_enabled': request.env['res.users'].sudo()._get_signup_invitation_scope() == 'b2c',
             'signup_url': '/web/signup?' + urlencode({'redirect': next_url}),
             'login_url': '/web/login?' + urlencode({'redirect': next_url}),
+            'otp_enabled': request.env.company._sms_kavenegar_otp_ready(),
         })
 
     @http.route('/ikiku/ki', type='http', auth='public', website=True)
