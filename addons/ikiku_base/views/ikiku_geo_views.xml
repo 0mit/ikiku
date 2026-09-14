@@ -4,7 +4,10 @@
     <field name="name">ikiku.province.list</field>
     <field name="model">ikiku.province</field>
     <field name="arch" type="xml">
-      <list string="استان‌ها"><field name="name"/><field name="code"/><field name="centre"/></list>
+      <list string="استان‌ها">
+        <field name="sequence" widget="handle"/>
+        <field name="name"/><field name="code"/><field name="centre"/>
+      </list>
     </field>
   </record>
   <record id="action_province" model="ir.actions.act_window">

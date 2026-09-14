@@ -156,5 +156,7 @@
       <field name="code">YA</field>
       <field name="centre">یزد</field>
     </record>
+    <!-- Inside noupdate, so it runs on install only: an order changed later survives -u. -->
+    <function model="ikiku.province" name="_ikiku_apply_order"/>
   </data>
 </odoo>
