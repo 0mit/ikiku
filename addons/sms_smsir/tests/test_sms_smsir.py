@@ -163,6 +163,11 @@ class TestSmsIrSending(TransactionCase):
         sms = self.send_answered(answer({'packId': PACK, 'messageIds': [1], 'cost': 1.0}), count=2)
         self.assertEqual(set(sms.mapped('failure_type')), {'smsir_unconfirmed'})
 
+    def test_line_not_activated(self):
+        # What a new, unverified account's line answered on 2026-09-15.
+        sms = self.send_answered(answer(None, 123, "خط ارسال‌کننده نیاز به فعال‌سازی دارد."))
+        self.assertEqual((sms.state, sms.failure_type), ('error', 'smsir_sender'))
+
     def test_missing_line(self):
         self.company.sms_smsir_line = False
         sms = self.make_sms()

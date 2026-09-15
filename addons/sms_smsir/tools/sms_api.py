@@ -24,6 +24,8 @@ RETURN_TO_STATE = {
     10: 'smsir_account', 11: 'smsir_account', 12: 'smsir_account',
     13: 'smsir_account', 14: 'smsir_account', 15: 'smsir_account',
     101: 'smsir_sender',
+    # Not in the published table; answered on 2026-09-15 by a new account's line.
+    123: 'smsir_sender',
     102: 'insufficient_credit',
     103: 'smsir_content',
     104: 'wrong_number_format',
@@ -99,7 +101,7 @@ class SmsApiSmsIr(SmsApiBase):
         error_dict = super()._get_sms_api_error_messages()
         error_dict.update({
             'smsir_account': _("sms.ir refused the API key, the account, or this server's address."),
-            'smsir_sender': _("The sms.ir sender line is missing or not one of this account's lines."),
+            'smsir_sender': _("The sms.ir sender line is missing, not one of this account's lines, or not activated yet."),
             'smsir_content': _("sms.ir refused the text."),
             'smsir_unconfirmed': _("The request reached sms.ir but no usable answer came back, so this SMS "
                                    "may have been sent. sms.ir cannot refuse a repeat: check its panel "
