@@ -3,15 +3,18 @@
 
 Phone is the establishing anchor (docs/design.html) and ikiku_mobile is UNIQUE,
 so writing whatever number a visitor types would let anyone take somebody else's
-number first. With Kavenegar's OTP configured, the number waits here until its
-owner types the code sent to it; only then is it written to the partner. Proving
-a number proves the SIM, not the person: ikiku_is_verified stays a staff decision.
+number first. With an SMS provider's verification template configured (Kavenegar
+or sms.ir, reached through sms_otp, which names neither), the number waits here
+until its owner types the code sent to it; only then is it written to the
+partner. Proving a number proves the SIM, not the person: ikiku_is_verified
+stays a staff decision.
 
 The code is kept as an HMAC keyed by the database secret. The plain code exists
-only until the background job has handed it to Kavenegar, because a job cannot
-send what it cannot read. Kavenegar takes seconds to answer from Iran, so sending
-never happens inside the visitor's request: the page waits at most WAIT_LIMIT
-for the result and shows it the moment it is known.
+only until the background job has handed it to the provider, because a job
+cannot send what it cannot read. An outside API can take seconds to answer (every
+lookup from the production host took 8 s until its resolver was fixed on
+2026-09-15), so sending never happens inside the visitor's request: the page
+waits at most WAIT_LIMIT for the result and shows it the moment it is known.
 """
 import hashlib
 import hmac
@@ -20,7 +23,7 @@ from datetime import timedelta
 
 from odoo import api, fields, models
 
-from odoo.addons.sms_kavenegar.tools.kavenegar import KavenegarError
+from odoo.addons.sms_otp.tools.otp import SmsOtpError
 
 CODE_DIGITS = 6
 CODE_TTL = timedelta(minutes=5)
@@ -31,8 +34,6 @@ WAIT_LIMIT = timedelta(minutes=2)
 KEEP = timedelta(days=1)
 
 TO_ASCII_DIGITS = str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789')
-# Kavenegar return statuses that mean the number itself was refused.
-BAD_NUMBER = {411}
 
 # What the visitor reads. Keys travel in URLs; sentences never do.
 MESSAGES = {
@@ -72,11 +73,12 @@ class IkikuMobileChallenge(models.Model):
     queued_at = fields.Datetime("درخواست", required=True, default=fields.Datetime.now)
     sent_at = fields.Datetime("ارسال")
     expires_at = fields.Datetime("انقضا")
-    kavenegar_messageid = fields.Char("شناسهٔ پیامک")
+    sms_provider = fields.Char("سامانهٔ پیامک")
+    sms_messageid = fields.Char("شناسهٔ پیامک")
 
     @api.model
     def _enabled(self):
-        return self.env.company._sms_kavenegar_otp_ready()
+        return self.env.company._sms_otp_ready()
 
     @api.model
     def _hash(self, code):
@@ -123,14 +125,15 @@ class IkikuMobileChallenge(models.Model):
                 challenge.write({'state': 'failed', 'failure': 'timeout', 'pending_code': False})
             else:
                 try:
-                    messageid = company._sms_kavenegar_send_otp(challenge.mobile, challenge.pending_code)
-                except KavenegarError as e:
-                    challenge.write({'state': 'failed', 'pending_code': False,
-                                     'failure': 'number' if e.status in BAD_NUMBER else 'failed'})
+                    provider, messageid = company._sms_otp_send(challenge.mobile, challenge.pending_code)
+                except SmsOtpError as e:
+                    challenge.write({'state': 'failed', 'pending_code': False, 'sms_provider': e.provider,
+                                     'failure': 'number' if e.bad_number else 'failed'})
                 else:
                     sent = fields.Datetime.now()
                     challenge.write({'state': 'sent', 'sent_at': sent, 'expires_at': sent + CODE_TTL,
-                                     'kavenegar_messageid': messageid, 'pending_code': False})
+                                     'sms_provider': provider, 'sms_messageid': messageid,
+                                     'pending_code': False})
             if self.env.context.get('cron_id'):
                 # A sent SMS cannot be taken back: commit it before the next one can fail.
                 self.env['ir.cron']._commit_progress(1)

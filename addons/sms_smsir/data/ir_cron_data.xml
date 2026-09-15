@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1">
+  <!-- sms.ir documents no delivery callback, so this is the only way status comes
+       back: every tracked SMS of the last 48 hours, one report per send request. -->
+  <record id="ir_cron_sms_smsir_poll_status" model="ir.cron" forcecreate="True">
+    <field name="name">SMS: sms.ir delivery status</field>
+    <field name="model_id" ref="sms.model_sms_tracker"/>
+    <field name="state">code</field>
+    <field name="code">model._smsir_poll_status()</field>
+    <field name="user_id" ref="base.user_root"/>
+    <field name="interval_number">10</field>
+    <field name="interval_type">minutes</field>
+  </record>
+</data></odoo>

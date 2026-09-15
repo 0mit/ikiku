@@ -4,9 +4,11 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from odoo import fields
+from odoo.exceptions import ValidationError
 from odoo.tests import HttpCase, TransactionCase, tagged
 
 from odoo.addons.sms_kavenegar.tools.kavenegar import KavenegarError
+from odoo.addons.sms_smsir.tools.smsir import SmsIrError
 
 CODE = 123456
 MOBILE = '+989121234567'
@@ -20,10 +22,10 @@ class OtpSetup:
         cls.env.company.write({'sms_kavenegar_enabled': True, 'sms_kavenegar_api_key': 'KEY',
                                'sms_kavenegar_sender': '10004346', 'sms_kavenegar_otp_template': 'ikiku-otp'})
 
-    def send_queued(self, result='77'):
+    def send_queued(self, result=('kavenegar', '77')):
         company_class = type(self.env['res.company'])
         options = {'side_effect': result} if isinstance(result, Exception) else {'return_value': result}
-        with patch.object(company_class, '_sms_kavenegar_send_otp', **options) as send:
+        with patch.object(company_class, '_sms_otp_send', **options) as send:
             self.env['ikiku.mobile.challenge']._cron_send()
         return send
 
@@ -51,7 +53,8 @@ class TestMobileChallenge(OtpSetup, TransactionCase):
         self.assertFalse(self.partner.ikiku_mobile, "the number waits for its proof")
         send = self.send_queued()
         send.assert_called_once_with(MOBILE, '123456')
-        self.assertEqual((challenge.state, challenge.pending_code, challenge.kavenegar_messageid), ('sent', False, '77'))
+        self.assertEqual((challenge.state, challenge.pending_code, challenge.sms_provider, challenge.sms_messageid),
+                         ('sent', False, 'kavenegar', '77'))
 
     def test_wrong_then_right_in_persian_digits(self):
         challenge, _error = self.start()
@@ -116,12 +119,38 @@ class TestMobileChallenge(OtpSetup, TransactionCase):
         self.assertEqual((challenge.state, challenge.failure), ('failed', 'number'))
         self.assertEqual(challenge.check('123456'), 'number')
 
+    def test_refused_number_through_smsir(self):
+        challenge, _error = self.start()
+        self.send_queued(SmsIrError('/send/verify', 104, "شماره نامعتبر"))
+        self.assertEqual((challenge.state, challenge.failure, challenge.sms_provider), ('failed', 'number', 'smsir'))
+
+    def test_a_refusal_that_is_not_the_number(self):
+        challenge, _error = self.start()
+        self.send_queued(SmsIrError('/send/verify', 20, "درخواست بیش از حد"))
+        self.assertEqual((challenge.state, challenge.failure), ('failed', 'failed'))
+
     def test_hand_edit_drops_the_proof(self):
         self.partner.write({'ikiku_mobile': MOBILE, 'ikiku_mobile_verified_on': fields.Datetime.now()})
         self.partner.write({'ikiku_mobile': MOBILE})
         self.assertTrue(self.partner.ikiku_mobile_verified_on)
         self.partner.write({'ikiku_mobile': '+989351234567'})
         self.assertFalse(self.partner.ikiku_mobile_verified_on)
+
+
+@tagged('post_install', '-at_install')
+class TestSmsProviders(TransactionCase):
+
+    def test_one_provider_at_a_time(self):
+        self.env.company.sms_kavenegar_enabled = True
+        with self.assertRaises(ValidationError):
+            self.env.company.sms_smsir_enabled = True
+
+    def test_codes_follow_the_provider_that_is_on(self):
+        self.env.company.write({'sms_smsir_enabled': True, 'sms_smsir_api_key': 'KEY',
+                                'sms_smsir_otp_template_id': 100000})
+        self.assertTrue(self.env['ikiku.mobile.challenge']._enabled())
+        self.env.company.sms_smsir_otp_template_id = 0
+        self.assertFalse(self.env['ikiku.mobile.challenge']._enabled())
 
 
 @tagged('post_install', '-at_install')

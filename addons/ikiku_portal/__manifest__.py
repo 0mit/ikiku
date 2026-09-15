@@ -4,9 +4,10 @@
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Website',
-    'version': '19.0.0.1.0',
+    'version': '19.0.0.1.1',
     'license': 'AGPL-3',
-    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal', 'auth_signup', 'sms_kavenegar'],
+    'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal', 'auth_signup',
+                'sms_otp', 'sms_kavenegar', 'sms_smsir'],
     'data': [
         'security/ir.model.access.csv',
         'data/ikiku_otp_data.xml',

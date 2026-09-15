@@ -14,8 +14,12 @@ import json
 
 import requests
 
+from odoo.addons.sms_otp.tools.otp import SmsOtpError
+
 API_ROOT = 'https://api.kavenegar.com/v1'
-# Measured 8 s per call from the production host in Iran on 2026-09-14.
+# The 8 s per call measured from the production host on 2026-09-14 was its
+# resolver waiting on unreachable IPv6 nameservers; fixed 2026-09-15, a call
+# takes about 0.2 s. The timeout stays generous for a slow day.
 TIMEOUT = 30
 
 # Per-message delivery status, from Kavenegar's status table.
@@ -32,14 +36,12 @@ SEND_LIMIT = 200
 STATUS_LIMIT = 500
 
 
-class KavenegarError(Exception):
+class KavenegarError(SmsOtpError):
     """`status` is Kavenegar's return.status, or 0 when the call never got an answer."""
 
-    def __init__(self, method, status, message):
-        super().__init__('%s: %s %s' % (method, status, message))
-        self.method = method
-        self.status = status
-        self.message = message
+    provider = 'kavenegar'
+    # 411: the receptor is invalid.
+    BAD_NUMBER_STATUSES = (411,)
 
 
 class KavenegarClient:

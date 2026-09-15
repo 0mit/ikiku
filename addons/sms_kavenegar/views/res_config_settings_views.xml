@@ -42,7 +42,7 @@
         </div>
       </xpath>
       <xpath expr="//widget[@service_name='sms']" position="attributes">
-        <attribute name="invisible">sms_kavenegar_enabled</attribute>
+        <attribute name="invisible" add="sms_kavenegar_enabled" separator="or"/>
       </xpath>
     </field>
   </record>

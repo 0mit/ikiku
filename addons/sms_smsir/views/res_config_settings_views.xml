@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="res_config_settings_view_form" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.inherit.sms.smsir</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="sms.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//widget[@service_name='sms']" position="before">
+        <div class="content-group">
+          <div class="d-flex gap-2">
+            <field name="sms_smsir_enabled"/>
+            <label for="sms_smsir_enabled" class="o_light_label"/>
+          </div>
+          <div class="content-group mt-2" invisible="not sms_smsir_enabled">
+            <div class="row mt-1">
+              <label for="sms_smsir_api_key" class="col-lg-4 o_light_label"/>
+              <field name="sms_smsir_api_key" class="col-lg-8" password="True"/>
+            </div>
+            <div class="row mt-1">
+              <label for="sms_smsir_line" class="col-lg-4 o_light_label"/>
+              <field name="sms_smsir_line" class="col-lg-8" placeholder="30002101000000"/>
+            </div>
+            <div class="row mt-1">
+              <label for="sms_smsir_otp_template_id" class="col-lg-4 o_light_label"/>
+              <field name="sms_smsir_otp_template_id" class="col-lg-8"/>
+            </div>
+            <div class="row mt-1">
+              <label for="sms_smsir_otp_parameter" class="col-lg-4 o_light_label"/>
+              <field name="sms_smsir_otp_parameter" class="col-lg-8" placeholder="CODE"/>
+            </div>
+            <div class="row mt-1">
+              <label for="sms_smsir_test_number" class="col-lg-4 o_light_label"/>
+              <field name="sms_smsir_test_number" class="col-lg-8" placeholder="+989121234567"/>
+            </div>
+            <div class="text-muted mt-1">
+              sms.ir sends no delivery callback: delivery status is checked every 10 minutes.
+            </div>
+            <div class="mt-2">
+              <button name="action_sms_smsir_check_account" type="object" class="btn-link"
+                      icon="oi-arrow-right" string="Check account"/>
+              <button name="action_sms_smsir_send_test" type="object" class="btn-link"
+                      icon="oi-arrow-right" string="Send test SMS"/>
+            </div>
+          </div>
+        </div>
+      </xpath>
+      <xpath expr="//widget[@service_name='sms']" position="attributes">
+        <attribute name="invisible" add="sms_smsir_enabled" separator="or"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

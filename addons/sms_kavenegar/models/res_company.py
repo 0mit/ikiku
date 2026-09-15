@@ -1,7 +1,7 @@
 # Part of iKiKu. Licensed under AGPL-3.0.
 import secrets
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 from odoo.addons.sms_kavenegar.tools import kavenegar
 from odoo.addons.sms_kavenegar.tools.kavenegar import KavenegarClient, KavenegarError
@@ -21,6 +21,10 @@ class ResCompany(models.Model):
     sms_kavenegar_callback_token = fields.Char(
         "Kavenegar callback token", groups='base.group_system', copy=False,
         default=lambda self: secrets.token_hex(16))
+
+    @api.constrains('sms_kavenegar_enabled')
+    def _check_sms_kavenegar_single_provider(self):
+        self._sms_check_single_provider()
 
     def _get_sms_api_class(self):
         self.ensure_one()
@@ -54,3 +58,14 @@ class ResCompany(models.Model):
         entries = self._sms_kavenegar_client().verify_lookup(
             number, self.sudo().sms_kavenegar_otp_template, code) or []
         return str((entries[:1] or [{}])[0].get('messageid') or '')
+
+    def _sms_providers_enabled(self):
+        return super()._sms_providers_enabled() + (['kavenegar'] if self.sms_kavenegar_enabled else [])
+
+    def _sms_otp_ready(self):
+        return self._sms_kavenegar_otp_ready() or super()._sms_otp_ready()
+
+    def _sms_otp_send(self, number, code):
+        if self.sudo().sms_kavenegar_enabled:
+            return 'kavenegar', self._sms_kavenegar_send_otp(number, code)
+        return super()._sms_otp_send(number, code)

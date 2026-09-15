@@ -66,6 +66,10 @@ class TestKavenegarClient(TransactionCase):
                 KavenegarClient('BAD').account_info()
         self.assertEqual(caught.exception.status, 403)
 
+    def test_refused_numbers_are_named(self):
+        self.assertTrue(KavenegarError('verify/lookup', 411, "receptor").bad_number)
+        self.assertFalse(KavenegarError('verify/lookup', 418, "credit").bad_number)
+
 
 @tagged('post_install', '-at_install')
 class TestKavenegarSending(TransactionCase):
@@ -90,6 +94,13 @@ class TestKavenegarSending(TransactionCase):
         self.assertIn('/KEY/sms/sendarray.json', post.call_args.args[0])
         self.assertEqual(json.loads(post.call_args.kwargs['data']['localmessageids']), [local_id(sms.uuid)])
         self.assertEqual(sms.state, 'pending')
+
+    def test_code_through_the_common_interface(self):
+        self.company.sms_kavenegar_otp_template = 'ikiku-otp'
+        self.assertTrue(self.company._sms_otp_ready())
+        with patch.object(requests.Session, 'post', return_value=answer([{'messageid': 77, 'status': 5}])) as post:
+            self.assertEqual(self.company._sms_otp_send('+989121234567', '123456'), ('kavenegar', '77'))
+        self.assertIn('/KEY/verify/lookup.json', post.call_args.args[0])
 
     def test_batches_of_two_hundred(self):
         sms = self.make_sms(250)
