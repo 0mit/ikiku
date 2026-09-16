@@ -48,20 +48,20 @@ PLAIN_FIELDS = {
     ('ikiku.demand', 'date_start'): "از کِی",
     ('ikiku.demand', 'date_end'): "تا کِی",
     ('ikiku.demand', 'business_id'): "اسمِ کافه یا رستوران",
-    ('ikiku.demand', 'position_id'): "اسمی که خودِ کافه روی اون کار گذاشته",
-    ('ikiku.demand', 'note'): "یادداشتِ کافه",
+    ('ikiku.demand', 'position_id'): "اسمی که خودِ کافه یا رستوران روی اون کار گذاشته",
+    ('ikiku.demand', 'note'): "یادداشتِ کافه یا رستوران",
     ('ikiku.demand', 'cancel_reason'): "دلیلی که برای لغو نوشتید",
     ('ikiku.demand', 'closed_on'): None,
     ('ikiku.demand', 'closed_by_id'): None,
-    ('ikiku.business', 'partner_id'): "اینکه کافه مالِ کیه",
-    ('ikiku.business', 'province_id'): "استان و شهرِ کافه",
+    ('ikiku.business', 'partner_id'): "اینکه کافه یا رستوران مالِ کیه",
+    ('ikiku.business', 'province_id'): "استان و شهرِ کافه یا رستوران",
     ('ikiku.business', 'city'): None,
 }
 
 # The booking states as a person says them (D-10: قرار کار).
 BOOKING_STATES = {
     'confirmed': "قطعی",
-    'at_risk': "در خطر",
+    'at_risk': "دوباره بررسی میشه",
     'replaced': "نفر عوض شد",
     'in_progress': "سرِ کار",
     'done': "تموم شد",
@@ -162,7 +162,7 @@ class IkikuHelp(http.Controller):
             errors['best_time'] = "بگید کِی زنگ بزنیم."
         Request = request.env['ikiku.help.request'].sudo()
         if not errors and Request.too_many(mobile):
-            errors['mobile'] = "امروز برای این شماره درخواست گذاشتید. همکارای ایکیکو زنگ می‌زنن."
+            errors['mobile'] = "امروز برای این شماره درخواست گذاشتید. تیمِ ایکیکو زنگ می‌زنه."
         if errors:
             values = self._values('tamas')
             values.update({'sent': False, 'form': form, 'errors': errors})

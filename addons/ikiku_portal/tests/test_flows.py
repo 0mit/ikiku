@@ -40,11 +40,11 @@ class TestFlows(HttpCase):
         self.goes_to(self.url_open('/join', allow_redirects=False), '/join/where')
         where = self.post('/join/where', {'city': "کرج"})
         self.assertEqual(where.status_code, 200)
-        self.assertIn("استان رو انتخاب نکردید.", where.text)
+        self.assertIn("استان رو انتخاب کنید.", where.text)
         self.assertIn('value="کرج"', where.text, "what was typed stays")
         self.goes_to(self.post('/join/where', {'province_id': str(self.tehran.id), 'city': "کرج"}), '/join/skills')
         tiles = self.url_open('/join/skills').text
-        self.assertIn("ظرف‌شستن", tiles)
+        self.assertIn(self.env.ref('ikiku_base.spec_dishwashing').plain_label, tiles)
         self.assertNotIn("شیفت صبح", tiles, "shifts are not skills")
         dishwashing = self.env.ref('ikiku_base.spec_dishwashing')
         prep = self.env.ref('ikiku_base.spec_prep')
@@ -64,7 +64,7 @@ class TestFlows(HttpCase):
         self.assertEqual((availability.date_end, set(availability.work_type_ids.ids), availability.details_confirmed),
                          (False, {self.full.id, self.shift.id}, True))
         me = self.url_open('/me').text
-        self.assertIn("ثبت شد. همکارای ایکیکو نگاهش می‌کنن", me)
+        self.assertIn("ثبت شد. تیمِ ایکیکو نگاهش می‌کنه", me)
         self.assertIn("بدون پایان", me)
         self.goes_to(self.post('/join/where?edit=1', {'province_id': str(self.tehran.id), 'city': "تهران",
                                                       'edit': '1'}), '/me')
@@ -85,15 +85,15 @@ class TestFlows(HttpCase):
         self.goes_to(self.post('/business/need/count', {'seats': '۲', 'next': '1'}), '/business/need/when')
         self.goes_to(self.post('/business/need/when', {'start': 'week', 'end': '1m'}), '/business/need/where')
         check = self.url_open('/business/need/where').text
-        self.assertIn("گارسونی", check)
-        self.assertIn("اسمِ کافه‌تون دیده نمیشه", check)
+        self.assertIn(waiter.plain_label, check)
+        self.assertIn("اسمِ مجموعه‌تون دیده نمیشه", check)
         saved = self.post('/business/need/where', {'province_id': str(self.tehran.id), 'city': "تهران"})
         demand = self.env['ikiku.demand'].search([('business_id.name', '=', "کافه نارنج")])
         self.goes_to(saved, '/business/need/%d' % demand.id)
         self.assertEqual((demand.seats, demand.work_type_id, demand.city, demand.state), (2, self.shift, "تهران", 'open'))
         self.assertTrue(demand.date_end and demand.date_end > demand.date_start)
         self.assertIn("درخواستتون ثبت شد", self.url_open('/business/need/%d' % demand.id).text)
-        self.assertIn("گارسونی", self.url_open('/business').text)
+        self.assertIn(waiter.plain_label, self.url_open('/business').text)
 
     def test_help_pages_read_their_numbers_from_the_code(self):
         for page in help_controller.PAGES:
@@ -102,8 +102,8 @@ class TestFlows(HttpCase):
         with patch('odoo.addons.ikiku_portal.models.mobile_challenge.MAX_SENDS_PER_HOUR', 7):
             self.assertIn("فقط ۷ بار", self.url_open('/help/code').text)
         dide = self.url_open('/help/dide').text
-        self.assertIn("اسمتون", dide.split("فقط همکارای ایکیکو می‌بینن")[0])
-        self.assertIn("کدِ ملی", dide.split("فقط همکارای ایکیکو می‌بینن")[1])
+        self.assertIn("اسمتون", dide.split("فقط تیمِ ایکیکو می‌بینه")[0])
+        self.assertIn("کدِ ملی", dide.split("فقط تیمِ ایکیکو می‌بینه")[1])
         self.assertIn("تا ۳", self.url_open('/help/etebar').text)
 
     def test_a_call_back_request(self):

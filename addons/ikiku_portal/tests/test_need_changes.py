@@ -89,7 +89,7 @@ class TestNeedChanges(HttpCase):
 
     def test_found_is_its_own_end(self):
         page = self.url_open('/business/need/%d/close' % self.need.id).text
-        self.assertIn("نیرو پیدا کردم", page)
+        self.assertIn("همکار پیدا کردم", page)
         self.assertIn("لغو می‌کنم", page)
         done = self.post('/business/need/%d/close' % self.need.id, {'outcome': 'found'})
         self.assertTrue(self.location(done).endswith('/business?done=filled'))
@@ -199,7 +199,7 @@ class TestSeveralBusinesses(HttpCase):
         self.assertEqual(need.business_id, second)
         home = self.url_open('/business').text
         self.assertIn("کافه نارنج", home)
-        self.assertIn("نیروی تازه برای رستوران لیمو", home)
+        self.assertIn("همکارِ تازه برای رستوران لیمو", home)
         self.assertIn('/business/need/%d/edit' % need.id, home)
         self.assertEqual(self.url_open('/business/need/%d/edit' % need.id, allow_redirects=False).status_code, 303)
         self.assertIn("برای <strong>رستوران لیمو</strong>", self.url_open('/business/need/who').text)

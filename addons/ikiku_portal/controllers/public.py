@@ -11,6 +11,23 @@ from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import to_latin_digits
 
+# How a claim reads next to a person's name, in spoken words (D-9, D-10). The model's
+# selections stay as they are for staff; a key missing here falls back to them.
+CLAIM_METHODS = {
+    'self': "خودش",
+    'coworker': "کسی که باهاش کار کرده",
+    'employer': "جایی که کار کرده",
+    'academy': "آموزشگاه",
+    'platform': "ایکیکو",
+    'document': "مدرک",
+}
+CLAIM_STATES = {
+    'claimed': "خودش گفته",
+    'supported': "تأیید شده",
+    'contested': "کسی قبول نداره",
+    'withdrawn': "پس گرفته شد",
+}
+
 
 class IkikuPublic(http.Controller):
 
@@ -30,6 +47,8 @@ class IkikuPublic(http.Controller):
             'resource': resource,
             'values': resource.ikiku_public_values('public'),
             'assertions': assertions,
+            'claim_methods': CLAIM_METHODS,
+            'claim_states': CLAIM_STATES,
             'bookings': [b.public_payload() for b in bookings],
         })
 

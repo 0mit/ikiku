@@ -173,7 +173,7 @@ class TestTwoSidesPages(TwoSidesData, OtpSetup, HttpCase):
         self.authenticate('two-sides', 'two-sides-pass-1')
         door = self.url_open('/ku', allow_redirects=False)
         self.assertEqual(door.status_code, 200)
-        self.assertIn("کافه یا رستوران دارید و نیرو می‌خواید؟", door.text)
+        self.assertIn("کافه یا رستوران دارید و همکار می‌خواید؟", door.text)
         self.assertFalse(self.env['ikiku.business'].search([('partner_id', '=', self.person.partner_id.id)]))
         name_page = self.url_open('/business/name').text
         self.assertIn("صفحه‌ی کاری‌تون سرِ جاشه", name_page)
@@ -217,7 +217,7 @@ class TestTwoSidesPages(TwoSidesData, OtpSetup, HttpCase):
         cafe.write({'province_id': self.tehran.id, 'city': "تهران"})
         self.authenticate('two-sides', 'two-sides-pass-1')
         page = self.url_open('/join/where?edit=1').text
-        self.assertIn("شهرِ کافه‌تون عوض نمیشه", page)
+        self.assertIn("شهرِ مجموعه‌تون عوض نمیشه", page)
         self.post('/join/where?edit=1', {'province_id': str(self.alborz.id), 'city': "کرج", 'edit': '1'})
         self.assertEqual(self.person.partner_id.ikiku_city, "کرج")
         self.assertEqual((cafe.province_id, cafe.city), (self.tehran, "تهران"))
@@ -267,4 +267,4 @@ class TestTwoSidesPages(TwoSidesData, OtpSetup, HttpCase):
         for url in ('/help', '/help/kar', '/help/niroo'):
             self.assertIn('/help/hardo', self.url_open(url).text, url)
         dide = self.url_open('/help/dide').text
-        self.assertIn("اینکه کافه مالِ کیه", dide)
+        self.assertIn("اینکه کافه یا رستوران مالِ کیه", dide)

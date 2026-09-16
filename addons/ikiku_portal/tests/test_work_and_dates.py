@@ -108,9 +108,10 @@ class TestWorkAndDates(TransactionCase):
 
     def test_signup_tiles_have_everyday_names_in_a_published_order(self):
         Node = self.env['ikiku.spec.node']
-        self.assertEqual(self.node.plain_label, "ظرف‌شستن")
-        kitchen = Node.search([('code', 'in', ('dishwashing', 'prep', 'line-cook', 'chef'))], order='sequence')
-        self.assertEqual(kitchen.mapped('code'), ['dishwashing', 'prep', 'line-cook', 'chef'])
+        self.assertEqual(self.node.plain_label, "شست‌وشوی ظرف")
+        kitchen = Node.search([('kind', '=', 'role'), ('featured', '=', True),
+                               ('parent_id', 'child_of', self.env.ref('ikiku_base.spec_kitchen').id)], order='sequence')
+        self.assertEqual(kitchen.mapped('code'), ['cook', 'prep', 'dishwashing', 'kebab-cook', 'fast-food-cook', 'chef'])
 
     def test_open_job_values_follow_the_policy_rows(self):
         self.need(city="تهران", work_type_id=self.part.id, date_end=self.today + timedelta(days=20))

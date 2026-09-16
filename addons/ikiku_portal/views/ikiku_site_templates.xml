@@ -20,25 +20,25 @@
           <div class="ikiku__hero-copy">
             <p class="ikiku__kicker">ایکیکو · کافه و رستوران</p>
             <h1 class="ikiku__ask">آیکی؟ کو؟</h1>
-            <p class="ikiku__plain">کار تو کافه و رستوران می‌خواید؟ یا نیرو لازم دارید؟</p>
+            <p class="ikiku__plain">کار تو کافه و رستوران می‌خواید؟ یا همکار لازم دارید؟</p>
           </div>
 
           <div id="ikiku-doors" class="ikiku__doors">
             <a class="ikiku__door" href="/ki">
               <span class="ikiku__door-ask">کی؟</span>
               <strong class="ikiku__door-who">دنبالِ کار هستم</strong>
-              <span>ظرف‌شستن، قهوه، آشپزی، گارسونی. با شماره موبایل، حدودِ ۳ دقیقه.</span>
+              <span>شست‌وشوی ظرف، قهوه، آشپزی، پذیرایی. با شماره موبایل، حدودِ ۳ دقیقه.</span>
               <span class="ikiku__door-go">ثبت‌نام برای کار</span>
             </a>
             <a class="ikiku__door" href="/ku">
               <span class="ikiku__door-ask">کو؟</span>
-              <strong class="ikiku__door-who">نیرو لازم دارم</strong>
-              <span>کافه یا رستوران دارید؟ بگید چه نیرویی، چند نفر و از کِی.</span>
-              <span class="ikiku__door-go">نیرو می‌خوام</span>
+              <strong class="ikiku__door-who">همکار لازم دارم</strong>
+              <span>کافه یا رستوران دارید؟ بگید برای چه کاری، چند نفر و از کِی.</span>
+              <span class="ikiku__door-go">همکار می‌خوام</span>
             </a>
             <p class="ikiku__doors-note">ایمیل و رمز لازم نیست. فقط شماره موبایل.</p>
-            <nav class="ikiku__roles" aria-label="نیرو برای چه کاری">
-              <span>نیرو برای:</span>
+            <nav class="ikiku__roles" aria-label="همکار برای چه کاری">
+              <span>همکار برای:</span>
               <t t-foreach="Demand.ikiku_role_shortcuts()" t-as="role">
                 <a class="ikiku__role" t-att-href="'/ku?node=%s' % role[0]" t-out="role[1]"/>
               </t>
@@ -58,7 +58,7 @@
             <div>
               <p class="ikiku__kicker">همه می‌بینن</p>
               <h2>کارهای باز</h2>
-              <p class="ikiku__lead">نیرویی که کافه‌ها و رستوران‌ها لازم دارن. اسمِ کافه یا رستوران اینجا نوشته نمیشه.</p>
+              <p class="ikiku__lead">کارهایی که کافه‌ها و رستوران‌ها براش همکار می‌خوان. اسمِ کافه یا رستوران اینجا نوشته نمیشه.</p>
             </div>
             <a t-if="jobs_count" class="ikiku__secondary" href="/jobs">
               همه‌ی کارهای باز (<t t-out="Demand.ikiku_fa_digits(jobs_count)"/>)</a>
@@ -77,8 +77,8 @@
             </div>
           </div>
           <ol class="ikiku__steps">
-            <li><strong>کارگر</strong> میگه چه کاری بلده و کِی آزاده.</li>
-            <li><strong>کافه یا رستوران</strong> میگه چه نیرویی، چند نفر، از کِی.</li>
+            <li><strong>کارجو</strong> میگه چه کاری بلده و کِی آزاده.</li>
+            <li><strong>کافه یا رستوران</strong> میگه برای چه کاری، چند نفر، از کِی.</li>
             <li><strong>ایکیکو</strong> کسانی رو که به هم می‌خورن معرفی می‌کنه، و میگه هر عدد از کجا اومده.</li>
             <li><strong>قرارِ کار</strong> که گذاشته شد، همه می‌بینن. اگه به هم بخوره هم همه می‌بینن.</li>
           </ol>
@@ -88,16 +88,16 @@
       <section class="ikiku__band">
         <div class="ikiku__wide ikiku__trust">
           <div class="ikiku__tenets-panel">
-            <p class="ikiku__kicker">مرام‌نامه، ساده</p>
+            <p class="ikiku__kicker">مرام‌نامه، کوتاه</p>
             <h2>قول‌هایی که دادیم</h2>
             <ul class="ikiku__tenets">
-              <li><strong>هر کاری آبرو داره.</strong> هیچ کاری «ساده» نیست؛ ظرف‌شستن هم فنه. تو ایکیکو آدم‌ها شماره نیستن. <small>بند ۱</small></li>
+              <li><strong>هر کاری آبرو داره.</strong> هیچ کاری «ساده» نیست؛ شست‌وشوی ظرف هم فنه. تو ایکیکو آدم‌ها شماره نیستن. <small>بند ۱</small></li>
               <li><strong>آبروی کاری مالِ خودتونه.</strong> هر چی تو کار به دست میارید به اسمِ خودتون نوشته میشه و با شما میاد؛ به شهرِ دیگه، به کارِ دیگه. <small>بند ۲</small></li>
               <li><strong>هر حرفی صاحب داره.</strong> معلومه کی گفته و از کجا می‌دونه. حرفی که نشه پرسید «کی گفته؟» حساب نیست. <small>بند ۳</small></li>
               <li><strong>امنیتِ آدم‌ها اول.</strong> کارتون رو همه می‌بینن؛ آدرس، شماره، کدِ ملی و برنامه‌ی روزتون رو نه. <small>بند ۷</small></li>
               <li><strong>واسطه‌ایم، نه دلال.</strong> هیچ‌کس با پول رتبه‌ش بالا نمیره، و هیچ‌کس با پول نقدی رو پاک نمی‌کنه. <small>بند ۸</small></li>
             </ul>
-            <p class="ikiku__links"><a class="ikiku__link" href="/help/maram">خلاصه‌ی ساده‌ی همه‌ی بندها</a>
+            <p class="ikiku__links"><a class="ikiku__link" href="/help/maram">خلاصه‌ی همه‌ی بندها</a>
               <a class="ikiku__link" href="/manifest">متنِ کاملِ مرام‌نامه</a></p>
           </div>
 
@@ -106,7 +106,7 @@
             <h2>جلوی چشمِ همه</h2>
             <ul class="ikiku__ledgers">
               <li><a href="/jobs"><strong>کارهای باز</strong>
-                <span>نیرویی که کافه‌ها و رستوران‌ها لازم دارن.</span></a></li>
+                <span>کارهایی که کافه‌ها و رستوران‌ها براش همکار می‌خوان.</span></a></li>
               <li><a href="/bookings"><strong>دفترِ قرارهای کار</strong>
                 <span>هر قرارِ کاری که گذاشته شد، و هر قراری که به هم خورد.</span></a></li>
               <li><a href="/costs"><strong>هزینه‌ی مشترک</strong>
@@ -143,7 +143,7 @@
       </t>
     </div>
     <div t-else="" class="ikiku__empty">
-      هنوز کارِ بازی نیست. نیرو لازم دارید؟ <a href="/ku">اینجا بگید</a>.
+      هنوز کارِ بازی نیست. همکار لازم دارید؟ <a href="/ku">اینجا بگید</a>.
     </div>
   </template>
 
@@ -154,7 +154,7 @@
         <h1 class="ikiku__ask">کی؟</h1>
         <p class="ikiku__plain">دنبالِ کار هستید؟</p>
         <ul class="ikiku__plainlist">
-          <li>ظرف‌شستن، قهوه، آشپزی، گارسونی.</li>
+          <li>شست‌وشوی ظرف، قهوه، آشپزی، پذیرایی.</li>
           <li>حدودِ ۳ دقیقه طول می‌کشه.</li>
           <li>شماره و آدرس‌تون رو به هیچ‌کس نشون نمی‌دیم. <a href="/help/dide">چرا؟</a></li>
         </ul>
@@ -177,10 +177,10 @@
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__kicker">برای کافه و رستوران</p>
         <h1 class="ikiku__ask">کو؟</h1>
-        <p class="ikiku__plain">برای کافه یا رستورانتون نیرو می‌خواید؟</p>
+        <p class="ikiku__plain">برای کافه یا رستورانتون همکار می‌خواید؟</p>
         <ul class="ikiku__plainlist">
-          <li>بگید چه نیرویی، چند نفر، از کِی، کجا.</li>
-          <li>ایکیکو از مزدِ کارگر چیزی برنمی‌داره. <a href="/help/hazine">هزینه‌ش چطوریه؟</a></li>
+          <li>بگید برای چه کاری، چند نفر، از کِی، کجا.</li>
+          <li>ایکیکو از حقوقِ هیچ‌کس چیزی برنمی‌داره. <a href="/help/hazine">هزینه‌ش چطوریه؟</a></li>
         </ul>
         <t t-if="otp_enabled">
           <a class="ikiku__go ikiku__go--block" t-att-href="start_url">شروع کنیم</a>
@@ -199,7 +199,7 @@
   <template id="manifest_page" name="ایکیکو — مرام‌نامه">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__manifest">
-        <p class="ikiku__note">متنِ کامل و رسمیِ قانونِ ایکیکو. <a href="/help/maram">خلاصه‌ی ساده‌اش اینجاست.</a></p>
+        <p class="ikiku__note">متنِ کامل و رسمیِ قانونِ ایکیکو. <a href="/help/maram">خلاصه‌ش اینجاست.</a></p>
         <t t-out="body"/>
       </div></div>
     </t>
@@ -207,14 +207,14 @@
 
   <!-- A signed-in person at the other door: asked once, on its own screen, before a second
        side is made (operator, 2026-09-16: one person may hold both). -->
-  <template id="door_add_ki" name="ایکیکو — کی؟ برای کسی که کافه داره">
+  <template id="door_add_ki" name="ایکیکو — کی؟ برای کسی که کافه یا رستوران داره">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__kicker">کار می‌خوام</p>
         <h1 class="ikiku__question">خودتون هم دنبالِ کار هستید؟</h1>
-        <p class="ikiku__plain">با همین شماره میشه. حسابِ تازه لازم نیست. کافه‌تون و درخواست‌هاش سرِ جاشه.</p>
+        <p class="ikiku__plain">با همین شماره میشه. حسابِ تازه لازم نیست. مجموعه‌تون و درخواست‌هاش سرِ جاشه.</p>
         <a class="ikiku__go ikiku__go--block" href="/join">آره، دنبالِ کار هم هستم</a>
-        <a class="ikiku__secondary ikiku__go--block" href="/business">نه، برگردم به کافه‌م</a>
+        <a class="ikiku__secondary ikiku__go--block" href="/business">نه، برگردم به درخواست‌هام</a>
         <p class="ikiku__links"><a href="/help/hardo">راهنما</a></p>
       </div></div>
     </t>
@@ -223,10 +223,10 @@
   <template id="door_add_ku" name="ایکیکو — کو؟ برای کسی که دنبالِ کاره">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
-        <p class="ikiku__kicker">نیرو می‌خوام</p>
-        <h1 class="ikiku__question">کافه یا رستوران دارید و نیرو می‌خواید؟</h1>
+        <p class="ikiku__kicker">همکار می‌خوام</p>
+        <h1 class="ikiku__question">کافه یا رستوران دارید و همکار می‌خواید؟</h1>
         <p class="ikiku__plain">با همین شماره میشه. حسابِ تازه لازم نیست. صفحه‌ی کاری‌تون سرِ جاشه و عوض نمیشه.</p>
-        <a class="ikiku__go ikiku__go--block" href="/business/name">آره، نیرو می‌خوام</a>
+        <a class="ikiku__go ikiku__go--block" href="/business/name">آره، همکار می‌خوام</a>
         <a class="ikiku__secondary ikiku__go--block" href="/me">نه، برگردم به صفحه‌ی کاری‌م</a>
         <p class="ikiku__links"><a href="/help/hardo">راهنما</a></p>
       </div></div>

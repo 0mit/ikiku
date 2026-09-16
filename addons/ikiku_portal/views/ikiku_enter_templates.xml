@@ -8,7 +8,7 @@
         <p class="ikiku__step"><t t-if="signed_in">تأییدِ شماره</t><t t-else="">ورود</t></p>
         <h1 class="ikiku__question">شماره موبایلتون چیه؟</h1>
         <p class="ikiku__lead">یه کد براتون پیامک می‌کنیم.<t t-if="not signed_in"> رمز و ایمیل لازم نیست.</t></p>
-        <p t-if="role == 'ku' and not signed_in" class="ikiku__lead">با شماره‌ی خودتون وارد بشید، نه شماره‌ی کافه.</p>
+        <p t-if="role == 'ku' and not signed_in" class="ikiku__lead">با شماره‌ی خودتون وارد بشید، نه شماره‌ی کافه یا رستوران.</p>
 
         <div t-if="not otp_enabled" class="ikiku__note">
           ورود با پیامک الان کار نمی‌کنه. <a href="/web/login">با ایمیل وارد بشید</a>.

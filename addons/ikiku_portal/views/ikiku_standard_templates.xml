@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- The standard, read by anyone (controllers/standard.py): roles, the skills under them and
+       the fields of knowledge under the skills. Spoken Persian (D-9), plain words (D-10). -->
+
+  <!-- A search box that suggests as the person types; without JavaScript it is a GET form. -->
+  <template id="standard_search" name="ایکیکو — جست‌وجو در کارها">
+    <form t-att-action="action" method="get" class="ikiku__form ikiku__search" role="search">
+      <label t-att-for="field_id" class="ikiku__label" t-out="label"/>
+      <div data-suggest="" t-att-data-suggest-url="'/standard/suggest?kind=%s' % kind"
+           data-suggest-count="{n} پیشنهاد">
+        <input class="ikiku__field ikiku__field--big" type="search" t-att-id="field_id" name="q"
+               t-att-value="query" t-att-placeholder="placeholder" maxlength="80"/>
+      </div>
+      <button class="ikiku__secondary" type="submit">بگرد</button>
+    </form>
+  </template>
+
+  <template id="standard_trail" name="ایکیکو — مسیرِ کار یا مهارت">
+    <p class="ikiku__kicker">
+      <a t-att-href="home_url" t-out="home_label"/>
+      <t t-foreach="trail" t-as="family"> · <t t-out="family.plain_label or family.name"/></t>
+    </p>
+  </template>
+
+  <template id="standard_roles" name="ایکیکو — کارها">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <p class="ikiku__kicker"><a href="/knowledge">درختِ دانش</a></p>
+        <h1 class="ikiku__question">کارهای کافه و رستوران</h1>
+        <p class="ikiku__lead"><t t-out="total"/> کار. هر کدوم رو بزنید، می‌بینید چه مهارت‌هایی لازم داره
+          و اون مهارت‌ها از کدوم دانش میان.</p>
+        <t t-call="ikiku_portal.standard_search">
+          <t t-set="action" t-value="'/roles'"/><t t-set="kind" t-value="'role'"/>
+          <t t-set="field_id" t-value="'roles-q'"/><t t-set="label" t-value="'دنبالِ چه کاری هستید؟'"/>
+          <t t-set="placeholder" t-value="'مثلاً: باریستا، کباب‌پز، میزبان'"/>
+        </t>
+        <section t-if="query" class="ikiku__card">
+          <h2 class="ikiku__subhead">برای «<t t-out="query"/>»</h2>
+          <ul t-if="results" class="ikiku__helplist">
+            <li t-foreach="results" t-as="node">
+              <a t-att-href="'/roles/%s' % node.code" t-out="node.plain_label or node.name"/>
+              <small t-if="node.parent_id" class="ikiku__muted"> · <t t-out="node.parent_id.plain_label or node.parent_id.name"/></small>
+            </li>
+          </ul>
+          <p t-else="" class="ikiku__lead">چیزی پیدا نشد. یه جورِ دیگه بنویسید، یا از فهرستِ پایین انتخاب کنید.</p>
+        </section>
+        <t t-foreach="families" t-as="row">
+          <section class="ikiku__biz">
+            <h2 class="ikiku__subhead"><t t-out="row['family'].plain_label or row['family'].name"/>
+              <small class="ikiku__muted">(<t t-out="row['count']"/>)</small></h2>
+            <nav class="ikiku__roles ikiku__roles--start" t-att-aria-label="row['family'].plain_label or row['family'].name">
+              <a t-foreach="row['featured']" t-as="node" class="ikiku__role" t-att-href="'/roles/%s' % node.code"
+                 t-out="node.plain_label or node.name"/>
+            </nav>
+            <details t-if="row['others']" class="ikiku__more">
+              <summary>بقیه‌ی کارهای <t t-out="row['family'].plain_label or row['family'].name"/></summary>
+              <nav class="ikiku__roles ikiku__roles--start">
+                <a t-foreach="row['others']" t-as="node" class="ikiku__role" t-att-href="'/roles/%s' % node.code"
+                   t-out="node.plain_label or node.name"/>
+              </nav>
+            </details>
+          </section>
+        </t>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="standard_role" name="ایکیکو — یک کار">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <t t-call="ikiku_portal.standard_trail">
+          <t t-set="home_url" t-value="'/roles'"/><t t-set="home_label" t-value="'کارها'"/>
+        </t>
+        <h1 class="ikiku__question" t-out="label"/>
+        <p t-if="role.name and role.name != label" class="ikiku__muted">نامِ رسمی: <t t-out="role.name"/>
+          <t t-if="role.name_en"> · <bdi dir="ltr" t-out="role.name_en"/></t></p>
+        <p t-if="role.description" class="ikiku__plain" t-out="role.description"/>
+
+        <section t-if="groups">
+          <h2 class="ikiku__subhead">این کار چه مهارت‌هایی لازم داره؟</h2>
+          <t t-foreach="groups" t-as="group">
+            <h3 class="ikiku__label" t-out="group[0]"/>
+            <nav class="ikiku__roles ikiku__roles--start">
+              <a t-foreach="group[1]" t-as="skill" class="ikiku__role" t-att-href="'/skills/%s' % skill.code"
+                 t-out="skill.plain_label or skill.name"/>
+            </nav>
+          </t>
+          <p class="ikiku__lead">هر مهارت رو بزنید تا ببینید چیه و از کدوم دانش میاد.</p>
+        </section>
+
+        <section t-if="occupations" class="ikiku__card">
+          <h2 class="ikiku__subhead">جای این کار در طبقه‌بندیِ جهانیِ مشاغل</h2>
+          <ul class="ikiku__helplist">
+            <li t-foreach="occupations" t-as="klass">
+              <a t-att-href="'/knowledge/isco-08/%s' % klass.code" t-out="klass.name"/>
+              <small class="ikiku__muted"> · ISCO-08 <bdi dir="ltr" t-out="klass.code"/></small>
+            </li>
+          </ul>
+        </section>
+
+        <div class="ikiku__actions">
+          <a class="ikiku__go" href="/ki">این کار رو بلدم</a>
+          <a class="ikiku__secondary" t-att-href="'/ku?node=%d' % role.id">برای این کار همکار می‌خوام</a>
+        </div>
+        <p class="ikiku__links"><a href="/jobs">کارهای باز</a> <a href="/roles">همه‌ی کارها</a> <a href="/knowledge">درختِ دانش</a></p>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="standard_skill" name="ایکیکو — یک مهارت">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <t t-call="ikiku_portal.standard_trail">
+          <t t-set="home_url" t-value="'/roles'"/><t t-set="home_label" t-value="'کارها'"/>
+        </t>
+        <p class="ikiku__step">مهارت</p>
+        <h1 class="ikiku__question" t-out="label"/>
+        <p t-if="skill.name and skill.name != label" class="ikiku__muted">نامِ رسمی: <t t-out="skill.name"/>
+          <t t-if="skill.name_en"> · <bdi dir="ltr" t-out="skill.name_en"/></t></p>
+        <p t-if="skill.description" class="ikiku__plain" t-out="skill.description"/>
+
+        <section t-if="links" class="ikiku__card">
+          <h2 class="ikiku__subhead">این مهارت از کدوم دانش میاد؟</h2>
+          <ul class="ikiku__knowledge">
+            <li t-foreach="links" t-as="link">
+              <a t-att-href="'/knowledge/%s/%s' % (link.class_id.scheme_id.code, link.class_id.code)">
+                <t t-out="link.class_id.name"/></a>
+              <t t-if="link.topic">: <strong t-out="link.topic"/></t>
+              <p t-if="link.note" class="ikiku__muted" t-out="link.note"/>
+            </li>
+          </ul>
+        </section>
+
+        <section t-if="roles">
+          <h2 class="ikiku__subhead">کارهایی که این مهارت رو لازم دارن</h2>
+          <nav class="ikiku__roles ikiku__roles--start">
+            <a t-foreach="roles" t-as="role" class="ikiku__role" t-att-href="'/roles/%s' % role.code"
+               t-out="role.plain_label or role.name"/>
+          </nav>
+        </section>
+        <p class="ikiku__links"><a href="/roles">همه‌ی کارها</a> <a href="/knowledge">درختِ دانش</a></p>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="standard_knowledge" name="ایکیکو — درختِ دانش">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <p class="ikiku__kicker"><a href="/roles">کارها</a></p>
+        <h1 class="ikiku__question">درختِ دانش</h1>
+        <p class="ikiku__plain">هر مهارت از یک یا چند دانش میاد. مثلاً اسپرسو گرفتن به فیزیکِ فشارِ آب و
+          به برقِ دستگاه ربط داره. اینجا دانش‌ها رو به ترتیبِ طبقه‌بندی‌های جهانی می‌بینید.</p>
+        <t t-call="ikiku_portal.standard_search">
+          <t t-set="action" t-value="'/knowledge'"/><t t-set="kind" t-value="'knowledge'"/>
+          <t t-set="field_id" t-value="'knowledge-q'"/><t t-set="label" t-value="'دنبالِ کدوم دانش هستید؟'"/>
+          <t t-set="placeholder" t-value="'مثلاً: فیزیک، تغذیه، حسابداری'"/>
+        </t>
+        <section t-if="query" class="ikiku__card">
+          <h2 class="ikiku__subhead">برای «<t t-out="query"/>»</h2>
+          <ul t-if="results" class="ikiku__knowledge">
+            <li t-foreach="results" t-as="klass">
+              <a t-att-href="'/knowledge/%s/%s' % (klass.scheme_id.code, klass.code)" t-out="klass.name"/>
+              <small class="ikiku__muted"> · <bdi dir="ltr"><t t-out="klass.scheme_id.code"/> <t t-out="klass.code"/></bdi></small>
+            </li>
+          </ul>
+          <p t-else="" class="ikiku__lead">چیزی پیدا نشد. یه جورِ دیگه بنویسید.</p>
+        </section>
+        <section t-foreach="schemes" t-as="row" class="ikiku__biz">
+          <h2 class="ikiku__subhead" t-out="row['scheme'].name"/>
+          <p class="ikiku__muted"><bdi dir="ltr" t-out="row['scheme'].name_en"/> · <t t-out="row['scheme'].publisher"/></p>
+          <ul class="ikiku__knowledge">
+            <li t-foreach="row['tops']" t-as="top">
+              <a t-att-href="'/knowledge/%s/%s' % (row['scheme'].code, top['klass'].code)" t-out="top['klass'].name"/>
+              <small t-if="top['count']" class="ikiku__muted"> · <t t-out="top['count_fa']"/> <t t-out="row['noun']"/></small>
+            </li>
+          </ul>
+        </section>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="standard_knowledge_class" name="ایکیکو — یک شاخه‌ی دانش">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <p class="ikiku__kicker">
+          <a href="/knowledge">درختِ دانش</a>
+          <t t-foreach="ancestors" t-as="up"> · <a t-att-href="'/knowledge/%s/%s' % (scheme_code, up.code)" t-out="up.name"/></t>
+        </p>
+        <h1 class="ikiku__question" t-out="klass.name"/>
+        <p class="ikiku__muted"><bdi dir="ltr"><t t-out="klass.scheme_id.code"/> <t t-out="klass.code"/> · <t t-out="klass.name_en"/></bdi></p>
+        <p class="ikiku__lead"><t t-out="total_fa"/> <t t-out="noun"/> در این شاخه و زیرشاخه‌هاش.</p>
+
+        <section t-if="rows" class="ikiku__card">
+          <h2 class="ikiku__subhead"><t t-if="noun == 'مهارت'">مهارت‌هایی که از این دانش میان</t><t t-else="">کارهایی که اینجا جا دارن</t></h2>
+          <ul class="ikiku__knowledge">
+            <li t-foreach="rows" t-as="row">
+              <a t-att-href="'/%s/%s' % ('skills' if row[0].kind == 'competency' else 'roles', row[0].code)"
+                 t-out="row[0].plain_label or row[0].name"/>
+              <t t-foreach="row[1]" t-as="link"><t t-if="link.topic">: <span t-out="link.topic"/></t></t>
+            </li>
+          </ul>
+        </section>
+
+        <section t-if="children">
+          <h2 class="ikiku__subhead">زیرشاخه‌ها</h2>
+          <ul class="ikiku__knowledge">
+            <li t-foreach="children" t-as="child">
+              <a t-att-href="'/knowledge/%s/%s' % (scheme_code, child['klass'].code)" t-out="child['klass'].name"/>
+              <small class="ikiku__muted"> · <bdi dir="ltr" t-out="child['klass'].code"/><t t-if="child['count']"> · <t t-out="child['count_fa']"/> <t t-out="noun"/></t></small>
+            </li>
+          </ul>
+        </section>
+        <p class="ikiku__links"><a href="/roles">همه‌ی کارها</a> <a href="/knowledge">درختِ دانش</a></p>
+      </div></div>
+    </t>
+  </template>
+
+</odoo>

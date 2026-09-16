@@ -51,20 +51,28 @@ class IkikuPortal(http.Controller):
         return request.env.user.partner_id.sudo()
 
     def _competencies(self):
-        """The signup tiles: every competency, grouped under its family, in the published
-        order stored on the nodes (never popularity)."""
+        """The tiles: every role on offer, grouped under the family below the F&B root, in the
+        published order stored on the nodes (never popularity). A family's featured roles are
+        buttons; the rest wait under «کارهای دیگه», so the whole standard is reachable without
+        a hundred buttons on a phone. Returns (family, featured, others)."""
         Node = request.env['ikiku.spec.node'].sudo()
+        root = request.env.ref('ikiku_base.spec_fnb', raise_if_not_found=False)
         groups = []
-        for family in Node.search([('kind', '=', 'family'), ('parent_id', '!=', False)], order='sequence, id'):
-            nodes = Node.search([('kind', '=', 'competency'), ('parent_id', '=', family.id)], order='sequence, id')
-            if nodes:
-                groups.append((family, nodes))
+        if not root:
+            return groups
+        offered = Node.ikiku_offered_domain()
+        for family in Node.search([('kind', '=', 'family'), ('parent_id', '=', root.id)] + offered, order='sequence, id'):
+            roles = Node.search([('kind', '=', 'role'), ('parent_id', 'child_of', family.id)] + offered,
+                                order='sequence, id')
+            featured = roles.filtered('featured')
+            if roles:
+                groups.append((family, featured or roles[:6], roles - (featured or roles[:6])))
         return groups
 
     def _resolve(self, raw):
         if not raw:
             return request.env['ikiku.spec.node'].sudo().browse()
-        return request.env['ikiku.spec.node'].sudo().resolve_text(raw).filtered(lambda n: n.kind == 'competency')
+        return request.env['ikiku.spec.node'].sudo().resolve_text(raw, kinds=('role',))
 
     def _city_suggestions(self):
         """What the city field suggests: every province's centre and the cities open jobs
@@ -156,7 +164,7 @@ class IkikuPortal(http.Controller):
                 if for_business:
                     return request.redirect('/business/name')
                 return self._after_worker_save(self._resource(create=True), edit)
-            error = "اسم رو ننوشتید. اینجا بنویسید."
+            error = "اسمتون رو اینجا بنویسید."
         else:
             error = None
             name = '' if self._needs_name(partner) else partner.name
@@ -174,9 +182,9 @@ class IkikuPortal(http.Controller):
         if request.httprequest.method == 'POST':
             province = request.env['ikiku.province'].sudo().browse(province_id or 0).exists()
             if not province:
-                errors['province'] = "استان رو انتخاب نکردید."
+                errors['province'] = "استان رو انتخاب کنید."
             if not city:
-                errors['city'] = "شهر رو ننوشتید."
+                errors['city'] = "شهر رو بنویسید."
             if not errors:
                 partner.write({'ikiku_province_id': province.id, 'ikiku_city': city})
                 resource = self._resource(create=True)
@@ -200,7 +208,7 @@ class IkikuPortal(http.Controller):
         if request.httprequest.method == 'POST':
             Node = request.env['ikiku.spec.node'].sudo()
             chosen = Node.browse([to_int(v, 0) for v in _form_list('node_id')]).exists().filtered(
-                lambda n: n.kind == 'competency')
+                lambda n: n.kind == 'role')
             for node in chosen - claimed:
                 resource.claim_skill(node)
             if raw:
@@ -377,7 +385,7 @@ class IkikuPortal(http.Controller):
                            'booked': bool(d.ikiku_live_bookings())}
                           for d in Demand.search([('business_id', '=', business.id)], order='create_date desc')],
             } for business in businesses],
-            'note': {'filled': "درخواست بسته شد: نیرو پیدا کردید.",
+            'note': {'filled': "درخواست بسته شد: همکار پیدا کردید.",
                      'cancelled': "درخواست لغو شد. دلیلی که نوشتید ثبت شد.",
                      'changed': "تغییرها ثبت شد."}.get(kw.get('done')),
             'sides': ikiku_sides(request.env.user),
@@ -414,7 +422,7 @@ class IkikuPortal(http.Controller):
                 remember_side('ku')
                 self._keep_draft({'business_id': made.id})
                 return request.redirect('/business/need/who')
-            error = "اسم رو ننوشتید. اینجا بنویسید."
+            error = "اسمِ کافه یا رستوران رو اینجا بنویسید."
         else:
             name = business.name if business else ''
         return request.render('ikiku_portal.business_name', {
@@ -432,7 +440,7 @@ class IkikuPortal(http.Controller):
         error = None
         if request.httprequest.method == 'POST':
             node = request.env['ikiku.spec.node'].sudo().browse(to_int(post.get('node_id'), 0)).exists()
-            if node and node.kind == 'competency':
+            if node and node.kind == 'role':
                 position = request.env['ikiku.position'].sudo().search(
                     [('business_id', '=', business.id), ('spec_node_id', '=', node.id)], limit=1)
                 if not position:
@@ -530,9 +538,9 @@ class IkikuPortal(http.Controller):
             city = ' '.join((post.get('city') or '').split())
             province = request.env['ikiku.province'].sudo().browse(province_id or 0).exists()
             if not province:
-                errors['province'] = "استان رو انتخاب نکردید."
+                errors['province'] = "استان رو انتخاب کنید."
             if not city:
-                errors['city'] = "شهر رو ننوشتید."
+                errors['city'] = "شهر رو بنویسید."
             position = request.env['ikiku.position'].sudo().browse(draft['position_id']).exists()
             if position.business_id != business:
                 return request.redirect('/business/need/who')

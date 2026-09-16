@@ -13,6 +13,12 @@
             groups="ikiku_base.group_ikiku_staff"/>
   <menuitem id="menu_ikiku_spec_node" parent="menu_ikiku_standard"
             action="action_spec_node" sequence="10"/>
+  <menuitem id="menu_ikiku_spec_requirement" parent="menu_ikiku_standard"
+            action="action_spec_requirement" sequence="12"/>
+  <menuitem id="menu_ikiku_knowledge_link" parent="menu_ikiku_standard"
+            action="action_knowledge_link" sequence="14"/>
+  <menuitem id="menu_ikiku_knowledge_class" parent="menu_ikiku_standard"
+            action="action_knowledge_class" sequence="16"/>
   <menuitem id="menu_ikiku_spec_candidate" parent="menu_ikiku_standard"
             action="action_spec_candidate" sequence="20"/>
 

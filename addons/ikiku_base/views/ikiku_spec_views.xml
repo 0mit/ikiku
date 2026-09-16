@@ -7,8 +7,11 @@
       <list string="درخت استاندارد">
         <field name="complete_code"/>
         <field name="name"/>
+        <field name="plain_label" optional="show"/>
+        <field name="name_en" optional="hide"/>
         <field name="kind"/>
-        <field name="version"/>
+        <field name="featured" optional="hide"/>
+        <field name="version" optional="hide"/>
         <field name="active" column_invisible="1"/>
       </list>
     </field>
@@ -29,6 +32,9 @@
               <field name="code"/>
               <field name="kind"/>
               <field name="parent_id"/>
+              <field name="plain_label"/>
+              <field name="sequence"/>
+              <field name="featured" invisible="kind != 'role'"/>
             </group>
             <group>
               <field name="version"/>
@@ -41,6 +47,29 @@
           <notebook>
             <page string="شرح">
               <field name="description" placeholder="این گره چه می‌گوید؟"/>
+            </page>
+            <page string="مهارت‌های لازم" invisible="kind != 'role'">
+              <field name="requirement_ids">
+                <list editable="bottom"><field name="skill_id"/><field name="importance"/><field name="note"/></list>
+              </field>
+            </page>
+            <page string="نقش‌هایی که لازمش دارند" invisible="kind != 'competency'">
+              <field name="used_by_ids" readonly="1">
+                <list><field name="role_id"/><field name="importance"/></list>
+              </field>
+            </page>
+            <page string="پیوند با دانش">
+              <field name="knowledge_link_ids">
+                <list editable="bottom">
+                  <field name="relation"/><field name="class_id"/><field name="topic"/><field name="topic_en" optional="hide"/>
+                  <field name="note" optional="hide"/>
+                </list>
+              </field>
+            </page>
+            <page string="عرضه در کشورها">
+              <field name="country_rule_ids">
+                <list editable="bottom"><field name="country_id"/><field name="offered"/><field name="reason"/></list>
+              </field>
             </page>
             <page string="واژه‌های راهنما">
               <field name="hint_terms"
@@ -57,10 +86,132 @@
     </field>
   </record>
 
+  <record id="view_spec_node_search" model="ir.ui.view">
+    <field name="name">ikiku.spec.node.search</field>
+    <field name="model">ikiku.spec.node</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name" filter_domain="['|', '|', '|', ('name', 'ilike', self), ('plain_label', 'ilike', self), ('name_en', 'ilike', self), ('hint_terms', 'ilike', self)]"/>
+        <field name="code"/>
+        <field name="parent_id" operator="child_of"/>
+        <filter name="roles" string="نقش‌ها" domain="[('kind', '=', 'role')]"/>
+        <filter name="skills" string="مهارت‌ها" domain="[('kind', '=', 'competency')]"/>
+        <filter name="families" string="خانواده‌ها" domain="[('kind', '=', 'family')]"/>
+        <separator/>
+        <filter name="inactive" string="عرضه‌نشده" domain="[('active', '=', False)]"/>
+        <group>
+          <filter name="by_parent" string="والد" context="{'group_by': 'parent_id'}"/>
+          <filter name="by_kind" string="نوع" context="{'group_by': 'kind'}"/>
+        </group>
+      </search>
+    </field>
+  </record>
+
   <record id="action_spec_node" model="ir.actions.act_window">
     <field name="name">درخت استاندارد</field>
     <field name="res_model">ikiku.spec.node</field>
     <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="view_knowledge_class_list" model="ir.ui.view">
+    <field name="name">ikiku.knowledge.class.list</field>
+    <field name="model">ikiku.knowledge.class</field>
+    <field name="arch" type="xml">
+      <list string="رده‌های دانش و شغل">
+        <field name="scheme_id"/><field name="code"/><field name="name"/><field name="name_en"/>
+        <field name="level" optional="hide"/><field name="parent_id" optional="hide"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_knowledge_class_form" model="ir.ui.view">
+    <field name="name">ikiku.knowledge.class.form</field>
+    <field name="model">ikiku.knowledge.class</field>
+    <field name="arch" type="xml">
+      <form string="رده">
+        <sheet>
+          <group>
+            <group><field name="scheme_id"/><field name="code"/><field name="level"/><field name="parent_id"/></group>
+            <group><field name="name"/><field name="name_en"/></group>
+          </group>
+          <notebook>
+            <page string="نقش‌ها و مهارت‌های پیوسته">
+              <field name="link_ids" readonly="1">
+                <list><field name="node_id"/><field name="relation"/><field name="topic"/></list>
+              </field>
+            </page>
+            <page string="زیررده‌ها">
+              <field name="child_ids" readonly="1"><list><field name="code"/><field name="name"/></list></field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_knowledge_class_search" model="ir.ui.view">
+    <field name="name">ikiku.knowledge.class.search</field>
+    <field name="model">ikiku.knowledge.class</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name" filter_domain="['|', '|', ('name', 'ilike', self), ('name_en', 'ilike', self), ('code', '=like', self + '%')]"/>
+        <field name="scheme_id"/>
+        <group><filter name="by_scheme" string="طبقه‌بندی" context="{'group_by': 'scheme_id'}"/></group>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_knowledge_class" model="ir.actions.act_window">
+    <field name="name">رده‌های دانش و شغل</field>
+    <field name="res_model">ikiku.knowledge.class</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <record id="view_knowledge_link_list" model="ir.ui.view">
+    <field name="name">ikiku.knowledge.link.list</field>
+    <field name="model">ikiku.knowledge.link</field>
+    <field name="arch" type="xml">
+      <list string="پیوندها با دانش" editable="bottom">
+        <field name="node_id"/><field name="relation"/><field name="scheme_id"/><field name="class_id"/>
+        <field name="topic"/><field name="topic_en" optional="hide"/><field name="note" optional="hide"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_knowledge_link_search" model="ir.ui.view">
+    <field name="name">ikiku.knowledge.link.search</field>
+    <field name="model">ikiku.knowledge.link</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="node_id"/><field name="class_id"/><field name="topic"/>
+        <group>
+          <filter name="by_class" string="رده" context="{'group_by': 'class_id'}"/>
+          <filter name="by_node" string="نقش یا مهارت" context="{'group_by': 'node_id'}"/>
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_knowledge_link" model="ir.actions.act_window">
+    <field name="name">پیوندها با دانش</field>
+    <field name="res_model">ikiku.knowledge.link</field>
+    <field name="view_mode">list</field>
+  </record>
+
+  <record id="view_spec_requirement_list" model="ir.ui.view">
+    <field name="name">ikiku.spec.requirement.list</field>
+    <field name="model">ikiku.spec.requirement</field>
+    <field name="arch" type="xml">
+      <list string="نقش و مهارت" editable="bottom">
+        <field name="role_id"/><field name="skill_id"/><field name="importance"/><field name="note" optional="hide"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="action_spec_requirement" model="ir.actions.act_window">
+    <field name="name">نقش‌ها و مهارت‌ها</field>
+    <field name="res_model">ikiku.spec.requirement</field>
+    <field name="view_mode">list</field>
   </record>
 
   <record id="view_spec_candidate_list" model="ir.ui.view">

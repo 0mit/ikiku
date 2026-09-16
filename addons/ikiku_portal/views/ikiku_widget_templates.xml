@@ -14,29 +14,40 @@
       <span t-att-style="'inline-size: ' + str(100 * step // total) + '%'"/>
     </div>
     <p t-if="for_business" class="ikiku__lead">برای <strong t-out="for_business"/>
-      <a href="/business/need/for">کافه‌ی دیگه</a></p>
+      <a href="/business/need/for">مجموعه‌ی دیگه</a></p>
     <p t-if="changing_need" class="ikiku__notice">دارید درخواستی رو که قبلاً ثبت کردید عوض می‌کنید.
       <a href="/business">نمی‌خوام عوضش کنم</a></p>
   </template>
 
-  <!-- Skill tiles from the standard, grouped by family, in the published order. -->
+  <!-- Role tiles from the standard, grouped by family, in the published order. The featured
+       roles are buttons; every other role of the family is one tap away under «کارهای دیگه»,
+       which opens by itself when one of them is already chosen. -->
   <template id="skill_tiles" name="ایکیکو — دکمه‌های کار">
     <t t-foreach="groups" t-as="group">
       <fieldset class="ikiku__group">
         <legend t-out="group[0].plain_label or group[0].name"/>
         <div class="ikiku__tiles">
-          <t t-foreach="group[1]" t-as="node">
-            <label class="ikiku__tile">
-              <input t-att-type="input_type" name="node_id" t-att-value="node.id"
-                     t-att-checked="node.id in on_ids and 'checked'"
-                     t-att-disabled="node.id in locked_ids and 'disabled'"/>
-              <span><t t-out="node.plain_label or node.name"/>
-                <small t-if="node.id in locked_ids">ثبت شده</small></span>
-            </label>
-          </t>
+          <t t-foreach="group[1]" t-as="node"><t t-call="ikiku_portal.role_tile"/></t>
         </div>
+        <details t-if="group[2]" class="ikiku__more"
+                 t-att-open="(group[2] &amp; group[2].browse(on_ids)) and 'open'">
+          <summary>کارهای دیگه‌ی <t t-out="group[0].plain_label or group[0].name"/></summary>
+          <div class="ikiku__tiles">
+            <t t-foreach="group[2]" t-as="node"><t t-call="ikiku_portal.role_tile"/></t>
+          </div>
+        </details>
       </fieldset>
     </t>
+  </template>
+
+  <template id="role_tile" name="ایکیکو — دکمه‌ی یک کار">
+    <label class="ikiku__tile">
+      <input t-att-type="input_type" name="node_id" t-att-value="node.id"
+             t-att-checked="node.id in on_ids and 'checked'"
+             t-att-disabled="node.id in locked_ids and 'disabled'"/>
+      <span><t t-out="node.plain_label or node.name"/>
+        <small t-if="node.id in locked_ids">ثبت شده</small></span>
+    </label>
   </template>
 
   <!-- «از کِی؟» and «تا کِی؟» as buttons, with three selects for another day. -->

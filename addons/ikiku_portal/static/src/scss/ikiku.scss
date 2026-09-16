@@ -540,3 +540,27 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   &__biz-head .ikiku__subhead { margin: 0; }
   &__biz-add { margin-block: 0 1.5rem; }
 }
+
+// «کارهای دیگه»: the rest of a family's roles, one tap away (2026-09-17).
+.ikiku {
+  &__more { margin-block-start: .6rem; }
+  &__more > summary {
+    cursor: pointer; font-weight: 700; color: var(--ik-blue); min-block-size: 2.75rem;
+    display: flex; align-items: center;
+  }
+  &__more[open] > summary { margin-block-end: .5rem; }
+}
+
+// The standard's public pages (/roles, /skills, /knowledge) and the suggest box (2026-09-17).
+.ikiku {
+  &__roles--start { justify-content: flex-start; margin-block: .5rem 1rem; }
+  &__search { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: end; margin-block: 1rem 1.5rem; }
+  &__search .ikiku__label { grid-column: 1 / -1; margin: 0; }
+  &__search .ikiku__secondary { margin-top: 0; }
+  &__knowledge { list-style: none; padding: 0; margin-block: .5rem; display: grid; gap: .6rem; }
+  &__knowledge li { line-height: 1.8; }
+  &__knowledge p { margin: .1rem 0 0; font-size: .92rem; }
+  &__pick { margin-block: 0 1rem; }
+  &__pick-note { margin-block: .4rem 0; min-block-size: 1.5rem; }
+}
+.search-suggest { --search-suggest-active: var(--ik-blue-soft); --search-suggest-border: var(--ik-rule); }

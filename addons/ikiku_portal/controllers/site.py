@@ -101,7 +101,7 @@ class IkikuSite(http.Controller):
         business flow opens with that role already chosen."""
         chosen = request.env['ikiku.spec.node'].sudo().browse(
             int(node) if node and str(node).isdigit() else 0).exists()
-        if chosen and chosen.kind == 'competency':
+        if chosen and chosen.kind == 'role':
             request.session['ikiku_need'] = {'node_id': chosen.id}
         return self._door('ikiku_portal.door_ku', 'ku')
 

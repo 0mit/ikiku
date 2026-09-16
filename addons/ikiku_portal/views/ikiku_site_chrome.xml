@@ -10,14 +10,14 @@
           <div class="ikiku__wide ikiku__footer-grid">
             <div>
               <h5>ایکیکو</h5>
-              <p>آیکی؟ کو؟ — کارگرِ کافه و رستوران و کسی که نیرو لازم داره، زودتر و جلوی چشمِ همه
-                به هم می‌رسن.</p>
+              <p>آیکی؟ کو؟ — کسی که دنبالِ کار تو کافه و رستورانه، و کافه یا رستورانی که همکار لازم داره،
+                زودتر و جلوی چشمِ همه به هم می‌رسن.</p>
             </div>
             <div>
               <h5>برای شما</h5>
               <ul class="list-unstyled">
                 <li><a href="/ki">کار می‌خوام</a></li>
-                <li><a href="/ku">نیرو می‌خوام</a></li>
+                <li><a href="/ku">همکار می‌خوام</a></li>
                 <li><a href="/help">راهنما</a></li>
                 <li><a href="/help/tamas?from=footer">می‌خوام یکی کمکم کنه</a></li>
               </ul>
@@ -26,6 +26,8 @@
               <h5>جلوی چشمِ همه</h5>
               <ul class="list-unstyled">
                 <li><a href="/jobs">کارهای باز</a></li>
+                <li><a href="/roles">کارها و مهارت‌ها</a></li>
+                <li><a href="/knowledge">درختِ دانش</a></li>
                 <li><a href="/bookings">دفترِ قرارهای کار</a></li>
                 <li><a href="/costs">هزینه‌ی مشترک</a></li>
                 <li><a href="/manifest">مرام‌نامه</a></li>

@@ -1,0 +1,3 @@
+id,code,name,name_en,publisher,url,kind
+kscheme_isced_f_2013,isced-f-2013,رشته‌های آموزش و تربیتِ یونسکو (ISCED-F 2013),ISCED Fields of Education and Training 2013,UNESCO Institute for Statistics,https://uis.unesco.org/en/topic/international-standard-classification-education-isced,field
+kscheme_isco_08,isco-08,طبقه‌بندیِ بین‌المللیِ استانداردِ مشاغل (ISCO-08),International Standard Classification of Occupations 2008,International Labour Organization,https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/,occupation

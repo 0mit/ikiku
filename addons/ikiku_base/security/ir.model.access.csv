@@ -26,3 +26,13 @@ access_work_type_public,work type public,model_ikiku_work_type,base.group_public
 access_work_type_portal,work type portal,model_ikiku_work_type,base.group_portal,1,0,0,0
 access_work_type_user,work type user,model_ikiku_work_type,base.group_user,1,0,0,0
 access_work_type_master,work type master,model_ikiku_work_type,group_ikiku_master,1,1,1,1
+access_knowledge_scheme_user,knowledge scheme user,model_ikiku_knowledge_scheme,base.group_user,1,0,0,0
+access_knowledge_scheme_master,knowledge scheme master,model_ikiku_knowledge_scheme,group_ikiku_master,1,1,1,1
+access_knowledge_class_user,knowledge class user,model_ikiku_knowledge_class,base.group_user,1,0,0,0
+access_knowledge_class_master,knowledge class master,model_ikiku_knowledge_class,group_ikiku_master,1,1,1,1
+access_knowledge_link_user,knowledge link user,model_ikiku_knowledge_link,base.group_user,1,0,0,0
+access_knowledge_link_master,knowledge link master,model_ikiku_knowledge_link,group_ikiku_master,1,1,1,1
+access_spec_requirement_user,spec requirement user,model_ikiku_spec_requirement,base.group_user,1,0,0,0
+access_spec_requirement_master,spec requirement master,model_ikiku_spec_requirement,group_ikiku_master,1,1,1,1
+access_spec_country_rule_user,spec country rule user,model_ikiku_spec_country_rule,base.group_user,1,0,0,0
+access_spec_country_rule_master,spec country rule master,model_ikiku_spec_country_rule,group_ikiku_master,1,1,1,1

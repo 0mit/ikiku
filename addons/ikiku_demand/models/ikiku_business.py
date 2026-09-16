@@ -67,7 +67,7 @@ class IkikuPosition(models.Model):
                                   index=True, string="کسب‌وکار")
     spec_node_id = fields.Many2one(
         'ikiku.spec.node', string="گرهٔ استاندارد", required=True,
-        domain="[('kind', 'in', ('competency', 'family'))]",
+        domain="[('kind', 'in', ('role', 'family'))]",
         help="این جایگاه به کدام مهارتِ استاندارد می‌رسد؟ بدون آن، نیرویی که "
              "جای دیگری آموزش دیده نمی‌فهمد این کار چیست.")
     raw_request = fields.Text("آنچه نوشتید",
@@ -102,7 +102,7 @@ class IkikuPosition(models.Model):
         the standard can grow toward what businesses actually say.
         """
         Node = self.env['ikiku.spec.node']
-        proposals = Node.resolve_text(raw_text)
+        proposals = Node.resolve_text(raw_text, kinds=('role',))
         if chosen_node is None:
             return {'proposals': proposals, 'raw': raw_text}
         position = self.create({

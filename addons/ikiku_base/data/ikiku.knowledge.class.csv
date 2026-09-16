@@ -1,0 +1,839 @@
+id,scheme_id:id,code,name,name_en,level,parent_id:id
+kc_isced_00,kscheme_isced_f_2013,00,برنامه‌ها و مدارک عمومی,Generic programmes and qualifications,broad,
+kc_isced_01,kscheme_isced_f_2013,01,آموزش,Education,broad,
+kc_isced_02,kscheme_isced_f_2013,02,هنر و علوم انسانی,Arts and humanities,broad,
+kc_isced_03,kscheme_isced_f_2013,03,علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی,"Social sciences, journalism and information",broad,
+kc_isced_04,kscheme_isced_f_2013,04,کسب‌وکار، امور اداری و حقوق,"Business, administration and law",broad,
+kc_isced_05,kscheme_isced_f_2013,05,علوم طبیعی، ریاضیات و آمار,"Natural sciences, mathematics and statistics",broad,
+kc_isced_06,kscheme_isced_f_2013,06,فناوری اطلاعات و ارتباطات (فاوا),Information and Communication Technologies (ICTs),broad,
+kc_isced_07,kscheme_isced_f_2013,07,مهندسی، تولید و ساخت‌وساز,"Engineering, manufacturing and construction",broad,
+kc_isced_08,kscheme_isced_f_2013,08,کشاورزی، جنگلداری، شیلات و دامپزشکی,"Agriculture, forestry, fisheries and veterinary",broad,
+kc_isced_09,kscheme_isced_f_2013,09,سلامت و رفاه اجتماعی,Health and welfare,broad,
+kc_isced_10,kscheme_isced_f_2013,10,خدمات,Services,broad,
+kc_isced_99,kscheme_isced_f_2013,99,رشته نامعلوم,Field unknown,broad,
+kc_isced_000,kscheme_isced_f_2013,000,برنامه‌ها و مدارک عمومی، بدون تعریف دقیق‌تر,Generic programmes and qualifications not further defined,narrow,kc_isced_00
+kc_isced_001,kscheme_isced_f_2013,001,برنامه‌ها و مدارک پایه,Basic programmes and qualifications,narrow,kc_isced_00
+kc_isced_002,kscheme_isced_f_2013,002,سوادآموزی و حساب,Literacy and numeracy,narrow,kc_isced_00
+kc_isced_003,kscheme_isced_f_2013,003,مهارت‌های فردی و رشد شخصی,Personal skills and development,narrow,kc_isced_00
+kc_isced_009,kscheme_isced_f_2013,009,برنامه‌ها و مدارک عمومی، طبقه‌بندی‌نشده در جای دیگر,Generic programmes and qualifications not elsewhere classified,narrow,kc_isced_00
+kc_isced_011,kscheme_isced_f_2013,011,آموزش,Education,narrow,kc_isced_01
+kc_isced_018,kscheme_isced_f_2013,018,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه آموزش,Inter-disciplinary programmes and qualifications involving education,narrow,kc_isced_01
+kc_isced_020,kscheme_isced_f_2013,020,هنر و علوم انسانی، بدون تعریف دقیق‌تر,Arts and humanities not further defined,narrow,kc_isced_02
+kc_isced_021,kscheme_isced_f_2013,021,هنر,Arts,narrow,kc_isced_02
+kc_isced_022,kscheme_isced_f_2013,022,علوم انسانی (به‌جز زبان‌ها),Humanities (except languages),narrow,kc_isced_02
+kc_isced_023,kscheme_isced_f_2013,023,زبان‌ها,Languages,narrow,kc_isced_02
+kc_isced_028,kscheme_isced_f_2013,028,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه هنر و علوم انسانی,Inter-disciplinary programmes and qualifications involving arts and humanities,narrow,kc_isced_02
+kc_isced_029,kscheme_isced_f_2013,029,هنر و علوم انسانی، طبقه‌بندی‌نشده در جای دیگر,Arts and humanities not elsewhere classified,narrow,kc_isced_02
+kc_isced_030,kscheme_isced_f_2013,030,علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی، بدون تعریف دقیق‌تر,"Social sciences, journalism and information not further defined",narrow,kc_isced_03
+kc_isced_031,kscheme_isced_f_2013,031,علوم اجتماعی و رفتاری,Social and behavioural sciences,narrow,kc_isced_03
+kc_isced_032,kscheme_isced_f_2013,032,روزنامه‌نگاری و اطلاع‌رسانی,Journalism and information,narrow,kc_isced_03
+kc_isced_038,kscheme_isced_f_2013,038,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی,"Inter-disciplinary programmes and qualifications involving social sciences, journalism and information",narrow,kc_isced_03
+kc_isced_039,kscheme_isced_f_2013,039,علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی، طبقه‌بندی‌نشده در جای دیگر,"Social sciences, journalism and information not elsewhere classified",narrow,kc_isced_03
+kc_isced_040,kscheme_isced_f_2013,040,کسب‌وکار، امور اداری و حقوق، بدون تعریف دقیق‌تر,"Business, administration and law not further defined",narrow,kc_isced_04
+kc_isced_041,kscheme_isced_f_2013,041,کسب‌وکار و امور اداری,Business and administration,narrow,kc_isced_04
+kc_isced_042,kscheme_isced_f_2013,042,حقوق,Law,narrow,kc_isced_04
+kc_isced_048,kscheme_isced_f_2013,048,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه کسب‌وکار، امور اداری و حقوق,"Inter-disciplinary programmes and qualifications involving business, administration and law",narrow,kc_isced_04
+kc_isced_049,kscheme_isced_f_2013,049,کسب‌وکار، امور اداری و حقوق، طبقه‌بندی‌نشده در جای دیگر,"Business, administration and law not elsewhere classified",narrow,kc_isced_04
+kc_isced_050,kscheme_isced_f_2013,050,علوم طبیعی، ریاضیات و آمار، بدون تعریف دقیق‌تر,"Natural sciences, mathematics and statistics not further defined",narrow,kc_isced_05
+kc_isced_051,kscheme_isced_f_2013,051,علوم زیستی و علوم وابسته,Biological and related sciences,narrow,kc_isced_05
+kc_isced_052,kscheme_isced_f_2013,052,محیط زیست,Environment,narrow,kc_isced_05
+kc_isced_053,kscheme_isced_f_2013,053,علوم فیزیکی,Physical sciences,narrow,kc_isced_05
+kc_isced_054,kscheme_isced_f_2013,054,ریاضیات و آمار,Mathematics and statistics,narrow,kc_isced_05
+kc_isced_058,kscheme_isced_f_2013,058,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه علوم طبیعی، ریاضیات و آمار,"Inter-disciplinary programmes and qualifications involving natural sciences, mathematics and statistics",narrow,kc_isced_05
+kc_isced_059,kscheme_isced_f_2013,059,علوم طبیعی، ریاضیات و آمار، طبقه‌بندی‌نشده در جای دیگر,"Natural sciences, mathematics and statistics not elsewhere classified",narrow,kc_isced_05
+kc_isced_061,kscheme_isced_f_2013,061,فناوری اطلاعات و ارتباطات (فاوا),Information and Communication Technologies (ICTs),narrow,kc_isced_06
+kc_isced_068,kscheme_isced_f_2013,068,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه فناوری اطلاعات و ارتباطات (فاوا),Inter-disciplinary programmes and qualifications involving Information and Communication Technologies (ICTs),narrow,kc_isced_06
+kc_isced_070,kscheme_isced_f_2013,070,مهندسی، تولید و ساخت‌وساز، بدون تعریف دقیق‌تر,"Engineering, manufacturing and construction not further defined",narrow,kc_isced_07
+kc_isced_071,kscheme_isced_f_2013,071,مهندسی و حرفه‌های مهندسی,Engineering and engineering trades,narrow,kc_isced_07
+kc_isced_072,kscheme_isced_f_2013,072,تولید و فرآوری,Manufacturing and processing,narrow,kc_isced_07
+kc_isced_073,kscheme_isced_f_2013,073,معماری و ساخت‌وساز,Architecture and construction,narrow,kc_isced_07
+kc_isced_078,kscheme_isced_f_2013,078,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه مهندسی، تولید و ساخت‌وساز,"Inter-disciplinary programmes and qualifications involving engineering, manufacturing and construction",narrow,kc_isced_07
+kc_isced_079,kscheme_isced_f_2013,079,مهندسی، تولید و ساخت‌وساز، طبقه‌بندی‌نشده در جای دیگر,"Engineering, manufacturing and construction not elsewhere classified",narrow,kc_isced_07
+kc_isced_080,kscheme_isced_f_2013,080,کشاورزی، جنگلداری، شیلات و دامپزشکی، بدون تعریف دقیق‌تر,"Agriculture, forestry, fisheries and veterinary not further defined",narrow,kc_isced_08
+kc_isced_081,kscheme_isced_f_2013,081,کشاورزی,Agriculture,narrow,kc_isced_08
+kc_isced_082,kscheme_isced_f_2013,082,جنگلداری,Forestry,narrow,kc_isced_08
+kc_isced_083,kscheme_isced_f_2013,083,شیلات,Fisheries,narrow,kc_isced_08
+kc_isced_084,kscheme_isced_f_2013,084,دامپزشکی,Veterinary,narrow,kc_isced_08
+kc_isced_088,kscheme_isced_f_2013,088,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه کشاورزی، جنگلداری، شیلات و دامپزشکی,"Inter-disciplinary programmes and qualifications involving agriculture, forestry, fisheries and veterinary",narrow,kc_isced_08
+kc_isced_089,kscheme_isced_f_2013,089,کشاورزی، جنگلداری، شیلات و دامپزشکی، طبقه‌بندی‌نشده در جای دیگر,"Agriculture, forestry, fisheries and veterinary not elsewhere classified",narrow,kc_isced_08
+kc_isced_090,kscheme_isced_f_2013,090,سلامت و رفاه اجتماعی، بدون تعریف دقیق‌تر,Health and welfare not further defined,narrow,kc_isced_09
+kc_isced_091,kscheme_isced_f_2013,091,سلامت,Health,narrow,kc_isced_09
+kc_isced_092,kscheme_isced_f_2013,092,رفاه اجتماعی,Welfare,narrow,kc_isced_09
+kc_isced_098,kscheme_isced_f_2013,098,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه سلامت و رفاه اجتماعی,Inter-disciplinary programmes and qualifications involving health and welfare,narrow,kc_isced_09
+kc_isced_099,kscheme_isced_f_2013,099,سلامت و رفاه اجتماعی، طبقه‌بندی‌نشده در جای دیگر,Health and welfare not elsewhere classified,narrow,kc_isced_09
+kc_isced_100,kscheme_isced_f_2013,100,خدمات، بدون تعریف دقیق‌تر,Services not further defined,narrow,kc_isced_10
+kc_isced_101,kscheme_isced_f_2013,101,خدمات فردی,Personal services,narrow,kc_isced_10
+kc_isced_102,kscheme_isced_f_2013,102,خدمات بهداشت عمومی و بهداشت حرفه‌ای,Hygiene and occupational health services,narrow,kc_isced_10
+kc_isced_103,kscheme_isced_f_2013,103,خدمات امنیتی و حفاظتی,Security services,narrow,kc_isced_10
+kc_isced_104,kscheme_isced_f_2013,104,خدمات حمل‌ونقل,Transport services,narrow,kc_isced_10
+kc_isced_108,kscheme_isced_f_2013,108,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه خدمات,Inter-disciplinary programmes and qualifications involving services,narrow,kc_isced_10
+kc_isced_109,kscheme_isced_f_2013,109,خدمات، طبقه‌بندی‌نشده در جای دیگر,Services not elsewhere classified,narrow,kc_isced_10
+kc_isced_999,kscheme_isced_f_2013,999,رشته نامعلوم,Field unknown,narrow,kc_isced_99
+kc_isced_0000,kscheme_isced_f_2013,0000,برنامه‌ها و مدارک عمومی، بدون تعریف دقیق‌تر,Generic programmes and qualifications not further defined,detailed,kc_isced_000
+kc_isced_0011,kscheme_isced_f_2013,0011,برنامه‌ها و مدارک پایه,Basic programmes and qualifications,detailed,kc_isced_001
+kc_isced_0021,kscheme_isced_f_2013,0021,سوادآموزی و حساب,Literacy and numeracy,detailed,kc_isced_002
+kc_isced_0031,kscheme_isced_f_2013,0031,مهارت‌های فردی و رشد شخصی,Personal skills and development,detailed,kc_isced_003
+kc_isced_0099,kscheme_isced_f_2013,0099,برنامه‌ها و مدارک عمومی، طبقه‌بندی‌نشده در جای دیگر,Generic programmes and qualifications not elsewhere classified,detailed,kc_isced_009
+kc_isced_0110,kscheme_isced_f_2013,0110,آموزش، بدون تعریف دقیق‌تر,Education not further defined,detailed,kc_isced_011
+kc_isced_0111,kscheme_isced_f_2013,0111,علوم تربیتی,Education science,detailed,kc_isced_011
+kc_isced_0112,kscheme_isced_f_2013,0112,تربیت مربی پیش‌دبستانی,Training for pre-school teachers,detailed,kc_isced_011
+kc_isced_0113,kscheme_isced_f_2013,0113,تربیت معلم بدون تخصص موضوعی,Teacher training without subject specialisation,detailed,kc_isced_011
+kc_isced_0114,kscheme_isced_f_2013,0114,تربیت معلم با تخصص موضوعی,Teacher training with subject specialisation,detailed,kc_isced_011
+kc_isced_0119,kscheme_isced_f_2013,0119,آموزش، طبقه‌بندی‌نشده در جای دیگر,Education not elsewhere classified,detailed,kc_isced_011
+kc_isced_0188,kscheme_isced_f_2013,0188,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه آموزش,Inter-disciplinary programmes and qualifications involving education,detailed,kc_isced_018
+kc_isced_0200,kscheme_isced_f_2013,0200,هنر و علوم انسانی، بدون تعریف دقیق‌تر,Arts and humanities not further defined,detailed,kc_isced_020
+kc_isced_0210,kscheme_isced_f_2013,0210,هنر، بدون تعریف دقیق‌تر,Arts not further defined,detailed,kc_isced_021
+kc_isced_0211,kscheme_isced_f_2013,0211,فنون دیداری‌شنیداری و تولید رسانه,Audio-visual techniques and media production,detailed,kc_isced_021
+kc_isced_0212,kscheme_isced_f_2013,0212,طراحی مد، طراحی داخلی و طراحی صنعتی,"Fashion, interior and industrial design",detailed,kc_isced_021
+kc_isced_0213,kscheme_isced_f_2013,0213,هنرهای زیبا,Fine arts,detailed,kc_isced_021
+kc_isced_0214,kscheme_isced_f_2013,0214,صنایع دستی,Handicrafts,detailed,kc_isced_021
+kc_isced_0215,kscheme_isced_f_2013,0215,موسیقی و هنرهای نمایشی,Music and performing arts,detailed,kc_isced_021
+kc_isced_0219,kscheme_isced_f_2013,0219,هنر، طبقه‌بندی‌نشده در جای دیگر,Arts not elsewhere classified,detailed,kc_isced_021
+kc_isced_0220,kscheme_isced_f_2013,0220,علوم انسانی (به‌جز زبان‌ها)، بدون تعریف دقیق‌تر,Humanities (except languages) not further defined,detailed,kc_isced_022
+kc_isced_0221,kscheme_isced_f_2013,0221,دین و الهیات,Religion and theology,detailed,kc_isced_022
+kc_isced_0222,kscheme_isced_f_2013,0222,تاریخ و باستان‌شناسی,History and archaeology,detailed,kc_isced_022
+kc_isced_0223,kscheme_isced_f_2013,0223,فلسفه و اخلاق,Philosophy and ethics,detailed,kc_isced_022
+kc_isced_0229,kscheme_isced_f_2013,0229,علوم انسانی (به‌جز زبان‌ها)، طبقه‌بندی‌نشده در جای دیگر,Humanities (except languages) not elsewhere classified,detailed,kc_isced_022
+kc_isced_0230,kscheme_isced_f_2013,0230,زبان‌ها، بدون تعریف دقیق‌تر,Languages not further defined,detailed,kc_isced_023
+kc_isced_0231,kscheme_isced_f_2013,0231,زبان‌آموزی,Language acquisition,detailed,kc_isced_023
+kc_isced_0232,kscheme_isced_f_2013,0232,ادبیات و زبان‌شناسی,Literature and linguistics,detailed,kc_isced_023
+kc_isced_0239,kscheme_isced_f_2013,0239,زبان‌ها، طبقه‌بندی‌نشده در جای دیگر,Languages not elsewhere classified,detailed,kc_isced_023
+kc_isced_0288,kscheme_isced_f_2013,0288,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه هنر و علوم انسانی,Inter-disciplinary programmes and qualifications involving arts and humanities,detailed,kc_isced_028
+kc_isced_0299,kscheme_isced_f_2013,0299,هنر و علوم انسانی، طبقه‌بندی‌نشده در جای دیگر,Arts and humanities not elsewhere classified,detailed,kc_isced_029
+kc_isced_0300,kscheme_isced_f_2013,0300,علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی، بدون تعریف دقیق‌تر,"Social sciences, journalism and information not further defined",detailed,kc_isced_030
+kc_isced_0310,kscheme_isced_f_2013,0310,علوم اجتماعی و رفتاری، بدون تعریف دقیق‌تر,Social and behavioural sciences not further defined,detailed,kc_isced_031
+kc_isced_0311,kscheme_isced_f_2013,0311,اقتصاد,Economics,detailed,kc_isced_031
+kc_isced_0312,kscheme_isced_f_2013,0312,علوم سیاسی و تعلیمات مدنی,Political sciences and civics,detailed,kc_isced_031
+kc_isced_0313,kscheme_isced_f_2013,0313,روان‌شناسی,Psychology,detailed,kc_isced_031
+kc_isced_0314,kscheme_isced_f_2013,0314,جامعه‌شناسی و مطالعات فرهنگی,Sociology and cultural studies,detailed,kc_isced_031
+kc_isced_0319,kscheme_isced_f_2013,0319,علوم اجتماعی و رفتاری، طبقه‌بندی‌نشده در جای دیگر,Social and behavioural sciences not elsewhere classified,detailed,kc_isced_031
+kc_isced_0320,kscheme_isced_f_2013,0320,روزنامه‌نگاری و اطلاع‌رسانی، بدون تعریف دقیق‌تر,Journalism and information not further defined,detailed,kc_isced_032
+kc_isced_0321,kscheme_isced_f_2013,0321,روزنامه‌نگاری و خبرنگاری,Journalism and reporting,detailed,kc_isced_032
+kc_isced_0322,kscheme_isced_f_2013,0322,کتابداری، اطلاع‌رسانی و مطالعات آرشیوی,"Library, information and archival studies",detailed,kc_isced_032
+kc_isced_0329,kscheme_isced_f_2013,0329,روزنامه‌نگاری و اطلاع‌رسانی، طبقه‌بندی‌نشده در جای دیگر,Journalism and information not elsewhere classified,detailed,kc_isced_032
+kc_isced_0388,kscheme_isced_f_2013,0388,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی,"Inter-disciplinary programmes and qualifications involving social sciences, journalism and information",detailed,kc_isced_038
+kc_isced_0399,kscheme_isced_f_2013,0399,علوم اجتماعی، روزنامه‌نگاری و اطلاع‌رسانی، طبقه‌بندی‌نشده در جای دیگر,"Social sciences, journalism and information not elsewhere classified",detailed,kc_isced_039
+kc_isced_0400,kscheme_isced_f_2013,0400,کسب‌وکار، امور اداری و حقوق، بدون تعریف دقیق‌تر,"Business, administration and law not further defined",detailed,kc_isced_040
+kc_isced_0410,kscheme_isced_f_2013,0410,کسب‌وکار و امور اداری، بدون تعریف دقیق‌تر,Business and administration not further defined,detailed,kc_isced_041
+kc_isced_0411,kscheme_isced_f_2013,0411,حسابداری و مالیات,Accounting and taxation,detailed,kc_isced_041
+kc_isced_0412,kscheme_isced_f_2013,0412,مالی، بانکداری و بیمه,"Finance, banking and insurance",detailed,kc_isced_041
+kc_isced_0413,kscheme_isced_f_2013,0413,مدیریت و امور اداری,Management and administration,detailed,kc_isced_041
+kc_isced_0414,kscheme_isced_f_2013,0414,بازاریابی و تبلیغات,Marketing and advertising,detailed,kc_isced_041
+kc_isced_0415,kscheme_isced_f_2013,0415,منشی‌گری و امور دفتری,Secretarial and office work,detailed,kc_isced_041
+kc_isced_0416,kscheme_isced_f_2013,0416,فروش عمده و خرده,Wholesale and retail sales,detailed,kc_isced_041
+kc_isced_0417,kscheme_isced_f_2013,0417,مهارت‌های کاری,Work skills,detailed,kc_isced_041
+kc_isced_0419,kscheme_isced_f_2013,0419,کسب‌وکار و امور اداری، طبقه‌بندی‌نشده در جای دیگر,Business and administration not elsewhere classified,detailed,kc_isced_041
+kc_isced_0421,kscheme_isced_f_2013,0421,حقوق,Law,detailed,kc_isced_042
+kc_isced_0488,kscheme_isced_f_2013,0488,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه کسب‌وکار، امور اداری و حقوق,"Inter-disciplinary programmes and qualifications involving business, administration and law",detailed,kc_isced_048
+kc_isced_0499,kscheme_isced_f_2013,0499,کسب‌وکار، امور اداری و حقوق، طبقه‌بندی‌نشده در جای دیگر,"Business, administration and law not elsewhere classified",detailed,kc_isced_049
+kc_isced_0500,kscheme_isced_f_2013,0500,علوم طبیعی، ریاضیات و آمار، بدون تعریف دقیق‌تر,"Natural sciences, mathematics and statistics not further defined",detailed,kc_isced_050
+kc_isced_0510,kscheme_isced_f_2013,0510,علوم زیستی و علوم وابسته، بدون تعریف دقیق‌تر,Biological and related sciences not further defined,detailed,kc_isced_051
+kc_isced_0511,kscheme_isced_f_2013,0511,زیست‌شناسی,Biology,detailed,kc_isced_051
+kc_isced_0512,kscheme_isced_f_2013,0512,زیست‌شیمی (بیوشیمی),Biochemistry,detailed,kc_isced_051
+kc_isced_0519,kscheme_isced_f_2013,0519,علوم زیستی و علوم وابسته، طبقه‌بندی‌نشده در جای دیگر,Biological and related sciences not elsewhere classified,detailed,kc_isced_051
+kc_isced_0520,kscheme_isced_f_2013,0520,محیط زیست، بدون تعریف دقیق‌تر,Environment not further defined,detailed,kc_isced_052
+kc_isced_0521,kscheme_isced_f_2013,0521,علوم محیط زیست,Environmental sciences,detailed,kc_isced_052
+kc_isced_0522,kscheme_isced_f_2013,0522,محیط‌های طبیعی و حیات وحش,Natural environments and wildlife,detailed,kc_isced_052
+kc_isced_0529,kscheme_isced_f_2013,0529,محیط زیست، طبقه‌بندی‌نشده در جای دیگر,Environment not elsewhere classified,detailed,kc_isced_052
+kc_isced_0530,kscheme_isced_f_2013,0530,علوم فیزیکی، بدون تعریف دقیق‌تر,Physical sciences not further defined,detailed,kc_isced_053
+kc_isced_0531,kscheme_isced_f_2013,0531,شیمی,Chemistry,detailed,kc_isced_053
+kc_isced_0532,kscheme_isced_f_2013,0532,علوم زمین,Earth sciences,detailed,kc_isced_053
+kc_isced_0533,kscheme_isced_f_2013,0533,فیزیک,Physics,detailed,kc_isced_053
+kc_isced_0539,kscheme_isced_f_2013,0539,علوم فیزیکی، طبقه‌بندی‌نشده در جای دیگر,Physical sciences not elsewhere classified,detailed,kc_isced_053
+kc_isced_0540,kscheme_isced_f_2013,0540,ریاضیات و آمار، بدون تعریف دقیق‌تر,Mathematics and statistics not further defined,detailed,kc_isced_054
+kc_isced_0541,kscheme_isced_f_2013,0541,ریاضیات,Mathematics,detailed,kc_isced_054
+kc_isced_0542,kscheme_isced_f_2013,0542,آمار,Statistics,detailed,kc_isced_054
+kc_isced_0588,kscheme_isced_f_2013,0588,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه علوم طبیعی، ریاضیات و آمار,"Inter-disciplinary programmes and qualifications involving natural sciences, mathematics and statistics",detailed,kc_isced_058
+kc_isced_0599,kscheme_isced_f_2013,0599,علوم طبیعی، ریاضیات و آمار، طبقه‌بندی‌نشده در جای دیگر,"Natural sciences, mathematics and statistics not elsewhere classified",detailed,kc_isced_059
+kc_isced_0610,kscheme_isced_f_2013,0610,فناوری اطلاعات و ارتباطات (فاوا)، بدون تعریف دقیق‌تر,Information and Communication Technologies (ICTs) not further defined,detailed,kc_isced_061
+kc_isced_0611,kscheme_isced_f_2013,0611,کاربرد رایانه,Computer use,detailed,kc_isced_061
+kc_isced_0612,kscheme_isced_f_2013,0612,طراحی و مدیریت پایگاه داده و شبکه,Database and network design and administration,detailed,kc_isced_061
+kc_isced_0613,kscheme_isced_f_2013,0613,توسعه و تحلیل نرم‌افزار و برنامه‌های کاربردی,Software and applications development and analysis,detailed,kc_isced_061
+kc_isced_0619,kscheme_isced_f_2013,0619,فناوری اطلاعات و ارتباطات (فاوا)، طبقه‌بندی‌نشده در جای دیگر,Information and Communication Technologies (ICTs) not elsewhere classified,detailed,kc_isced_061
+kc_isced_0688,kscheme_isced_f_2013,0688,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه فناوری اطلاعات و ارتباطات (فاوا),Inter-disciplinary programmes and qualifications involving Information and Communication Technologies (ICTs),detailed,kc_isced_068
+kc_isced_0700,kscheme_isced_f_2013,0700,مهندسی، تولید و ساخت‌وساز، بدون تعریف دقیق‌تر,"Engineering, manufacturing and construction not further defined",detailed,kc_isced_070
+kc_isced_0710,kscheme_isced_f_2013,0710,مهندسی و حرفه‌های مهندسی، بدون تعریف دقیق‌تر,Engineering and engineering trades not further defined,detailed,kc_isced_071
+kc_isced_0711,kscheme_isced_f_2013,0711,مهندسی شیمی و فرایندها,Chemical engineering and processes,detailed,kc_isced_071
+kc_isced_0712,kscheme_isced_f_2013,0712,فناوری حفاظت از محیط زیست,Environmental protection technology,detailed,kc_isced_071
+kc_isced_0713,kscheme_isced_f_2013,0713,برق و انرژی,Electricity and energy,detailed,kc_isced_071
+kc_isced_0714,kscheme_isced_f_2013,0714,الکترونیک و خودکارسازی (اتوماسیون),Electronics and automation,detailed,kc_isced_071
+kc_isced_0715,kscheme_isced_f_2013,0715,مکانیک و حرفه‌های فلزکاری,Mechanics and metal trades,detailed,kc_isced_071
+kc_isced_0716,kscheme_isced_f_2013,0716,وسایل نقلیه موتوری، کشتی و هواپیما,"Motor vehicles, ships and aircraft",detailed,kc_isced_071
+kc_isced_0719,kscheme_isced_f_2013,0719,مهندسی و حرفه‌های مهندسی، طبقه‌بندی‌نشده در جای دیگر,Engineering and engineering trades not elsewhere classified,detailed,kc_isced_071
+kc_isced_0720,kscheme_isced_f_2013,0720,تولید و فرآوری، بدون تعریف دقیق‌تر,Manufacturing and processing not further defined,detailed,kc_isced_072
+kc_isced_0721,kscheme_isced_f_2013,0721,فرآوری مواد غذایی,Food processing,detailed,kc_isced_072
+kc_isced_0722,kscheme_isced_f_2013,0722,مواد (شیشه، کاغذ، پلاستیک و چوب),"Materials (glass, paper, plastic and wood)",detailed,kc_isced_072
+kc_isced_0723,kscheme_isced_f_2013,0723,نساجی (پوشاک، کفش و چرم),"Textiles (clothes, footwear and leather)",detailed,kc_isced_072
+kc_isced_0724,kscheme_isced_f_2013,0724,معدن و استخراج,Mining and extraction,detailed,kc_isced_072
+kc_isced_0729,kscheme_isced_f_2013,0729,تولید و فرآوری، طبقه‌بندی‌نشده در جای دیگر,Manufacturing and processing not elsewhere classified,detailed,kc_isced_072
+kc_isced_0730,kscheme_isced_f_2013,0730,معماری و ساخت‌وساز، بدون تعریف دقیق‌تر,Architecture and construction not further defined,detailed,kc_isced_073
+kc_isced_0731,kscheme_isced_f_2013,0731,معماری و شهرسازی,Architecture and town planning,detailed,kc_isced_073
+kc_isced_0732,kscheme_isced_f_2013,0732,ساختمان و مهندسی عمران,Building and civil engineering,detailed,kc_isced_073
+kc_isced_0788,kscheme_isced_f_2013,0788,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه مهندسی، تولید و ساخت‌وساز,"Inter-disciplinary programmes and qualifications involving engineering, manufacturing and construction",detailed,kc_isced_078
+kc_isced_0799,kscheme_isced_f_2013,0799,مهندسی، تولید و ساخت‌وساز، طبقه‌بندی‌نشده در جای دیگر,"Engineering, manufacturing and construction not elsewhere classified",detailed,kc_isced_079
+kc_isced_0800,kscheme_isced_f_2013,0800,کشاورزی، جنگلداری، شیلات و دامپزشکی، بدون تعریف دقیق‌تر,"Agriculture, forestry, fisheries and veterinary not further defined",detailed,kc_isced_080
+kc_isced_0810,kscheme_isced_f_2013,0810,کشاورزی، بدون تعریف دقیق‌تر,Agriculture not further defined,detailed,kc_isced_081
+kc_isced_0811,kscheme_isced_f_2013,0811,تولید محصولات زراعی و دامی,Crop and livestock production,detailed,kc_isced_081
+kc_isced_0812,kscheme_isced_f_2013,0812,باغبانی,Horticulture,detailed,kc_isced_081
+kc_isced_0819,kscheme_isced_f_2013,0819,کشاورزی، طبقه‌بندی‌نشده در جای دیگر,Agriculture not elsewhere classified,detailed,kc_isced_081
+kc_isced_0821,kscheme_isced_f_2013,0821,جنگلداری,Forestry,detailed,kc_isced_082
+kc_isced_0831,kscheme_isced_f_2013,0831,شیلات,Fisheries,detailed,kc_isced_083
+kc_isced_0841,kscheme_isced_f_2013,0841,دامپزشکی,Veterinary,detailed,kc_isced_084
+kc_isced_0888,kscheme_isced_f_2013,0888,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه کشاورزی، جنگلداری، شیلات و دامپزشکی,"Inter-disciplinary programmes and qualifications involving agriculture, forestry, fisheries and veterinary",detailed,kc_isced_088
+kc_isced_0899,kscheme_isced_f_2013,0899,کشاورزی، جنگلداری، شیلات و دامپزشکی، طبقه‌بندی‌نشده در جای دیگر,"Agriculture, forestry, fisheries and veterinary not elsewhere classified",detailed,kc_isced_089
+kc_isced_0900,kscheme_isced_f_2013,0900,سلامت و رفاه اجتماعی، بدون تعریف دقیق‌تر,Health and welfare not further defined,detailed,kc_isced_090
+kc_isced_0910,kscheme_isced_f_2013,0910,سلامت، بدون تعریف دقیق‌تر,Health not further defined,detailed,kc_isced_091
+kc_isced_0911,kscheme_isced_f_2013,0911,دندان‌پزشکی,Dental studies,detailed,kc_isced_091
+kc_isced_0912,kscheme_isced_f_2013,0912,پزشکی,Medicine,detailed,kc_isced_091
+kc_isced_0913,kscheme_isced_f_2013,0913,پرستاری و مامایی,Nursing and midwifery,detailed,kc_isced_091
+kc_isced_0914,kscheme_isced_f_2013,0914,فناوری تشخیص و درمان پزشکی,Medical diagnostic and treatment technology,detailed,kc_isced_091
+kc_isced_0915,kscheme_isced_f_2013,0915,درمان و توان‌بخشی,Therapy and rehabilitation,detailed,kc_isced_091
+kc_isced_0916,kscheme_isced_f_2013,0916,داروسازی,Pharmacy,detailed,kc_isced_091
+kc_isced_0917,kscheme_isced_f_2013,0917,طب و درمان سنتی و مکمل,Traditional and complementary medicine and therapy,detailed,kc_isced_091
+kc_isced_0919,kscheme_isced_f_2013,0919,سلامت، طبقه‌بندی‌نشده در جای دیگر,Health not elsewhere classified,detailed,kc_isced_091
+kc_isced_0920,kscheme_isced_f_2013,0920,رفاه اجتماعی، بدون تعریف دقیق‌تر,Welfare not further defined,detailed,kc_isced_092
+kc_isced_0921,kscheme_isced_f_2013,0921,مراقبت از سالمندان و بزرگسالان دارای معلولیت,Care of the elderly and of disabled adults,detailed,kc_isced_092
+kc_isced_0922,kscheme_isced_f_2013,0922,مراقبت از کودکان و خدمات جوانان,Child care and youth services,detailed,kc_isced_092
+kc_isced_0923,kscheme_isced_f_2013,0923,مددکاری اجتماعی و مشاوره,Social work and counselling,detailed,kc_isced_092
+kc_isced_0929,kscheme_isced_f_2013,0929,رفاه اجتماعی، طبقه‌بندی‌نشده در جای دیگر,Welfare not elsewhere classified,detailed,kc_isced_092
+kc_isced_0988,kscheme_isced_f_2013,0988,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه سلامت و رفاه اجتماعی,Inter-disciplinary programmes and qualifications involving health and welfare,detailed,kc_isced_098
+kc_isced_0999,kscheme_isced_f_2013,0999,سلامت و رفاه اجتماعی، طبقه‌بندی‌نشده در جای دیگر,Health and welfare not elsewhere classified,detailed,kc_isced_099
+kc_isced_1000,kscheme_isced_f_2013,1000,خدمات، بدون تعریف دقیق‌تر,Services not further defined,detailed,kc_isced_100
+kc_isced_1010,kscheme_isced_f_2013,1010,خدمات فردی، بدون تعریف دقیق‌تر,Personal services not further defined,detailed,kc_isced_101
+kc_isced_1011,kscheme_isced_f_2013,1011,خدمات خانگی,Domestic services,detailed,kc_isced_101
+kc_isced_1012,kscheme_isced_f_2013,1012,خدمات آرایش مو و زیبایی,Hair and beauty services,detailed,kc_isced_101
+kc_isced_1013,kscheme_isced_f_2013,1013,هتل‌داری، رستوران‌داری و پذیرایی,"Hotel, restaurants and catering",detailed,kc_isced_101
+kc_isced_1014,kscheme_isced_f_2013,1014,ورزش,Sports,detailed,kc_isced_101
+kc_isced_1015,kscheme_isced_f_2013,1015,سفر، گردشگری و اوقات فراغت,"Travel, tourism and leisure",detailed,kc_isced_101
+kc_isced_1019,kscheme_isced_f_2013,1019,خدمات فردی، طبقه‌بندی‌نشده در جای دیگر,Personal services not elsewhere classified,detailed,kc_isced_101
+kc_isced_1020,kscheme_isced_f_2013,1020,خدمات بهداشت عمومی و بهداشت حرفه‌ای، بدون تعریف دقیق‌تر,Hygiene and occupational health services not further defined,detailed,kc_isced_102
+kc_isced_1021,kscheme_isced_f_2013,1021,بهداشت محیط جامعه,Community sanitation,detailed,kc_isced_102
+kc_isced_1022,kscheme_isced_f_2013,1022,ایمنی و بهداشت حرفه‌ای,Occupational health and safety,detailed,kc_isced_102
+kc_isced_1029,kscheme_isced_f_2013,1029,خدمات بهداشت عمومی و بهداشت حرفه‌ای، طبقه‌بندی‌نشده در جای دیگر,Hygiene and occupational health services not elsewhere classified,detailed,kc_isced_102
+kc_isced_1030,kscheme_isced_f_2013,1030,خدمات امنیتی و حفاظتی، بدون تعریف دقیق‌تر,Security services not further defined,detailed,kc_isced_103
+kc_isced_1031,kscheme_isced_f_2013,1031,نظامی و دفاعی,Military and defence,detailed,kc_isced_103
+kc_isced_1032,kscheme_isced_f_2013,1032,حفاظت از اشخاص و اموال,Protection of persons and property,detailed,kc_isced_103
+kc_isced_1039,kscheme_isced_f_2013,1039,خدمات امنیتی و حفاظتی، طبقه‌بندی‌نشده در جای دیگر,Security services not elsewhere classified,detailed,kc_isced_103
+kc_isced_1041,kscheme_isced_f_2013,1041,خدمات حمل‌ونقل,Transport services,detailed,kc_isced_104
+kc_isced_1088,kscheme_isced_f_2013,1088,برنامه‌ها و مدارک میان‌رشته‌ای در حوزه خدمات,Inter-disciplinary programmes and qualifications involving services,detailed,kc_isced_108
+kc_isced_1099,kscheme_isced_f_2013,1099,خدمات، طبقه‌بندی‌نشده در جای دیگر,Services not elsewhere classified,detailed,kc_isced_109
+kc_isced_9999,kscheme_isced_f_2013,9999,رشته نامعلوم,Field unknown,detailed,kc_isced_999
+kc_isco_0,kscheme_isco_08,0,مشاغل نیروهای مسلح,Armed Forces Occupations,major,
+kc_isco_1,kscheme_isco_08,1,مدیران,Managers,major,
+kc_isco_2,kscheme_isco_08,2,متخصصان,Professionals,major,
+kc_isco_3,kscheme_isco_08,3,کاردانان فنی و دستیاران متخصص,Technicians and Associate Professionals,major,
+kc_isco_4,kscheme_isco_08,4,کارکنان پشتیبانی دفتری,Clerical Support Workers,major,
+kc_isco_5,kscheme_isco_08,5,کارکنان خدمات و فروش,Service and Sales Workers,major,
+kc_isco_6,kscheme_isco_08,6,کارکنان ماهر کشاورزی، جنگلداری و ماهیگیری,"Skilled Agricultural, Forestry and Fishery Workers",major,
+kc_isco_7,kscheme_isco_08,7,کارکنان صنایع دستی و حرفه‌های وابسته,Craft and Related Trades Workers,major,
+kc_isco_8,kscheme_isco_08,8,اپراتورهای تأسیسات و ماشین‌آلات و مونتاژکاران,"Plant and Machine Operators, and Assemblers",major,
+kc_isco_9,kscheme_isco_08,9,مشاغل ساده,Elementary Occupations,major,
+kc_isco_01,kscheme_isco_08,01,افسران نیروهای مسلح,Commissioned Armed Forces Officers,sub_major,kc_isco_0
+kc_isco_02,kscheme_isco_08,02,درجه‌داران نیروهای مسلح,Non-commissioned Armed Forces Officers,sub_major,kc_isco_0
+kc_isco_03,kscheme_isco_08,03,مشاغل نیروهای مسلح، سایر رده‌ها,"Armed Forces Occupations, Other Ranks",sub_major,kc_isco_0
+kc_isco_11,kscheme_isco_08,11,مدیران ارشد اجرایی، مقامات عالی‌رتبه و قانون‌گذاران,"Chief Executives, Senior Officials and Legislators",sub_major,kc_isco_1
+kc_isco_12,kscheme_isco_08,12,مدیران اداری و تجاری,Administrative and Commercial Managers,sub_major,kc_isco_1
+kc_isco_13,kscheme_isco_08,13,مدیران تولید و خدمات تخصصی,Production and Specialized Services Managers,sub_major,kc_isco_1
+kc_isco_14,kscheme_isco_08,14,مدیران مهمان‌نوازی، خرده‌فروشی و سایر خدمات,"Hospitality, Retail and Other Services Managers",sub_major,kc_isco_1
+kc_isco_21,kscheme_isco_08,21,متخصصان علوم و مهندسی,Science and Engineering Professionals,sub_major,kc_isco_2
+kc_isco_22,kscheme_isco_08,22,متخصصان سلامت,Health Professionals,sub_major,kc_isco_2
+kc_isco_23,kscheme_isco_08,23,متخصصان آموزش,Teaching Professionals,sub_major,kc_isco_2
+kc_isco_24,kscheme_isco_08,24,متخصصان کسب‌وکار و امور اداری,Business and Administration Professionals,sub_major,kc_isco_2
+kc_isco_25,kscheme_isco_08,25,متخصصان فناوری اطلاعات و ارتباطات,Information and Communications Technology Professionals,sub_major,kc_isco_2
+kc_isco_26,kscheme_isco_08,26,متخصصان حقوقی، اجتماعی و فرهنگی,"Legal, Social and Cultural Professionals",sub_major,kc_isco_2
+kc_isco_31,kscheme_isco_08,31,دستیاران متخصص علوم و مهندسی,Science and Engineering Associate Professionals,sub_major,kc_isco_3
+kc_isco_32,kscheme_isco_08,32,دستیاران متخصص سلامت,Health Associate Professionals,sub_major,kc_isco_3
+kc_isco_33,kscheme_isco_08,33,دستیاران متخصص کسب‌وکار و امور اداری,Business and Administration Associate Professionals,sub_major,kc_isco_3
+kc_isco_34,kscheme_isco_08,34,دستیاران متخصص حقوقی، اجتماعی، فرهنگی و موارد وابسته,"Legal, Social, Cultural and Related Associate Professionals",sub_major,kc_isco_3
+kc_isco_35,kscheme_isco_08,35,کاردانان فناوری اطلاعات و ارتباطات,Information and Communications Technicians,sub_major,kc_isco_3
+kc_isco_41,kscheme_isco_08,41,کارمندان دفتری عمومی و صفحه‌کلیدی,General and Keyboard Clerks,sub_major,kc_isco_4
+kc_isco_42,kscheme_isco_08,42,کارمندان خدمات مشتری,Customer Services Clerks,sub_major,kc_isco_4
+kc_isco_43,kscheme_isco_08,43,کارمندان ثبت ارقام و ثبت اقلام,Numerical and Material Recording Clerks,sub_major,kc_isco_4
+kc_isco_44,kscheme_isco_08,44,سایر کارکنان پشتیبانی دفتری,Other Clerical Support Workers,sub_major,kc_isco_4
+kc_isco_51,kscheme_isco_08,51,کارکنان خدمات شخصی,Personal Services Workers,sub_major,kc_isco_5
+kc_isco_52,kscheme_isco_08,52,کارکنان فروش,Sales Workers,sub_major,kc_isco_5
+kc_isco_53,kscheme_isco_08,53,کارکنان مراقبت شخصی,Personal Care Workers,sub_major,kc_isco_5
+kc_isco_54,kscheme_isco_08,54,کارکنان خدمات حفاظتی,Protective Services Workers,sub_major,kc_isco_5
+kc_isco_61,kscheme_isco_08,61,کارکنان ماهر کشاورزی بازارمحور,Market-oriented Skilled Agricultural Workers,sub_major,kc_isco_6
+kc_isco_62,kscheme_isco_08,62,کارکنان ماهر جنگلداری، ماهیگیری و شکار بازارمحور,"Market-oriented Skilled Forestry, Fishery and Hunting Workers",sub_major,kc_isco_6
+kc_isco_63,kscheme_isco_08,63,کشاورزان، ماهیگیران، شکارچیان و گردآورندگان معیشتی,"Subsistence Farmers, Fishers, Hunters and Gatherers",sub_major,kc_isco_6
+kc_isco_71,kscheme_isco_08,71,کارکنان حرفه‌های ساختمانی و وابسته (به‌جز برق‌کاران),Building and Related Trades Workers (excluding Electricians),sub_major,kc_isco_7
+kc_isco_72,kscheme_isco_08,72,کارکنان حرفه‌های فلز، ماشین‌آلات و وابسته,"Metal, Machinery and Related Trades Workers",sub_major,kc_isco_7
+kc_isco_73,kscheme_isco_08,73,کارکنان صنایع دستی و چاپ,Handicraft and Printing Workers,sub_major,kc_isco_7
+kc_isco_74,kscheme_isco_08,74,کارکنان حرفه‌های برق و الکترونیک,Electrical and Electronics Trades Workers,sub_major,kc_isco_7
+kc_isco_75,kscheme_isco_08,75,کارکنان فرآوری مواد غذایی، نجاری، پوشاک و سایر صنایع دستی و حرفه‌های وابسته,"Food Processing, Woodworking, Garment and Other Craft and Related Trades Workers",sub_major,kc_isco_7
+kc_isco_81,kscheme_isco_08,81,اپراتورهای تأسیسات و ماشین‌آلات ثابت,Stationary Plant and Machine Operators,sub_major,kc_isco_8
+kc_isco_82,kscheme_isco_08,82,مونتاژکاران,Assemblers,sub_major,kc_isco_8
+kc_isco_83,kscheme_isco_08,83,رانندگان و اپراتورهای ماشین‌آلات متحرک,Drivers and Mobile Plant Operators,sub_major,kc_isco_8
+kc_isco_91,kscheme_isco_08,91,نظافت‌کاران و کمک‌کاران,Cleaners and Helpers,sub_major,kc_isco_9
+kc_isco_92,kscheme_isco_08,92,کارکنان ساده کشاورزی، جنگلداری و ماهیگیری,"Agricultural, Forestry and Fishery Labourers",sub_major,kc_isco_9
+kc_isco_93,kscheme_isco_08,93,کارکنان ساده معدن، ساخت‌وساز، تولید صنعتی و حمل‌ونقل,"Labourers in Mining, Construction, Manufacturing and Transport",sub_major,kc_isco_9
+kc_isco_94,kscheme_isco_08,94,دستیاران آماده‌سازی غذا,Food Preparation Assistants,sub_major,kc_isco_9
+kc_isco_95,kscheme_isco_08,95,کارکنان فروش و خدمات خیابانی و وابسته,Street and Related Sales and Services Workers,sub_major,kc_isco_9
+kc_isco_96,kscheme_isco_08,96,کارکنان جمع‌آوری پسماند و سایر مشاغل ساده,Refuse Workers and Other Elementary Workers,sub_major,kc_isco_9
+kc_isco_011,kscheme_isco_08,011,افسران نیروهای مسلح,Commissioned Armed Forces Officers,minor,kc_isco_01
+kc_isco_021,kscheme_isco_08,021,درجه‌داران نیروهای مسلح,Non-commissioned Armed Forces Officers,minor,kc_isco_02
+kc_isco_031,kscheme_isco_08,031,مشاغل نیروهای مسلح، سایر رده‌ها,"Armed Forces Occupations, Other Ranks",minor,kc_isco_03
+kc_isco_111,kscheme_isco_08,111,قانون‌گذاران و مقامات عالی‌رتبه,Legislators and Senior Officials,minor,kc_isco_11
+kc_isco_112,kscheme_isco_08,112,مدیران عامل و مدیران ارشد اجرایی,Managing Directors and Chief Executives,minor,kc_isco_11
+kc_isco_121,kscheme_isco_08,121,مدیران خدمات کسب‌وکار و امور اداری,Business Services and Administration Managers,minor,kc_isco_12
+kc_isco_122,kscheme_isco_08,122,مدیران فروش، بازاریابی و توسعه,"Sales, Marketing and Development Managers",minor,kc_isco_12
+kc_isco_131,kscheme_isco_08,131,مدیران تولید در کشاورزی، جنگلداری و شیلات,"Production Managers in Agriculture, Forestry and Fisheries",minor,kc_isco_13
+kc_isco_132,kscheme_isco_08,132,مدیران تولید صنعتی، معدن، ساخت‌وساز و توزیع,"Manufacturing, Mining, Construction and Distribution Managers",minor,kc_isco_13
+kc_isco_133,kscheme_isco_08,133,مدیران خدمات فناوری اطلاعات و ارتباطات,Information and Communications Technology Services Managers,minor,kc_isco_13
+kc_isco_134,kscheme_isco_08,134,مدیران خدمات حرفه‌ای,Professional Services Managers,minor,kc_isco_13
+kc_isco_141,kscheme_isco_08,141,مدیران هتل و رستوران,Hotel and Restaurant Managers,minor,kc_isco_14
+kc_isco_142,kscheme_isco_08,142,مدیران تجارت خرده‌فروشی و عمده‌فروشی,Retail and Wholesale Trade Managers,minor,kc_isco_14
+kc_isco_143,kscheme_isco_08,143,مدیران سایر خدمات,Other Services Managers,minor,kc_isco_14
+kc_isco_211,kscheme_isco_08,211,متخصصان علوم فیزیکی و علوم زمین,Physical and Earth Science Professionals,minor,kc_isco_21
+kc_isco_212,kscheme_isco_08,212,ریاضی‌دانان، آمارگران بیمه (اکچوئرها) و آمارشناسان,"Mathematicians, Actuaries and Statisticians",minor,kc_isco_21
+kc_isco_213,kscheme_isco_08,213,متخصصان علوم زیستی,Life Science Professionals,minor,kc_isco_21
+kc_isco_214,kscheme_isco_08,214,متخصصان مهندسی (به‌جز برق و الکترونیک),Engineering Professionals (excluding Electrotechnology),minor,kc_isco_21
+kc_isco_215,kscheme_isco_08,215,مهندسان برق، الکترونیک و مخابرات,Electrotechnology Engineers,minor,kc_isco_21
+kc_isco_216,kscheme_isco_08,216,معماران، برنامه‌ریزان، نقشه‌برداران و طراحان,"Architects, Planners, Surveyors and Designers",minor,kc_isco_21
+kc_isco_221,kscheme_isco_08,221,پزشکان,Medical Doctors,minor,kc_isco_22
+kc_isco_222,kscheme_isco_08,222,متخصصان پرستاری و مامایی,Nursing and Midwifery Professionals,minor,kc_isco_22
+kc_isco_223,kscheme_isco_08,223,متخصصان طب سنتی و مکمل,Traditional and Complementary Medicine Professionals,minor,kc_isco_22
+kc_isco_224,kscheme_isco_08,224,متخصصان پیراپزشکی,Paramedical Practitioners,minor,kc_isco_22
+kc_isco_225,kscheme_isco_08,225,دامپزشکان,Veterinarians,minor,kc_isco_22
+kc_isco_226,kscheme_isco_08,226,سایر متخصصان سلامت,Other Health Professionals,minor,kc_isco_22
+kc_isco_231,kscheme_isco_08,231,مدرسان دانشگاه و آموزش عالی,University and Higher Education Teachers,minor,kc_isco_23
+kc_isco_232,kscheme_isco_08,232,مدرسان آموزش فنی و حرفه‌ای,Vocational Education Teachers,minor,kc_isco_23
+kc_isco_233,kscheme_isco_08,233,دبیران آموزش متوسطه,Secondary Education Teachers,minor,kc_isco_23
+kc_isco_234,kscheme_isco_08,234,آموزگاران دبستان و مربیان خردسالان,Primary School and Early Childhood Teachers,minor,kc_isco_23
+kc_isco_235,kscheme_isco_08,235,سایر متخصصان آموزش,Other Teaching Professionals,minor,kc_isco_23
+kc_isco_241,kscheme_isco_08,241,متخصصان مالی,Finance Professionals,minor,kc_isco_24
+kc_isco_242,kscheme_isco_08,242,متخصصان امور اداری,Administration Professionals,minor,kc_isco_24
+kc_isco_243,kscheme_isco_08,243,متخصصان فروش، بازاریابی و روابط عمومی,"Sales, Marketing and Public Relations Professionals",minor,kc_isco_24
+kc_isco_251,kscheme_isco_08,251,توسعه‌دهندگان و تحلیلگران نرم‌افزار و برنامه‌های کاربردی,Software and Applications Developers and Analysts,minor,kc_isco_25
+kc_isco_252,kscheme_isco_08,252,متخصصان پایگاه داده و شبکه,Database and Network Professionals,minor,kc_isco_25
+kc_isco_261,kscheme_isco_08,261,متخصصان حقوقی,Legal Professionals,minor,kc_isco_26
+kc_isco_262,kscheme_isco_08,262,کتابداران، آرشیویست‌ها و متصدیان موزه,"Librarians, Archivists and Curators",minor,kc_isco_26
+kc_isco_263,kscheme_isco_08,263,متخصصان اجتماعی و دینی,Social and Religious Professionals,minor,kc_isco_26
+kc_isco_264,kscheme_isco_08,264,نویسندگان، روزنامه‌نگاران و زبان‌شناسان,"Authors, Journalists and Linguists",minor,kc_isco_26
+kc_isco_265,kscheme_isco_08,265,هنرمندان آفرینشگر و اجراگر,Creative and Performing Artists,minor,kc_isco_26
+kc_isco_311,kscheme_isco_08,311,کاردانان علوم فیزیکی و مهندسی,Physical and Engineering Science Technicians,minor,kc_isco_31
+kc_isco_312,kscheme_isco_08,312,سرپرستان معدن، تولید صنعتی و ساخت‌وساز,"Mining, Manufacturing and Construction Supervisors",minor,kc_isco_31
+kc_isco_313,kscheme_isco_08,313,کاردانان کنترل فرایند,Process Control Technicians,minor,kc_isco_31
+kc_isco_314,kscheme_isco_08,314,کاردانان علوم زیستی و دستیاران متخصص وابسته,Life Science Technicians and Related Associate Professionals,minor,kc_isco_31
+kc_isco_315,kscheme_isco_08,315,کنترل‌کنندگان و کاردانان کشتی و هواپیما,Ship and Aircraft Controllers and Technicians,minor,kc_isco_31
+kc_isco_321,kscheme_isco_08,321,کاردانان پزشکی و دارویی,Medical and Pharmaceutical Technicians,minor,kc_isco_32
+kc_isco_322,kscheme_isco_08,322,دستیاران متخصص پرستاری و مامایی,Nursing and Midwifery Associate Professionals,minor,kc_isco_32
+kc_isco_323,kscheme_isco_08,323,دستیاران متخصص طب سنتی و مکمل,Traditional and Complementary Medicine Associate Professionals,minor,kc_isco_32
+kc_isco_324,kscheme_isco_08,324,کاردانان و دستیاران دامپزشکی,Veterinary Technicians and Assistants,minor,kc_isco_32
+kc_isco_325,kscheme_isco_08,325,سایر دستیاران متخصص سلامت,Other Health Associate Professionals,minor,kc_isco_32
+kc_isco_331,kscheme_isco_08,331,دستیاران متخصص مالی و ریاضی,Financial and Mathematical Associate Professionals,minor,kc_isco_33
+kc_isco_332,kscheme_isco_08,332,نمایندگان و کارگزاران فروش و خرید,Sales and Purchasing Agents and Brokers,minor,kc_isco_33
+kc_isco_333,kscheme_isco_08,333,نمایندگان خدمات کسب‌وکار,Business Services Agents,minor,kc_isco_33
+kc_isco_334,kscheme_isco_08,334,منشیان اداری و تخصصی,Administrative and Specialized Secretaries,minor,kc_isco_33
+kc_isco_335,kscheme_isco_08,335,دستیاران متخصص نظارتی دولتی,Government Regulatory Associate Professionals,minor,kc_isco_33
+kc_isco_341,kscheme_isco_08,341,دستیاران متخصص حقوقی، اجتماعی و دینی,"Legal, Social and Religious Associate Professionals",minor,kc_isco_34
+kc_isco_342,kscheme_isco_08,342,کارکنان ورزش و آمادگی جسمانی,Sports and Fitness Workers,minor,kc_isco_34
+kc_isco_343,kscheme_isco_08,343,دستیاران متخصص هنری، فرهنگی و آشپزی,"Artistic, Cultural and Culinary Associate Professionals",minor,kc_isco_34
+kc_isco_351,kscheme_isco_08,351,کاردانان عملیات و پشتیبانی کاربران فناوری اطلاعات و ارتباطات,Information and Communications Technology Operations and User Support Technicians,minor,kc_isco_35
+kc_isco_352,kscheme_isco_08,352,کاردانان مخابرات و پخش رادیو و تلویزیون,Telecommunications and Broadcasting Technicians,minor,kc_isco_35
+kc_isco_411,kscheme_isco_08,411,کارمندان دفتری عمومی,General Office Clerks,minor,kc_isco_41
+kc_isco_412,kscheme_isco_08,412,منشیان (عمومی),Secretaries (general),minor,kc_isco_41
+kc_isco_413,kscheme_isco_08,413,اپراتورهای صفحه‌کلید,Keyboard Operators,minor,kc_isco_41
+kc_isco_421,kscheme_isco_08,421,تحویلداران، وصول‌کنندگان وجه و کارمندان وابسته,"Tellers, Money Collectors and Related Clerks",minor,kc_isco_42
+kc_isco_422,kscheme_isco_08,422,کارکنان اطلاع‌رسانی به مشتریان,Client Information Workers,minor,kc_isco_42
+kc_isco_431,kscheme_isco_08,431,کارمندان امور ارقام,Numerical Clerks,minor,kc_isco_43
+kc_isco_432,kscheme_isco_08,432,کارمندان ثبت اقلام و حمل‌ونقل,Material Recording and Transport Clerks,minor,kc_isco_43
+kc_isco_441,kscheme_isco_08,441,سایر کارکنان پشتیبانی دفتری,Other Clerical Support Workers,minor,kc_isco_44
+kc_isco_511,kscheme_isco_08,511,مهمانداران سفر، مأموران بلیت و مسافر، و راهنمایان,"Travel Attendants, Conductors and Guides",minor,kc_isco_51
+kc_isco_512,kscheme_isco_08,512,آشپزها,Cooks,minor,kc_isco_51
+kc_isco_513,kscheme_isco_08,513,کارکنان پذیرایی و متصدیان بار,Waiters and Bartenders,minor,kc_isco_51
+kc_isco_514,kscheme_isco_08,514,آرایشگران مو، کارشناسان زیبایی و کارکنان وابسته,"Hairdressers, Beauticians and Related Workers",minor,kc_isco_51
+kc_isco_515,kscheme_isco_08,515,سرپرستان ساختمان و خانه‌داری,Building and Housekeeping Supervisors,minor,kc_isco_51
+kc_isco_516,kscheme_isco_08,516,سایر کارکنان خدمات شخصی,Other Personal Services Workers,minor,kc_isco_51
+kc_isco_521,kscheme_isco_08,521,فروشندگان خیابانی و بازار,Street and Market Salespersons,minor,kc_isco_52
+kc_isco_522,kscheme_isco_08,522,فروشندگان فروشگاه,Shop Salespersons,minor,kc_isco_52
+kc_isco_523,kscheme_isco_08,523,صندوق‌داران و متصدیان فروش بلیت,Cashiers and Ticket Clerks,minor,kc_isco_52
+kc_isco_524,kscheme_isco_08,524,سایر کارکنان فروش,Other Sales Workers,minor,kc_isco_52
+kc_isco_531,kscheme_isco_08,531,مراقبان کودک و دستیاران معلم,Child Care Workers and Teachers' Aides,minor,kc_isco_53
+kc_isco_532,kscheme_isco_08,532,کارکنان مراقبت شخصی در خدمات سلامت,Personal Care Workers in Health Services,minor,kc_isco_53
+kc_isco_541,kscheme_isco_08,541,کارکنان خدمات حفاظتی,Protective Services Workers,minor,kc_isco_54
+kc_isco_611,kscheme_isco_08,611,صیفی‌کاران بازارمحور و پرورش‌دهندگان محصولات زراعی,Market Gardeners and Crop Growers,minor,kc_isco_61
+kc_isco_612,kscheme_isco_08,612,دامداران و پرورش‌دهندگان جانوران,Animal Producers,minor,kc_isco_61
+kc_isco_613,kscheme_isco_08,613,تولیدکنندگان مختلط زراعی و دامی,Mixed Crop and Animal Producers,minor,kc_isco_61
+kc_isco_621,kscheme_isco_08,621,کارکنان جنگلداری و کارکنان وابسته,Forestry and Related Workers,minor,kc_isco_62
+kc_isco_622,kscheme_isco_08,622,کارکنان ماهیگیری، شکارچیان و تله‌گذاران,"Fishery Workers, Hunters and Trappers",minor,kc_isco_62
+kc_isco_631,kscheme_isco_08,631,زارعان معیشتی,Subsistence Crop Farmers,minor,kc_isco_63
+kc_isco_632,kscheme_isco_08,632,دامداران معیشتی,Subsistence Livestock Farmers,minor,kc_isco_63
+kc_isco_633,kscheme_isco_08,633,کشاورزان معیشتی زراعی و دامی,Subsistence Mixed Crop and Livestock Farmers,minor,kc_isco_63
+kc_isco_634,kscheme_isco_08,634,ماهیگیران، شکارچیان، تله‌گذاران و گردآورندگان معیشتی,"Subsistence Fishers, Hunters, Trappers and Gatherers",minor,kc_isco_63
+kc_isco_711,kscheme_isco_08,711,کارکنان حرفه‌های اسکلت ساختمان و وابسته,Building Frame and Related Trades Workers,minor,kc_isco_71
+kc_isco_712,kscheme_isco_08,712,کارکنان حرفه‌های تکمیلی ساختمان و وابسته,Building Finishers and Related Trades Workers,minor,kc_isco_71
+kc_isco_713,kscheme_isco_08,713,نقاشان، نظافت‌کاران نمای ساختمان و کارکنان حرفه‌های وابسته,"Painters, Building Structure Cleaners and Related Trades Workers",minor,kc_isco_71
+kc_isco_721,kscheme_isco_08,721,ورق‌کاران و سازه‌کاران فلزی، قالب‌گیران و جوشکاران و کارکنان وابسته,"Sheet and Structural Metal Workers, Moulders and Welders, and Related Workers",minor,kc_isco_72
+kc_isco_722,kscheme_isco_08,722,آهنگران، قالب‌سازان و کارکنان حرفه‌های وابسته,"Blacksmiths, Toolmakers and Related Trades Workers",minor,kc_isco_72
+kc_isco_723,kscheme_isco_08,723,مکانیک‌ها و تعمیرکاران ماشین‌آلات,Machinery Mechanics and Repairers,minor,kc_isco_72
+kc_isco_731,kscheme_isco_08,731,کارکنان صنایع دستی,Handicraft Workers,minor,kc_isco_73
+kc_isco_732,kscheme_isco_08,732,کارکنان حرفه‌های چاپ,Printing Trades Workers,minor,kc_isco_73
+kc_isco_741,kscheme_isco_08,741,نصابان و تعمیرکاران تجهیزات برقی,Electrical Equipment Installers and Repairers,minor,kc_isco_74
+kc_isco_742,kscheme_isco_08,742,نصابان و تعمیرکاران الکترونیک و مخابرات,Electronics and Telecommunications Installers and Repairers,minor,kc_isco_74
+kc_isco_751,kscheme_isco_08,751,کارکنان فرآوری مواد غذایی و حرفه‌های وابسته,Food Processing and Related Trades Workers,minor,kc_isco_75
+kc_isco_752,kscheme_isco_08,752,عمل‌آورندگان چوب، کابینت‌سازان و کارکنان حرفه‌های وابسته,"Wood Treaters, Cabinet-makers and Related Trades Workers",minor,kc_isco_75
+kc_isco_753,kscheme_isco_08,753,کارکنان پوشاک و حرفه‌های وابسته,Garment and Related Trades Workers,minor,kc_isco_75
+kc_isco_754,kscheme_isco_08,754,سایر کارکنان صنایع دستی و حرفه‌های وابسته,Other Craft and Related Workers,minor,kc_isco_75
+kc_isco_811,kscheme_isco_08,811,اپراتورهای تأسیسات معدن و فرآوری مواد معدنی,Mining and Mineral Processing Plant Operators,minor,kc_isco_81
+kc_isco_812,kscheme_isco_08,812,اپراتورهای تأسیسات فرآوری و تکمیل فلزات,Metal Processing and Finishing Plant Operators,minor,kc_isco_81
+kc_isco_813,kscheme_isco_08,813,اپراتورهای تأسیسات و ماشین‌های فراورده‌های شیمیایی و عکاسی,Chemical and Photographic Products Plant and Machine Operators,minor,kc_isco_81
+kc_isco_814,kscheme_isco_08,814,اپراتورهای ماشین‌های فراورده‌های لاستیکی، پلاستیکی و کاغذی,"Rubber, Plastic and Paper Products Machine Operators",minor,kc_isco_81
+kc_isco_815,kscheme_isco_08,815,اپراتورهای ماشین‌های فراورده‌های نساجی، خز و چرم,"Textile, Fur and Leather Products Machine Operators",minor,kc_isco_81
+kc_isco_816,kscheme_isco_08,816,اپراتورهای ماشین‌های مواد غذایی و فراورده‌های وابسته,Food and Related Products Machine Operators,minor,kc_isco_81
+kc_isco_817,kscheme_isco_08,817,اپراتورهای تأسیسات فرآوری چوب و کاغذسازی,Wood Processing and Papermaking Plant Operators,minor,kc_isco_81
+kc_isco_818,kscheme_isco_08,818,سایر اپراتورهای تأسیسات و ماشین‌آلات ثابت,Other Stationary Plant and Machine Operators,minor,kc_isco_81
+kc_isco_821,kscheme_isco_08,821,مونتاژکاران,Assemblers,minor,kc_isco_82
+kc_isco_831,kscheme_isco_08,831,رانندگان لکوموتیو و کارکنان وابسته,Locomotive Engine Drivers and Related Workers,minor,kc_isco_83
+kc_isco_832,kscheme_isco_08,832,رانندگان خودروی سواری، ون و موتورسیکلت,"Car, Van and Motorcycle Drivers",minor,kc_isco_83
+kc_isco_833,kscheme_isco_08,833,رانندگان کامیون سنگین و اتوبوس,Heavy Truck and Bus Drivers,minor,kc_isco_83
+kc_isco_834,kscheme_isco_08,834,اپراتورهای ماشین‌آلات متحرک,Mobile Plant Operators,minor,kc_isco_83
+kc_isco_835,kscheme_isco_08,835,خدمه عرشه کشتی و کارکنان وابسته,Ships' Deck Crews and Related Workers,minor,kc_isco_83
+kc_isco_911,kscheme_isco_08,911,نظافت‌کاران و کمک‌کاران منازل، هتل‌ها و ادارات,"Domestic, Hotel and Office Cleaners and Helpers",minor,kc_isco_91
+kc_isco_912,kscheme_isco_08,912,نظافت‌کاران وسایل نقلیه، پنجره، رختشویی و سایر نظافت‌های دستی,"Vehicle, Window, Laundry and Other Hand Cleaning Workers",minor,kc_isco_91
+kc_isco_921,kscheme_isco_08,921,کارکنان ساده کشاورزی، جنگلداری و ماهیگیری,"Agricultural, Forestry and Fishery Labourers",minor,kc_isco_92
+kc_isco_931,kscheme_isco_08,931,کارکنان ساده معدن و ساخت‌وساز,Mining and Construction Labourers,minor,kc_isco_93
+kc_isco_932,kscheme_isco_08,932,کارکنان ساده تولید صنعتی,Manufacturing Labourers,minor,kc_isco_93
+kc_isco_933,kscheme_isco_08,933,کارکنان ساده حمل‌ونقل و انبارداری,Transport and Storage Labourers,minor,kc_isco_93
+kc_isco_941,kscheme_isco_08,941,دستیاران آماده‌سازی غذا,Food Preparation Assistants,minor,kc_isco_94
+kc_isco_951,kscheme_isco_08,951,کارکنان خدمات خیابانی و وابسته,Street and Related Services Workers,minor,kc_isco_95
+kc_isco_952,kscheme_isco_08,952,فروشندگان خیابانی (به‌جز غذا),Street Vendors (excluding Food),minor,kc_isco_95
+kc_isco_961,kscheme_isco_08,961,کارکنان پسماند,Refuse Workers,minor,kc_isco_96
+kc_isco_962,kscheme_isco_08,962,سایر کارکنان مشاغل ساده,Other Elementary Workers,minor,kc_isco_96
+kc_isco_0110,kscheme_isco_08,0110,افسران نیروهای مسلح,Commissioned Armed Forces Officers,unit,kc_isco_011
+kc_isco_0210,kscheme_isco_08,0210,درجه‌داران نیروهای مسلح,Non-commissioned Armed Forces Officers,unit,kc_isco_021
+kc_isco_0310,kscheme_isco_08,0310,مشاغل نیروهای مسلح، سایر رده‌ها,"Armed Forces Occupations, Other Ranks",unit,kc_isco_031
+kc_isco_1111,kscheme_isco_08,1111,قانون‌گذاران,Legislators,unit,kc_isco_111
+kc_isco_1112,kscheme_isco_08,1112,مقامات عالی‌رتبه دولتی,Senior Government Officials,unit,kc_isco_111
+kc_isco_1113,kscheme_isco_08,1113,سران سنتی و دهداران,Traditional Chiefs and Heads of Villages,unit,kc_isco_111
+kc_isco_1114,kscheme_isco_08,1114,مقامات ارشد سازمان‌های با منافع خاص,Senior Officials of Special-interest Organizations,unit,kc_isco_111
+kc_isco_1120,kscheme_isco_08,1120,مدیران عامل و مدیران ارشد اجرایی,Managing Directors and Chief Executives,unit,kc_isco_112
+kc_isco_1211,kscheme_isco_08,1211,مدیران مالی,Finance Managers,unit,kc_isco_121
+kc_isco_1212,kscheme_isco_08,1212,مدیران منابع انسانی,Human Resource Managers,unit,kc_isco_121
+kc_isco_1213,kscheme_isco_08,1213,مدیران سیاست‌گذاری و برنامه‌ریزی,Policy and Planning Managers,unit,kc_isco_121
+kc_isco_1219,kscheme_isco_08,1219,مدیران خدمات کسب‌وکار و امور اداری طبقه‌بندی‌نشده در جای دیگر,Business Services and Administration Managers Not Elsewhere Classified,unit,kc_isco_121
+kc_isco_1221,kscheme_isco_08,1221,مدیران فروش و بازاریابی,Sales and Marketing Managers,unit,kc_isco_122
+kc_isco_1222,kscheme_isco_08,1222,مدیران تبلیغات و روابط عمومی,Advertising and Public Relations Managers,unit,kc_isco_122
+kc_isco_1223,kscheme_isco_08,1223,مدیران پژوهش و توسعه,Research and Development Managers,unit,kc_isco_122
+kc_isco_1311,kscheme_isco_08,1311,مدیران تولید کشاورزی و جنگلداری,Agricultural and Forestry Production Managers,unit,kc_isco_131
+kc_isco_1312,kscheme_isco_08,1312,مدیران تولید آبزی‌پروری و شیلات,Aquaculture and Fisheries Production Managers,unit,kc_isco_131
+kc_isco_1321,kscheme_isco_08,1321,مدیران تولید صنعتی,Manufacturing Managers,unit,kc_isco_132
+kc_isco_1322,kscheme_isco_08,1322,مدیران معدن,Mining Managers,unit,kc_isco_132
+kc_isco_1323,kscheme_isco_08,1323,مدیران ساخت‌وساز,Construction Managers,unit,kc_isco_132
+kc_isco_1324,kscheme_isco_08,1324,مدیران تأمین، توزیع و مدیران وابسته,"Supply, Distribution and Related Managers",unit,kc_isco_132
+kc_isco_1330,kscheme_isco_08,1330,مدیران خدمات فناوری اطلاعات و ارتباطات,Information and Communications Technology Services Managers,unit,kc_isco_133
+kc_isco_1341,kscheme_isco_08,1341,مدیران خدمات مراقبت از کودک,Child Care Services Managers,unit,kc_isco_134
+kc_isco_1342,kscheme_isco_08,1342,مدیران خدمات سلامت,Health Services Managers,unit,kc_isco_134
+kc_isco_1343,kscheme_isco_08,1343,مدیران خدمات مراقبت از سالمندان,Aged Care Services Managers,unit,kc_isco_134
+kc_isco_1344,kscheme_isco_08,1344,مدیران رفاه اجتماعی,Social Welfare Managers,unit,kc_isco_134
+kc_isco_1345,kscheme_isco_08,1345,مدیران آموزشی,Education Managers,unit,kc_isco_134
+kc_isco_1346,kscheme_isco_08,1346,مدیران شعب خدمات مالی و بیمه,Financial and Insurance Services Branch Managers,unit,kc_isco_134
+kc_isco_1349,kscheme_isco_08,1349,مدیران خدمات حرفه‌ای طبقه‌بندی‌نشده در جای دیگر,Professional Services Managers Not Elsewhere Classified,unit,kc_isco_134
+kc_isco_1411,kscheme_isco_08,1411,مدیران هتل,Hotel Managers,unit,kc_isco_141
+kc_isco_1412,kscheme_isco_08,1412,مدیران رستوران,Restaurant Managers,unit,kc_isco_141
+kc_isco_1420,kscheme_isco_08,1420,مدیران تجارت خرده‌فروشی و عمده‌فروشی,Retail and Wholesale Trade Managers,unit,kc_isco_142
+kc_isco_1431,kscheme_isco_08,1431,مدیران مراکز ورزشی، تفریحی و فرهنگی,"Sports, Recreation and Cultural Centre Managers",unit,kc_isco_143
+kc_isco_1439,kscheme_isco_08,1439,مدیران خدمات طبقه‌بندی‌نشده در جای دیگر,Services Managers Not Elsewhere Classified,unit,kc_isco_143
+kc_isco_2111,kscheme_isco_08,2111,فیزیک‌دانان و ستاره‌شناسان,Physicists and Astronomers,unit,kc_isco_211
+kc_isco_2112,kscheme_isco_08,2112,هواشناسان,Meteorologists,unit,kc_isco_211
+kc_isco_2113,kscheme_isco_08,2113,شیمی‌دانان,Chemists,unit,kc_isco_211
+kc_isco_2114,kscheme_isco_08,2114,زمین‌شناسان و ژئوفیزیک‌دانان,Geologists and Geophysicists,unit,kc_isco_211
+kc_isco_2120,kscheme_isco_08,2120,ریاضی‌دانان، آمارگران بیمه (اکچوئرها) و آمارشناسان,"Mathematicians, Actuaries and Statisticians",unit,kc_isco_212
+kc_isco_2131,kscheme_isco_08,2131,زیست‌شناسان، گیاه‌شناسان، جانورشناسان و متخصصان وابسته,"Biologists, Botanists, Zoologists and Related Professionals",unit,kc_isco_213
+kc_isco_2132,kscheme_isco_08,2132,مشاوران کشاورزی، جنگلداری و شیلات,"Farming, Forestry and Fisheries Advisers",unit,kc_isco_213
+kc_isco_2133,kscheme_isco_08,2133,متخصصان حفاظت محیط زیست,Environmental Protection Professionals,unit,kc_isco_213
+kc_isco_2141,kscheme_isco_08,2141,مهندسان صنایع و تولید,Industrial and Production Engineers,unit,kc_isco_214
+kc_isco_2142,kscheme_isco_08,2142,مهندسان عمران,Civil Engineers,unit,kc_isco_214
+kc_isco_2143,kscheme_isco_08,2143,مهندسان محیط زیست,Environmental Engineers,unit,kc_isco_214
+kc_isco_2144,kscheme_isco_08,2144,مهندسان مکانیک,Mechanical Engineers,unit,kc_isco_214
+kc_isco_2145,kscheme_isco_08,2145,مهندسان شیمی,Chemical Engineers,unit,kc_isco_214
+kc_isco_2146,kscheme_isco_08,2146,مهندسان معدن، متالورژیست‌ها و متخصصان وابسته,"Mining Engineers, Metallurgists and Related Professionals",unit,kc_isco_214
+kc_isco_2149,kscheme_isco_08,2149,متخصصان مهندسی طبقه‌بندی‌نشده در جای دیگر,Engineering Professionals Not Elsewhere Classified,unit,kc_isco_214
+kc_isco_2151,kscheme_isco_08,2151,مهندسان برق,Electrical Engineers,unit,kc_isco_215
+kc_isco_2152,kscheme_isco_08,2152,مهندسان الکترونیک,Electronics Engineers,unit,kc_isco_215
+kc_isco_2153,kscheme_isco_08,2153,مهندسان مخابرات,Telecommunications Engineers,unit,kc_isco_215
+kc_isco_2161,kscheme_isco_08,2161,معماران ساختمان,Building Architects,unit,kc_isco_216
+kc_isco_2162,kscheme_isco_08,2162,معماران منظر,Landscape Architects,unit,kc_isco_216
+kc_isco_2163,kscheme_isco_08,2163,طراحان محصول و پوشاک,Product and Garment Designers,unit,kc_isco_216
+kc_isco_2164,kscheme_isco_08,2164,برنامه‌ریزان شهری و ترافیک,Town and Traffic Planners,unit,kc_isco_216
+kc_isco_2165,kscheme_isco_08,2165,نقشه‌نگاران و نقشه‌برداران,Cartographers and Surveyors,unit,kc_isco_216
+kc_isco_2166,kscheme_isco_08,2166,طراحان گرافیک و چندرسانه‌ای,Graphic and Multimedia Designers,unit,kc_isco_216
+kc_isco_2211,kscheme_isco_08,2211,پزشکان عمومی,Generalist Medical Practitioners,unit,kc_isco_221
+kc_isco_2212,kscheme_isco_08,2212,پزشکان متخصص,Specialist Medical Practitioners,unit,kc_isco_221
+kc_isco_2221,kscheme_isco_08,2221,متخصصان پرستاری,Nursing Professionals,unit,kc_isco_222
+kc_isco_2222,kscheme_isco_08,2222,متخصصان مامایی,Midwifery Professionals,unit,kc_isco_222
+kc_isco_2230,kscheme_isco_08,2230,متخصصان طب سنتی و مکمل,Traditional and Complementary Medicine Professionals,unit,kc_isco_223
+kc_isco_2240,kscheme_isco_08,2240,متخصصان پیراپزشکی,Paramedical Practitioners,unit,kc_isco_224
+kc_isco_2250,kscheme_isco_08,2250,دامپزشکان,Veterinarians,unit,kc_isco_225
+kc_isco_2261,kscheme_isco_08,2261,دندان‌پزشکان,Dentists,unit,kc_isco_226
+kc_isco_2262,kscheme_isco_08,2262,داروسازان,Pharmacists,unit,kc_isco_226
+kc_isco_2263,kscheme_isco_08,2263,متخصصان بهداشت محیط و بهداشت حرفه‌ای,Environmental and Occupational Health and Hygiene Professionals,unit,kc_isco_226
+kc_isco_2264,kscheme_isco_08,2264,فیزیوتراپیست‌ها,Physiotherapists,unit,kc_isco_226
+kc_isco_2265,kscheme_isco_08,2265,کارشناسان تغذیه و رژیم‌درمانی,Dieticians and Nutritionists,unit,kc_isco_226
+kc_isco_2266,kscheme_isco_08,2266,شنوایی‌شناسان و گفتاردرمانگران,Audiologists and Speech Therapists,unit,kc_isco_226
+kc_isco_2267,kscheme_isco_08,2267,بینایی‌سنج‌ها (اپتومتریست‌ها) و اپتیسین‌های چشمی,Optometrists and Ophthalmic Opticians,unit,kc_isco_226
+kc_isco_2269,kscheme_isco_08,2269,متخصصان سلامت طبقه‌بندی‌نشده در جای دیگر,Health Professionals Not Elsewhere Classified,unit,kc_isco_226
+kc_isco_2310,kscheme_isco_08,2310,مدرسان دانشگاه و آموزش عالی,University and Higher Education Teachers,unit,kc_isco_231
+kc_isco_2320,kscheme_isco_08,2320,مدرسان آموزش فنی و حرفه‌ای,Vocational Education Teachers,unit,kc_isco_232
+kc_isco_2330,kscheme_isco_08,2330,دبیران آموزش متوسطه,Secondary Education Teachers,unit,kc_isco_233
+kc_isco_2341,kscheme_isco_08,2341,آموزگاران دبستان,Primary School Teachers,unit,kc_isco_234
+kc_isco_2342,kscheme_isco_08,2342,مربیان آموزش خردسالان,Early Childhood Educators,unit,kc_isco_234
+kc_isco_2351,kscheme_isco_08,2351,کارشناسان روش‌های آموزشی,Education Methods Specialists,unit,kc_isco_235
+kc_isco_2352,kscheme_isco_08,2352,معلمان آموزش ویژه (استثنایی),Special Needs Teachers,unit,kc_isco_235
+kc_isco_2353,kscheme_isco_08,2353,سایر مدرسان زبان,Other Language Teachers,unit,kc_isco_235
+kc_isco_2354,kscheme_isco_08,2354,سایر مدرسان موسیقی,Other Music Teachers,unit,kc_isco_235
+kc_isco_2355,kscheme_isco_08,2355,سایر مدرسان هنر,Other Arts Teachers,unit,kc_isco_235
+kc_isco_2356,kscheme_isco_08,2356,مدرسان فناوری اطلاعات,Information Technology Trainers,unit,kc_isco_235
+kc_isco_2359,kscheme_isco_08,2359,متخصصان آموزش طبقه‌بندی‌نشده در جای دیگر,Teaching Professionals Not Elsewhere Classified,unit,kc_isco_235
+kc_isco_2411,kscheme_isco_08,2411,حسابداران,Accountants,unit,kc_isco_241
+kc_isco_2412,kscheme_isco_08,2412,مشاوران مالی و سرمایه‌گذاری,Financial and Investment Advisers,unit,kc_isco_241
+kc_isco_2413,kscheme_isco_08,2413,تحلیلگران مالی,Financial Analysts,unit,kc_isco_241
+kc_isco_2421,kscheme_isco_08,2421,تحلیلگران مدیریت و سازمان,Management and Organization Analysts,unit,kc_isco_242
+kc_isco_2422,kscheme_isco_08,2422,متخصصان اجرای سیاست‌ها,Policy Administration Professionals,unit,kc_isco_242
+kc_isco_2423,kscheme_isco_08,2423,متخصصان امور کارکنان و مسیر شغلی,Personnel and Careers Professionals,unit,kc_isco_242
+kc_isco_2424,kscheme_isco_08,2424,متخصصان آموزش و توسعه کارکنان,Training and Staff Development Professionals,unit,kc_isco_242
+kc_isco_2431,kscheme_isco_08,2431,متخصصان تبلیغات و بازاریابی,Advertising and Marketing Professionals,unit,kc_isco_243
+kc_isco_2432,kscheme_isco_08,2432,متخصصان روابط عمومی,Public Relations Professionals,unit,kc_isco_243
+kc_isco_2433,kscheme_isco_08,2433,متخصصان فروش فنی و پزشکی (به‌جز فناوری اطلاعات و ارتباطات),Technical and Medical Sales Professionals (excluding ICT),unit,kc_isco_243
+kc_isco_2434,kscheme_isco_08,2434,متخصصان فروش فناوری اطلاعات و ارتباطات,Information and Communications Technology Sales Professionals,unit,kc_isco_243
+kc_isco_2511,kscheme_isco_08,2511,تحلیلگران سیستم,Systems Analysts,unit,kc_isco_251
+kc_isco_2512,kscheme_isco_08,2512,توسعه‌دهندگان نرم‌افزار,Software Developers,unit,kc_isco_251
+kc_isco_2513,kscheme_isco_08,2513,توسعه‌دهندگان وب و چندرسانه‌ای,Web and Multimedia Developers,unit,kc_isco_251
+kc_isco_2514,kscheme_isco_08,2514,برنامه‌نویسان برنامه‌های کاربردی,Applications Programmers,unit,kc_isco_251
+kc_isco_2519,kscheme_isco_08,2519,توسعه‌دهندگان و تحلیلگران نرم‌افزار و برنامه‌های کاربردی طبقه‌بندی‌نشده در جای دیگر,Software and Applications Developers and Analysts Not Elsewhere Classified,unit,kc_isco_251
+kc_isco_2521,kscheme_isco_08,2521,طراحان و مدیران پایگاه داده,Database Designers and Administrators,unit,kc_isco_252
+kc_isco_2522,kscheme_isco_08,2522,مدیران سیستم,Systems Administrators,unit,kc_isco_252
+kc_isco_2523,kscheme_isco_08,2523,متخصصان شبکه رایانه‌ای,Computer Network Professionals,unit,kc_isco_252
+kc_isco_2529,kscheme_isco_08,2529,متخصصان پایگاه داده و شبکه طبقه‌بندی‌نشده در جای دیگر,Database and Network Professionals Not Elsewhere Classified,unit,kc_isco_252
+kc_isco_2611,kscheme_isco_08,2611,وکلا و مشاوران حقوقی,Lawyers,unit,kc_isco_261
+kc_isco_2612,kscheme_isco_08,2612,قضات,Judges,unit,kc_isco_261
+kc_isco_2619,kscheme_isco_08,2619,متخصصان حقوقی طبقه‌بندی‌نشده در جای دیگر,Legal Professionals Not Elsewhere Classified,unit,kc_isco_261
+kc_isco_2621,kscheme_isco_08,2621,آرشیویست‌ها و متصدیان موزه,Archivists and Curators,unit,kc_isco_262
+kc_isco_2622,kscheme_isco_08,2622,کتابداران و متخصصان اطلاع‌رسانی وابسته,Librarians and Related Information Professionals,unit,kc_isco_262
+kc_isco_2631,kscheme_isco_08,2631,اقتصاددانان,Economists,unit,kc_isco_263
+kc_isco_2632,kscheme_isco_08,2632,جامعه‌شناسان، انسان‌شناسان و متخصصان وابسته,"Sociologists, Anthropologists and Related Professionals",unit,kc_isco_263
+kc_isco_2633,kscheme_isco_08,2633,فیلسوفان، مورخان و دانشمندان علوم سیاسی,"Philosophers, Historians and Political Scientists",unit,kc_isco_263
+kc_isco_2634,kscheme_isco_08,2634,روان‌شناسان,Psychologists,unit,kc_isco_263
+kc_isco_2635,kscheme_isco_08,2635,متخصصان مددکاری اجتماعی و مشاوره,Social Work and Counselling Professionals,unit,kc_isco_263
+kc_isco_2636,kscheme_isco_08,2636,متخصصان دینی,Religious Professionals,unit,kc_isco_263
+kc_isco_2641,kscheme_isco_08,2641,نویسندگان و نگارندگان وابسته,Authors and Related Writers,unit,kc_isco_264
+kc_isco_2642,kscheme_isco_08,2642,روزنامه‌نگاران,Journalists,unit,kc_isco_264
+kc_isco_2643,kscheme_isco_08,2643,مترجمان کتبی، مترجمان شفاهی و سایر زبان‌شناسان,"Translators, Interpreters and Other Linguists",unit,kc_isco_264
+kc_isco_2651,kscheme_isco_08,2651,هنرمندان تجسمی,Visual Artists,unit,kc_isco_265
+kc_isco_2652,kscheme_isco_08,2652,نوازندگان، خوانندگان و آهنگسازان,"Musicians, Singers and Composers",unit,kc_isco_265
+kc_isco_2653,kscheme_isco_08,2653,رقصندگان و طراحان رقص,Dancers and Choreographers,unit,kc_isco_265
+kc_isco_2654,kscheme_isco_08,2654,کارگردانان و تهیه‌کنندگان فیلم، صحنه و موارد وابسته,"Film, Stage and Related Directors and Producers",unit,kc_isco_265
+kc_isco_2655,kscheme_isco_08,2655,بازیگران,Actors,unit,kc_isco_265
+kc_isco_2656,kscheme_isco_08,2656,گویندگان رادیو، تلویزیون و سایر رسانه‌ها,"Announcers on Radio, Television and Other Media",unit,kc_isco_265
+kc_isco_2659,kscheme_isco_08,2659,هنرمندان آفرینشگر و اجراگر طبقه‌بندی‌نشده در جای دیگر,Creative and Performing Artists Not Elsewhere Classified,unit,kc_isco_265
+kc_isco_3111,kscheme_isco_08,3111,کاردانان علوم شیمی و فیزیک,Chemical and Physical Science Technicians,unit,kc_isco_311
+kc_isco_3112,kscheme_isco_08,3112,کاردانان مهندسی عمران,Civil Engineering Technicians,unit,kc_isco_311
+kc_isco_3113,kscheme_isco_08,3113,کاردانان مهندسی برق,Electrical Engineering Technicians,unit,kc_isco_311
+kc_isco_3114,kscheme_isco_08,3114,کاردانان مهندسی الکترونیک,Electronics Engineering Technicians,unit,kc_isco_311
+kc_isco_3115,kscheme_isco_08,3115,کاردانان مهندسی مکانیک,Mechanical Engineering Technicians,unit,kc_isco_311
+kc_isco_3116,kscheme_isco_08,3116,کاردانان مهندسی شیمی,Chemical Engineering Technicians,unit,kc_isco_311
+kc_isco_3117,kscheme_isco_08,3117,کاردانان معدن و متالورژی,Mining and Metallurgical Technicians,unit,kc_isco_311
+kc_isco_3118,kscheme_isco_08,3118,نقشه‌کشان,Draughtspersons,unit,kc_isco_311
+kc_isco_3119,kscheme_isco_08,3119,کاردانان علوم فیزیکی و مهندسی طبقه‌بندی‌نشده در جای دیگر,Physical and Engineering Science Technicians Not Elsewhere Classified,unit,kc_isco_311
+kc_isco_3121,kscheme_isco_08,3121,سرپرستان معدن,Mining Supervisors,unit,kc_isco_312
+kc_isco_3122,kscheme_isco_08,3122,سرپرستان تولید صنعتی,Manufacturing Supervisors,unit,kc_isco_312
+kc_isco_3123,kscheme_isco_08,3123,سرپرستان ساخت‌وساز,Construction Supervisors,unit,kc_isco_312
+kc_isco_3131,kscheme_isco_08,3131,اپراتورهای نیروگاه تولید برق,Power Production Plant Operators,unit,kc_isco_313
+kc_isco_3132,kscheme_isco_08,3132,اپراتورهای تأسیسات زباله‌سوز و تصفیه آب,Incinerator and Water Treatment Plant Operators,unit,kc_isco_313
+kc_isco_3133,kscheme_isco_08,3133,کنترل‌کنندگان واحدهای فرایند شیمیایی,Chemical Processing Plant Controllers,unit,kc_isco_313
+kc_isco_3134,kscheme_isco_08,3134,اپراتورهای پالایشگاه نفت و گاز طبیعی,Petroleum and Natural Gas Refining Plant Operators,unit,kc_isco_313
+kc_isco_3135,kscheme_isco_08,3135,کنترل‌کنندگان فرایند تولید فلزات,Metal Production Process Controllers,unit,kc_isco_313
+kc_isco_3139,kscheme_isco_08,3139,کاردانان کنترل فرایند طبقه‌بندی‌نشده در جای دیگر,Process Control Technicians Not Elsewhere Classified,unit,kc_isco_313
+kc_isco_3141,kscheme_isco_08,3141,کاردانان علوم زیستی (به‌جز پزشکی),Life Science Technicians (excluding Medical),unit,kc_isco_314
+kc_isco_3142,kscheme_isco_08,3142,کاردانان کشاورزی,Agricultural Technicians,unit,kc_isco_314
+kc_isco_3143,kscheme_isco_08,3143,کاردانان جنگلداری,Forestry Technicians,unit,kc_isco_314
+kc_isco_3151,kscheme_isco_08,3151,مهندسان کشتی,Ships' Engineers,unit,kc_isco_315
+kc_isco_3152,kscheme_isco_08,3152,افسران عرشه و راهنمایان کشتی,Ships' Deck Officers and Pilots,unit,kc_isco_315
+kc_isco_3153,kscheme_isco_08,3153,خلبانان هواپیما و دستیاران متخصص وابسته,Aircraft Pilots and Related Associate Professionals,unit,kc_isco_315
+kc_isco_3154,kscheme_isco_08,3154,کنترل‌کنندگان ترافیک هوایی,Air Traffic Controllers,unit,kc_isco_315
+kc_isco_3155,kscheme_isco_08,3155,کاردانان الکترونیک ایمنی ترافیک هوایی,Air Traffic Safety Electronics Technicians,unit,kc_isco_315
+kc_isco_3211,kscheme_isco_08,3211,کاردانان تجهیزات تصویربرداری و درمانی پزشکی,Medical Imaging and Therapeutic Equipment Technicians,unit,kc_isco_321
+kc_isco_3212,kscheme_isco_08,3212,کاردانان آزمایشگاه پزشکی و آسیب‌شناسی,Medical and Pathology Laboratory Technicians,unit,kc_isco_321
+kc_isco_3213,kscheme_isco_08,3213,کاردانان و دستیاران دارویی,Pharmaceutical Technicians and Assistants,unit,kc_isco_321
+kc_isco_3214,kscheme_isco_08,3214,کاردانان پروتزهای پزشکی و دندانی,Medical and Dental Prosthetic Technicians,unit,kc_isco_321
+kc_isco_3221,kscheme_isco_08,3221,دستیاران متخصص پرستاری,Nursing Associate Professionals,unit,kc_isco_322
+kc_isco_3222,kscheme_isco_08,3222,دستیاران متخصص مامایی,Midwifery Associate Professionals,unit,kc_isco_322
+kc_isco_3230,kscheme_isco_08,3230,دستیاران متخصص طب سنتی و مکمل,Traditional and Complementary Medicine Associate Professionals,unit,kc_isco_323
+kc_isco_3240,kscheme_isco_08,3240,کاردانان و دستیاران دامپزشکی,Veterinary Technicians and Assistants,unit,kc_isco_324
+kc_isco_3251,kscheme_isco_08,3251,دستیاران و درمانگران دندان‌پزشکی,Dental Assistants and Therapists,unit,kc_isco_325
+kc_isco_3252,kscheme_isco_08,3252,کاردانان مدارک پزشکی و اطلاعات سلامت,Medical Records and Health Information Technicians,unit,kc_isco_325
+kc_isco_3253,kscheme_isco_08,3253,کارکنان بهداشت جامعه (بهورزان),Community Health Workers,unit,kc_isco_325
+kc_isco_3254,kscheme_isco_08,3254,عینک‌سازان تحویل‌دهنده عینک (اپتیسین‌ها),Dispensing Opticians,unit,kc_isco_325
+kc_isco_3255,kscheme_isco_08,3255,کاردانان و دستیاران فیزیوتراپی,Physiotherapy Technicians and Assistants,unit,kc_isco_325
+kc_isco_3256,kscheme_isco_08,3256,دستیاران پزشکی,Medical Assistants,unit,kc_isco_325
+kc_isco_3257,kscheme_isco_08,3257,بازرسان و دستیاران بهداشت محیط و بهداشت حرفه‌ای,Environmental and Occupational Health Inspectors and Associates,unit,kc_isco_325
+kc_isco_3258,kscheme_isco_08,3258,کارکنان فوریت‌های آمبولانس,Ambulance Workers,unit,kc_isco_325
+kc_isco_3259,kscheme_isco_08,3259,دستیاران متخصص سلامت طبقه‌بندی‌نشده در جای دیگر,Health Associate Professionals Not Elsewhere Classified,unit,kc_isco_325
+kc_isco_3311,kscheme_isco_08,3311,معامله‌گران و کارگزاران اوراق بهادار و مالی,Securities and Finance Dealers and Brokers,unit,kc_isco_331
+kc_isco_3312,kscheme_isco_08,3312,کارشناسان اعتبار و وام,Credit and Loans Officers,unit,kc_isco_331
+kc_isco_3313,kscheme_isco_08,3313,دستیاران متخصص حسابداری,Accounting Associate Professionals,unit,kc_isco_331
+kc_isco_3314,kscheme_isco_08,3314,دستیاران متخصص آمار، ریاضی و موارد وابسته,"Statistical, Mathematical and Related Associate Professionals",unit,kc_isco_331
+kc_isco_3315,kscheme_isco_08,3315,ارزیابان و ارزیابان خسارت,Valuers and Loss Assessors,unit,kc_isco_331
+kc_isco_3321,kscheme_isco_08,3321,نمایندگان بیمه,Insurance Representatives,unit,kc_isco_332
+kc_isco_3322,kscheme_isco_08,3322,نمایندگان فروش تجاری,Commercial Sales Representatives,unit,kc_isco_332
+kc_isco_3323,kscheme_isco_08,3323,کارشناسان خرید,Buyers,unit,kc_isco_332
+kc_isco_3324,kscheme_isco_08,3324,کارگزاران تجاری,Trade Brokers,unit,kc_isco_332
+kc_isco_3331,kscheme_isco_08,3331,ترخیص‌کاران و کارگزاران حمل (فورواردرها),Clearing and Forwarding Agents,unit,kc_isco_333
+kc_isco_3332,kscheme_isco_08,3332,برنامه‌ریزان همایش و رویداد,Conference and Event Planners,unit,kc_isco_333
+kc_isco_3333,kscheme_isco_08,3333,نمایندگان کاریابی و پیمانکاران تأمین نیرو,Employment Agents and Contractors,unit,kc_isco_333
+kc_isco_3334,kscheme_isco_08,3334,مشاوران املاک و مدیران املاک,Real Estate Agents and Property Managers,unit,kc_isco_333
+kc_isco_3339,kscheme_isco_08,3339,نمایندگان خدمات کسب‌وکار طبقه‌بندی‌نشده در جای دیگر,Business Services Agents Not Elsewhere Classified,unit,kc_isco_333
+kc_isco_3341,kscheme_isco_08,3341,سرپرستان دفتر,Office Supervisors,unit,kc_isco_334
+kc_isco_3342,kscheme_isco_08,3342,منشیان حقوقی,Legal Secretaries,unit,kc_isco_334
+kc_isco_3343,kscheme_isco_08,3343,منشیان اداری و اجرایی,Administrative and Executive Secretaries,unit,kc_isco_334
+kc_isco_3344,kscheme_isco_08,3344,منشیان پزشکی,Medical Secretaries,unit,kc_isco_334
+kc_isco_3351,kscheme_isco_08,3351,بازرسان گمرک و مرز,Customs and Border Inspectors,unit,kc_isco_335
+kc_isco_3352,kscheme_isco_08,3352,مأموران دولتی مالیات و عوارض,Government Tax and Excise Officials,unit,kc_isco_335
+kc_isco_3353,kscheme_isco_08,3353,مأموران دولتی مزایای اجتماعی,Government Social Benefits Officials,unit,kc_isco_335
+kc_isco_3354,kscheme_isco_08,3354,مأموران دولتی صدور مجوز,Government Licensing Officials,unit,kc_isco_335
+kc_isco_3355,kscheme_isco_08,3355,بازرسان و کارآگاهان پلیس,Police Inspectors and Detectives,unit,kc_isco_335
+kc_isco_3359,kscheme_isco_08,3359,دستیاران متخصص نظارتی دولتی طبقه‌بندی‌نشده در جای دیگر,Government Regulatory Associate Professionals Not Elsewhere Classified,unit,kc_isco_335
+kc_isco_3411,kscheme_isco_08,3411,دستیاران متخصص حقوقی و موارد وابسته,Legal and Related Associate Professionals,unit,kc_isco_341
+kc_isco_3412,kscheme_isco_08,3412,دستیاران متخصص مددکاری اجتماعی,Social Work Associate Professionals,unit,kc_isco_341
+kc_isco_3413,kscheme_isco_08,3413,دستیاران متخصص دینی,Religious Associate Professionals,unit,kc_isco_341
+kc_isco_3421,kscheme_isco_08,3421,ورزشکاران و بازیکنان ورزشی,Athletes and Sports Players,unit,kc_isco_342
+kc_isco_3422,kscheme_isco_08,3422,مربیان، آموزش‌دهندگان و داوران ورزشی,"Sports Coaches, Instructors and Officials",unit,kc_isco_342
+kc_isco_3423,kscheme_isco_08,3423,مربیان آمادگی جسمانی و تفریحات و مسئولان برنامه‌های تفریحی,Fitness and Recreation Instructors and Programme Leaders,unit,kc_isco_342
+kc_isco_3431,kscheme_isco_08,3431,عکاسان,Photographers,unit,kc_isco_343
+kc_isco_3432,kscheme_isco_08,3432,طراحان داخلی و آراستگان فضا (دکوراتورها),Interior Designers and Decorators,unit,kc_isco_343
+kc_isco_3433,kscheme_isco_08,3433,کاردانان گالری، موزه و کتابخانه,"Gallery, Museum and Library Technicians",unit,kc_isco_343
+kc_isco_3434,kscheme_isco_08,3434,سرآشپزها,Chefs,unit,kc_isco_343
+kc_isco_3435,kscheme_isco_08,3435,سایر دستیاران متخصص هنری و فرهنگی,Other Artistic and Cultural Associate Professionals,unit,kc_isco_343
+kc_isco_3511,kscheme_isco_08,3511,کاردانان عملیات فناوری اطلاعات و ارتباطات,Information and Communications Technology Operations Technicians,unit,kc_isco_351
+kc_isco_3512,kscheme_isco_08,3512,کاردانان پشتیبانی کاربران فناوری اطلاعات و ارتباطات,Information and Communications Technology User Support Technicians,unit,kc_isco_351
+kc_isco_3513,kscheme_isco_08,3513,کاردانان شبکه و سیستم‌های رایانه‌ای,Computer Network and Systems Technicians,unit,kc_isco_351
+kc_isco_3514,kscheme_isco_08,3514,کاردانان وب,Web Technicians,unit,kc_isco_351
+kc_isco_3521,kscheme_isco_08,3521,کاردانان پخش و دیداری‌شنیداری,Broadcasting and Audiovisual Technicians,unit,kc_isco_352
+kc_isco_3522,kscheme_isco_08,3522,کاردانان مهندسی مخابرات,Telecommunications Engineering Technicians,unit,kc_isco_352
+kc_isco_4110,kscheme_isco_08,4110,کارمندان دفتری عمومی,General Office Clerks,unit,kc_isco_411
+kc_isco_4120,kscheme_isco_08,4120,منشیان (عمومی),Secretaries (general),unit,kc_isco_412
+kc_isco_4131,kscheme_isco_08,4131,ماشین‌نویسان و اپراتورهای واژه‌پرداز,Typists and Word Processing Operators,unit,kc_isco_413
+kc_isco_4132,kscheme_isco_08,4132,کارمندان ورود داده,Data Entry Clerks,unit,kc_isco_413
+kc_isco_4211,kscheme_isco_08,4211,تحویلداران بانک و کارمندان وابسته,Bank Tellers and Related Clerks,unit,kc_isco_421
+kc_isco_4212,kscheme_isco_08,4212,متصدیان شرط‌بندی، کازینو و کارکنان وابسته بازی‌های شانسی,"Bookmakers, Croupiers and Related Gaming Workers",unit,kc_isco_421
+kc_isco_4213,kscheme_isco_08,4213,گروداران و وام‌دهندگان,Pawnbrokers and Money-lenders,unit,kc_isco_421
+kc_isco_4214,kscheme_isco_08,4214,وصول‌کنندگان مطالبات و کارکنان وابسته,Debt Collectors and Related Workers,unit,kc_isco_421
+kc_isco_4221,kscheme_isco_08,4221,مشاوران و کارمندان سفر,Travel Consultants and Clerks,unit,kc_isco_422
+kc_isco_4222,kscheme_isco_08,4222,کارمندان اطلاع‌رسانی مرکز تماس,Contact Centre Information Clerks,unit,kc_isco_422
+kc_isco_4223,kscheme_isco_08,4223,اپراتورهای تلفنخانه,Telephone Switchboard Operators,unit,kc_isco_422
+kc_isco_4224,kscheme_isco_08,4224,متصدیان پذیرش هتل,Hotel Receptionists,unit,kc_isco_422
+kc_isco_4225,kscheme_isco_08,4225,کارمندان پاسخ‌گویی به پرسش‌ها,Inquiry Clerks,unit,kc_isco_422
+kc_isco_4226,kscheme_isco_08,4226,متصدیان پذیرش (عمومی),Receptionists (general),unit,kc_isco_422
+kc_isco_4227,kscheme_isco_08,4227,پرسشگران پیمایش و پژوهش بازار,Survey and Market Research Interviewers,unit,kc_isco_422
+kc_isco_4229,kscheme_isco_08,4229,کارکنان اطلاع‌رسانی به مشتریان طبقه‌بندی‌نشده در جای دیگر,Client Information Workers Not Elsewhere Classified,unit,kc_isco_422
+kc_isco_4311,kscheme_isco_08,4311,کارمندان حسابداری و دفترداری,Accounting and Bookkeeping Clerks,unit,kc_isco_431
+kc_isco_4312,kscheme_isco_08,4312,کارمندان آمار، مالی و بیمه,"Statistical, Finance and Insurance Clerks",unit,kc_isco_431
+kc_isco_4313,kscheme_isco_08,4313,کارمندان حقوق و دستمزد,Payroll Clerks,unit,kc_isco_431
+kc_isco_4321,kscheme_isco_08,4321,کارمندان انبار,Stock Clerks,unit,kc_isco_432
+kc_isco_4322,kscheme_isco_08,4322,کارمندان تولید,Production Clerks,unit,kc_isco_432
+kc_isco_4323,kscheme_isco_08,4323,کارمندان حمل‌ونقل,Transport Clerks,unit,kc_isco_432
+kc_isco_4411,kscheme_isco_08,4411,کارمندان کتابخانه,Library Clerks,unit,kc_isco_441
+kc_isco_4412,kscheme_isco_08,4412,نامه‌رسانان و کارمندان تفکیک مرسولات,Mail Carriers and Sorting Clerks,unit,kc_isco_441
+kc_isco_4413,kscheme_isco_08,4413,کارمندان کدگذاری، نمونه‌خوانی و موارد وابسته,"Coding, Proofreading and Related Clerks",unit,kc_isco_441
+kc_isco_4414,kscheme_isco_08,4414,کاتبان و کارکنان وابسته,Scribes and Related Workers,unit,kc_isco_441
+kc_isco_4415,kscheme_isco_08,4415,کارمندان بایگانی و تکثیر,Filing and Copying Clerks,unit,kc_isco_441
+kc_isco_4416,kscheme_isco_08,4416,کارمندان امور کارکنان,Personnel Clerks,unit,kc_isco_441
+kc_isco_4419,kscheme_isco_08,4419,کارکنان پشتیبانی دفتری طبقه‌بندی‌نشده در جای دیگر,Clerical Support Workers Not Elsewhere Classified,unit,kc_isco_441
+kc_isco_5111,kscheme_isco_08,5111,مهمانداران و خدمه سفر,Travel Attendants and Travel Stewards,unit,kc_isco_511
+kc_isco_5112,kscheme_isco_08,5112,مأموران بلیت و مسافر در وسایل حمل‌ونقل,Transport Conductors,unit,kc_isco_511
+kc_isco_5113,kscheme_isco_08,5113,راهنمایان گردشگری,Travel Guides,unit,kc_isco_511
+kc_isco_5120,kscheme_isco_08,5120,آشپزها,Cooks,unit,kc_isco_512
+kc_isco_5131,kscheme_isco_08,5131,کارکنان پذیرایی (سرو غذا و نوشیدنی),Waiters,unit,kc_isco_513
+kc_isco_5132,kscheme_isco_08,5132,متصدیان بار,Bartenders,unit,kc_isco_513
+kc_isco_5141,kscheme_isco_08,5141,آرایشگران مو,Hairdressers,unit,kc_isco_514
+kc_isco_5142,kscheme_isco_08,5142,کارشناسان زیبایی و کارکنان وابسته,Beauticians and Related Workers,unit,kc_isco_514
+kc_isco_5151,kscheme_isco_08,5151,سرپرستان نظافت و خانه‌داری در ادارات، هتل‌ها و سایر مؤسسات,"Cleaning and Housekeeping Supervisors in Offices, Hotels and Other Establishments",unit,kc_isco_515
+kc_isco_5152,kscheme_isco_08,5152,مدیران امور منزل,Domestic Housekeepers,unit,kc_isco_515
+kc_isco_5153,kscheme_isco_08,5153,سرایداران ساختمان,Building Caretakers,unit,kc_isco_515
+kc_isco_5161,kscheme_isco_08,5161,طالع‌بینان، فال‌گیران و کارکنان وابسته,"Astrologers, Fortune-tellers and Related Workers",unit,kc_isco_516
+kc_isco_5162,kscheme_isco_08,5162,همراهان و ملازمان شخصی,Companions and Valets,unit,kc_isco_516
+kc_isco_5163,kscheme_isco_08,5163,متصدیان کفن‌ودفن و مومیایی‌کنندگان,Undertakers and Embalmers,unit,kc_isco_516
+kc_isco_5164,kscheme_isco_08,5164,آراستگان حیوانات خانگی و کارکنان مراقبت از حیوانات,Pet Groomers and Animal Care Workers,unit,kc_isco_516
+kc_isco_5165,kscheme_isco_08,5165,مربیان رانندگی,Driving Instructors,unit,kc_isco_516
+kc_isco_5169,kscheme_isco_08,5169,کارکنان خدمات شخصی طبقه‌بندی‌نشده در جای دیگر,Personal Services Workers Not Elsewhere Classified,unit,kc_isco_516
+kc_isco_5211,kscheme_isco_08,5211,فروشندگان غرفه و بازار,Stall and Market Salespersons,unit,kc_isco_521
+kc_isco_5212,kscheme_isco_08,5212,فروشندگان خیابانی غذا,Street Food Salespersons,unit,kc_isco_521
+kc_isco_5221,kscheme_isco_08,5221,دارندگان فروشگاه,Shopkeepers,unit,kc_isco_522
+kc_isco_5222,kscheme_isco_08,5222,سرپرستان فروشگاه,Shop Supervisors,unit,kc_isco_522
+kc_isco_5223,kscheme_isco_08,5223,دستیاران فروش فروشگاه,Shop Sales Assistants,unit,kc_isco_522
+kc_isco_5230,kscheme_isco_08,5230,صندوق‌داران و متصدیان فروش بلیت,Cashiers and Ticket Clerks,unit,kc_isco_523
+kc_isco_5241,kscheme_isco_08,5241,مدل‌های لباس و سایر مدل‌ها,Fashion and Other Models,unit,kc_isco_524
+kc_isco_5242,kscheme_isco_08,5242,نمایش‌دهندگان کالا برای فروش,Sales Demonstrators,unit,kc_isco_524
+kc_isco_5243,kscheme_isco_08,5243,فروشندگان خانه‌به‌خانه,Door-to-door Salespersons,unit,kc_isco_524
+kc_isco_5244,kscheme_isco_08,5244,فروشندگان مرکز تماس,Contact Centre Salespersons,unit,kc_isco_524
+kc_isco_5245,kscheme_isco_08,5245,متصدیان جایگاه سوخت,Service Station Attendants,unit,kc_isco_524
+kc_isco_5246,kscheme_isco_08,5246,متصدیان پیشخوان سرو غذا,Food Service Counter Attendants,unit,kc_isco_524
+kc_isco_5249,kscheme_isco_08,5249,کارکنان فروش طبقه‌بندی‌نشده در جای دیگر,Sales Workers Not Elsewhere Classified,unit,kc_isco_524
+kc_isco_5311,kscheme_isco_08,5311,مراقبان کودک,Child Care Workers,unit,kc_isco_531
+kc_isco_5312,kscheme_isco_08,5312,دستیاران معلم,Teachers' Aides,unit,kc_isco_531
+kc_isco_5321,kscheme_isco_08,5321,دستیاران مراقبت سلامت (بهیاران),Health Care Assistants,unit,kc_isco_532
+kc_isco_5322,kscheme_isco_08,5322,مراقبان شخصی در منزل,Home-based Personal Care Workers,unit,kc_isco_532
+kc_isco_5329,kscheme_isco_08,5329,کارکنان مراقبت شخصی در خدمات سلامت طبقه‌بندی‌نشده در جای دیگر,Personal Care Workers in Health Services Not Elsewhere Classified,unit,kc_isco_532
+kc_isco_5411,kscheme_isco_08,5411,آتش‌نشانان,Fire Fighters,unit,kc_isco_541
+kc_isco_5412,kscheme_isco_08,5412,مأموران پلیس,Police Officers,unit,kc_isco_541
+kc_isco_5413,kscheme_isco_08,5413,نگهبانان زندان,Prison Guards,unit,kc_isco_541
+kc_isco_5414,kscheme_isco_08,5414,نگهبانان و مأموران حراست,Security Guards,unit,kc_isco_541
+kc_isco_5419,kscheme_isco_08,5419,کارکنان خدمات حفاظتی طبقه‌بندی‌نشده در جای دیگر,Protective Services Workers Not Elsewhere Classified,unit,kc_isco_541
+kc_isco_6111,kscheme_isco_08,6111,پرورش‌دهندگان محصولات زراعی و سبزیجات,Field Crop and Vegetable Growers,unit,kc_isco_611
+kc_isco_6112,kscheme_isco_08,6112,پرورش‌دهندگان درختان و درختچه‌های مثمر,Tree and Shrub Crop Growers,unit,kc_isco_611
+kc_isco_6113,kscheme_isco_08,6113,باغبانان؛ پرورش‌دهندگان گل‌وگیاه و نهال,Gardeners; Horticultural and Nursery Growers,unit,kc_isco_611
+kc_isco_6114,kscheme_isco_08,6114,پرورش‌دهندگان محصولات زراعی مختلط,Mixed Crop Growers,unit,kc_isco_611
+kc_isco_6121,kscheme_isco_08,6121,پرورش‌دهندگان دام و تولیدکنندگان لبنیات,Livestock and Dairy Producers,unit,kc_isco_612
+kc_isco_6122,kscheme_isco_08,6122,مرغداران,Poultry Producers,unit,kc_isco_612
+kc_isco_6123,kscheme_isco_08,6123,زنبورداران و نوغان‌داران,Apiarists and Sericulturists,unit,kc_isco_612
+kc_isco_6129,kscheme_isco_08,6129,پرورش‌دهندگان جانوران طبقه‌بندی‌نشده در جای دیگر,Animal Producers Not Elsewhere Classified,unit,kc_isco_612
+kc_isco_6130,kscheme_isco_08,6130,تولیدکنندگان مختلط زراعی و دامی,Mixed Crop and Animal Producers,unit,kc_isco_613
+kc_isco_6210,kscheme_isco_08,6210,کارکنان جنگلداری و کارکنان وابسته,Forestry and Related Workers,unit,kc_isco_621
+kc_isco_6221,kscheme_isco_08,6221,کارکنان آبزی‌پروری,Aquaculture Workers,unit,kc_isco_622
+kc_isco_6222,kscheme_isco_08,6222,ماهیگیران آب‌های داخلی و ساحلی,Inland and Coastal Waters Fishery Workers,unit,kc_isco_622
+kc_isco_6223,kscheme_isco_08,6223,ماهیگیران دریاهای آزاد,Deep-sea Fishery Workers,unit,kc_isco_622
+kc_isco_6224,kscheme_isco_08,6224,شکارچیان و تله‌گذاران,Hunters and Trappers,unit,kc_isco_622
+kc_isco_6310,kscheme_isco_08,6310,زارعان معیشتی,Subsistence Crop Farmers,unit,kc_isco_631
+kc_isco_6320,kscheme_isco_08,6320,دامداران معیشتی,Subsistence Livestock Farmers,unit,kc_isco_632
+kc_isco_6330,kscheme_isco_08,6330,کشاورزان معیشتی زراعی و دامی,Subsistence Mixed Crop and Livestock Farmers,unit,kc_isco_633
+kc_isco_6340,kscheme_isco_08,6340,ماهیگیران، شکارچیان، تله‌گذاران و گردآورندگان معیشتی,"Subsistence Fishers, Hunters, Trappers and Gatherers",unit,kc_isco_634
+kc_isco_7111,kscheme_isco_08,7111,سازندگان خانه,House Builders,unit,kc_isco_711
+kc_isco_7112,kscheme_isco_08,7112,بنایان آجرکار و کارکنان وابسته,Bricklayers and Related Workers,unit,kc_isco_711
+kc_isco_7113,kscheme_isco_08,7113,سنگ‌تراشان، سنگ‌بران، سنگ‌شکنان و حجاران,"Stonemasons, Stone Cutters, Splitters and Carvers",unit,kc_isco_711
+kc_isco_7114,kscheme_isco_08,7114,بتن‌ریزان، پرداخت‌کاران بتن و کارکنان وابسته,"Concrete Placers, Concrete Finishers and Related Workers",unit,kc_isco_711
+kc_isco_7115,kscheme_isco_08,7115,نجاران ساختمانی و درودگران,Carpenters and Joiners,unit,kc_isco_711
+kc_isco_7119,kscheme_isco_08,7119,کارکنان حرفه‌های اسکلت ساختمان و وابسته طبقه‌بندی‌نشده در جای دیگر,Building Frame and Related Trades Workers Not Elsewhere Classified,unit,kc_isco_711
+kc_isco_7121,kscheme_isco_08,7121,پوشش‌کاران بام,Roofers,unit,kc_isco_712
+kc_isco_7122,kscheme_isco_08,7122,کف‌پوش‌کاران و کاشی‌کاران,Floor Layers and Tile Setters,unit,kc_isco_712
+kc_isco_7123,kscheme_isco_08,7123,گچ‌کاران,Plasterers,unit,kc_isco_712
+kc_isco_7124,kscheme_isco_08,7124,عایق‌کاران,Insulation Workers,unit,kc_isco_712
+kc_isco_7125,kscheme_isco_08,7125,شیشه‌بُران و شیشه‌نصب‌کنندگان,Glaziers,unit,kc_isco_712
+kc_isco_7126,kscheme_isco_08,7126,لوله‌کشان و نصابان لوله,Plumbers and Pipe Fitters,unit,kc_isco_712
+kc_isco_7127,kscheme_isco_08,7127,مکانیک‌های تهویه مطبوع و تبرید,Air Conditioning and Refrigeration Mechanics,unit,kc_isco_712
+kc_isco_7131,kscheme_isco_08,7131,نقاشان ساختمان و کارکنان وابسته,Painters and Related Workers,unit,kc_isco_713
+kc_isco_7132,kscheme_isco_08,7132,رنگ‌پاشان و روغن‌کاران (ورنی‌کاران),Spray Painters and Varnishers,unit,kc_isco_713
+kc_isco_7133,kscheme_isco_08,7133,نظافت‌کاران نمای ساختمان,Building Structure Cleaners,unit,kc_isco_713
+kc_isco_7211,kscheme_isco_08,7211,قالب‌گیران فلز و ماهیچه‌سازان,Metal Moulders and Coremakers,unit,kc_isco_721
+kc_isco_7212,kscheme_isco_08,7212,جوشکاران و برشکاران شعله‌ای,Welders and Flame Cutters,unit,kc_isco_721
+kc_isco_7213,kscheme_isco_08,7213,ورق‌کاران فلزی,Sheet Metal Workers,unit,kc_isco_721
+kc_isco_7214,kscheme_isco_08,7214,آماده‌سازان و برپاکنندگان سازه‌های فلزی,Structural Metal Preparers and Erectors,unit,kc_isco_721
+kc_isco_7215,kscheme_isco_08,7215,ریگرها و اتصال‌دهندگان کابل,Riggers and Cable Splicers,unit,kc_isco_721
+kc_isco_7221,kscheme_isco_08,7221,آهنگران، پتک‌کاران و کارکنان پرس آهنگری,"Blacksmiths, Hammersmiths and Forging Press Workers",unit,kc_isco_722
+kc_isco_7222,kscheme_isco_08,7222,قالب‌سازان و ابزارسازان و کارکنان وابسته,Toolmakers and Related Workers,unit,kc_isco_722
+kc_isco_7223,kscheme_isco_08,7223,تنظیم‌کنندگان و اپراتورهای ماشین‌های ابزار فلزکاری,Metal Working Machine Tool Setters and Operators,unit,kc_isco_722
+kc_isco_7224,kscheme_isco_08,7224,پرداخت‌کاران فلز، سنگ‌زنان و تیزکنندگان ابزار,"Metal Polishers, Wheel Grinders and Tool Sharpeners",unit,kc_isco_722
+kc_isco_7231,kscheme_isco_08,7231,مکانیک‌ها و تعمیرکاران خودرو,Motor Vehicle Mechanics and Repairers,unit,kc_isco_723
+kc_isco_7232,kscheme_isco_08,7232,مکانیک‌ها و تعمیرکاران موتور هواپیما,Aircraft Engine Mechanics and Repairers,unit,kc_isco_723
+kc_isco_7233,kscheme_isco_08,7233,مکانیک‌ها و تعمیرکاران ماشین‌آلات کشاورزی و صنعتی,Agricultural and Industrial Machinery Mechanics and Repairers,unit,kc_isco_723
+kc_isco_7234,kscheme_isco_08,7234,تعمیرکاران دوچرخه و موارد وابسته,Bicycle and Related Repairers,unit,kc_isco_723
+kc_isco_7311,kscheme_isco_08,7311,سازندگان و تعمیرکاران ابزار دقیق,Precision-instrument Makers and Repairers,unit,kc_isco_731
+kc_isco_7312,kscheme_isco_08,7312,سازندگان و کوک‌کنندگان سازهای موسیقی,Musical Instrument Makers and Tuners,unit,kc_isco_731
+kc_isco_7313,kscheme_isco_08,7313,جواهرسازان و کارکنان فلزات گران‌بها,Jewellery and Precious Metal Workers,unit,kc_isco_731
+kc_isco_7314,kscheme_isco_08,7314,سفالگران و کارکنان وابسته,Potters and Related Workers,unit,kc_isco_731
+kc_isco_7315,kscheme_isco_08,7315,سازندگان، برشکاران، ساینده‌ها و پرداخت‌کاران شیشه,"Glass Makers, Cutters, Grinders and Finishers",unit,kc_isco_731
+kc_isco_7316,kscheme_isco_08,7316,تابلونویسان، نقاشان تزئینی، حکاکان و قلم‌زنان,"Sign Writers, Decorative Painters, Engravers and Etchers",unit,kc_isco_731
+kc_isco_7317,kscheme_isco_08,7317,کارکنان صنایع دستی چوب، سبدبافی و مواد وابسته,"Handicraft Workers in Wood, Basketry and Related Materials",unit,kc_isco_731
+kc_isco_7318,kscheme_isco_08,7318,کارکنان صنایع دستی منسوجات، چرم و مواد وابسته,"Handicraft Workers in Textile, Leather and Related Materials",unit,kc_isco_731
+kc_isco_7319,kscheme_isco_08,7319,کارکنان صنایع دستی طبقه‌بندی‌نشده در جای دیگر,Handicraft Workers Not Elsewhere Classified,unit,kc_isco_731
+kc_isco_7321,kscheme_isco_08,7321,کاردانان پیش از چاپ,Pre-press Technicians,unit,kc_isco_732
+kc_isco_7322,kscheme_isco_08,7322,چاپگران,Printers,unit,kc_isco_732
+kc_isco_7323,kscheme_isco_08,7323,کارکنان تکمیل چاپ و صحافی,Print Finishing and Binding Workers,unit,kc_isco_732
+kc_isco_7411,kscheme_isco_08,7411,برق‌کاران ساختمان و موارد وابسته,Building and Related Electricians,unit,kc_isco_741
+kc_isco_7412,kscheme_isco_08,7412,مکانیک‌ها و نصابان برق,Electrical Mechanics and Fitters,unit,kc_isco_741
+kc_isco_7413,kscheme_isco_08,7413,نصابان و تعمیرکاران خطوط برق,Electrical Line Installers and Repairers,unit,kc_isco_741
+kc_isco_7421,kscheme_isco_08,7421,مکانیک‌ها و تعمیرکاران الکترونیک,Electronics Mechanics and Servicers,unit,kc_isco_742
+kc_isco_7422,kscheme_isco_08,7422,نصابان و تعمیرکاران فناوری اطلاعات و ارتباطات,Information and Communications Technology Installers and Servicers,unit,kc_isco_742
+kc_isco_7511,kscheme_isco_08,7511,قصابان، ماهی‌فروشان و آماده‌کنندگان غذای وابسته,"Butchers, Fishmongers and Related Food Preparers",unit,kc_isco_751
+kc_isco_7512,kscheme_isco_08,7512,نانوایان، شیرینی‌پزان و سازندگان شیرینی و آب‌نبات,"Bakers, Pastry-cooks and Confectionery Makers",unit,kc_isco_751
+kc_isco_7513,kscheme_isco_08,7513,سازندگان فراورده‌های لبنی,Dairy Products Makers,unit,kc_isco_751
+kc_isco_7514,kscheme_isco_08,7514,نگاهدارندگان میوه، سبزی و مواد وابسته,"Fruit, Vegetable and Related Preservers",unit,kc_isco_751
+kc_isco_7515,kscheme_isco_08,7515,چشندگان و درجه‌بندان مواد غذایی و نوشیدنی,Food and Beverage Tasters and Graders,unit,kc_isco_751
+kc_isco_7516,kscheme_isco_08,7516,آماده‌کنندگان توتون و سازندگان فراورده‌های دخانی,Tobacco Preparers and Tobacco Products Makers,unit,kc_isco_751
+kc_isco_7521,kscheme_isco_08,7521,عمل‌آورندگان چوب,Wood Treaters,unit,kc_isco_752
+kc_isco_7522,kscheme_isco_08,7522,کابینت‌سازان و کارکنان وابسته,Cabinet-makers and Related Workers,unit,kc_isco_752
+kc_isco_7523,kscheme_isco_08,7523,تنظیم‌کنندگان و اپراتورهای ماشین‌های ابزار نجاری,Woodworking Machine Tool Setters and Operators,unit,kc_isco_752
+kc_isco_7531,kscheme_isco_08,7531,خیاطان، دوزندگان لباس، پوستین‌دوزان و کلاه‌دوزان,"Tailors, Dressmakers, Furriers and Hatters",unit,kc_isco_753
+kc_isco_7532,kscheme_isco_08,7532,الگوسازان و برشکاران پوشاک و موارد وابسته,Garment and Related Patternmakers and Cutters,unit,kc_isco_753
+kc_isco_7533,kscheme_isco_08,7533,کارکنان دوخت، گلدوزی و موارد وابسته,"Sewing, Embroidery and Related Workers",unit,kc_isco_753
+kc_isco_7534,kscheme_isco_08,7534,رویه‌کوبان مبل و کارکنان وابسته,Upholsterers and Related Workers,unit,kc_isco_753
+kc_isco_7535,kscheme_isco_08,7535,آماده‌کنندگان پوست، دباغان و پوست‌پیرایان,"Pelt Dressers, Tanners and Fellmongers",unit,kc_isco_753
+kc_isco_7536,kscheme_isco_08,7536,کفاشان و کارکنان وابسته,Shoemakers and Related Workers,unit,kc_isco_753
+kc_isco_7541,kscheme_isco_08,7541,غواصان,Underwater Divers,unit,kc_isco_754
+kc_isco_7542,kscheme_isco_08,7542,آتشباران و انفجارکاران,Shotfirers and Blasters,unit,kc_isco_754
+kc_isco_7543,kscheme_isco_08,7543,درجه‌بندان و آزمایندگان محصول (به‌جز مواد غذایی و نوشیدنی),Product Graders and Testers (excluding Foods and Beverages),unit,kc_isco_754
+kc_isco_7544,kscheme_isco_08,7544,سم‌پاشان و سایر کنترل‌کنندگان آفات و علف‌های هرز,Fumigators and Other Pest and Weed Controllers,unit,kc_isco_754
+kc_isco_7549,kscheme_isco_08,7549,کارکنان صنایع دستی و حرفه‌های وابسته طبقه‌بندی‌نشده در جای دیگر,Craft and Related Workers Not Elsewhere Classified,unit,kc_isco_754
+kc_isco_8111,kscheme_isco_08,8111,معدنکاران و استخراج‌کنندگان سنگ,Miners and Quarriers,unit,kc_isco_811
+kc_isco_8112,kscheme_isco_08,8112,اپراتورهای تأسیسات فرآوری مواد معدنی و سنگ,Mineral and Stone Processing Plant Operators,unit,kc_isco_811
+kc_isco_8113,kscheme_isco_08,8113,حفاران چاه، گمانه‌زنان و کارکنان وابسته,Well Drillers and Borers and Related Workers,unit,kc_isco_811
+kc_isco_8114,kscheme_isco_08,8114,اپراتورهای ماشین‌های تولید سیمان، سنگ و سایر فراورده‌های معدنی,"Cement, Stone and Other Mineral Products Machine Operators",unit,kc_isco_811
+kc_isco_8121,kscheme_isco_08,8121,اپراتورهای تأسیسات فرآوری فلزات,Metal Processing Plant Operators,unit,kc_isco_812
+kc_isco_8122,kscheme_isco_08,8122,اپراتورهای ماشین‌های پرداخت، آبکاری و پوشش‌دهی فلزات,"Metal Finishing, Plating and Coating Machine Operators",unit,kc_isco_812
+kc_isco_8131,kscheme_isco_08,8131,اپراتورهای تأسیسات و ماشین‌های فراورده‌های شیمیایی,Chemical Products Plant and Machine Operators,unit,kc_isco_813
+kc_isco_8132,kscheme_isco_08,8132,اپراتورهای ماشین‌های فراورده‌های عکاسی,Photographic Products Machine Operators,unit,kc_isco_813
+kc_isco_8141,kscheme_isco_08,8141,اپراتورهای ماشین‌های فراورده‌های لاستیکی,Rubber Products Machine Operators,unit,kc_isco_814
+kc_isco_8142,kscheme_isco_08,8142,اپراتورهای ماشین‌های فراورده‌های پلاستیکی,Plastic Products Machine Operators,unit,kc_isco_814
+kc_isco_8143,kscheme_isco_08,8143,اپراتورهای ماشین‌های فراورده‌های کاغذی,Paper Products Machine Operators,unit,kc_isco_814
+kc_isco_8151,kscheme_isco_08,8151,اپراتورهای ماشین‌های آماده‌سازی الیاف، ریسندگی و بوبین‌پیچی,"Fibre Preparing, Spinning and Winding Machine Operators",unit,kc_isco_815
+kc_isco_8152,kscheme_isco_08,8152,اپراتورهای ماشین‌های بافندگی و کشباف,Weaving and Knitting Machine Operators,unit,kc_isco_815
+kc_isco_8153,kscheme_isco_08,8153,اپراتورهای چرخ خیاطی صنعتی,Sewing Machine Operators,unit,kc_isco_815
+kc_isco_8154,kscheme_isco_08,8154,اپراتورهای ماشین‌های سفیدگری، رنگرزی و شست‌وشوی پارچه,"Bleaching, Dyeing and Fabric Cleaning Machine Operators",unit,kc_isco_815
+kc_isco_8155,kscheme_isco_08,8155,اپراتورهای ماشین‌های آماده‌سازی خز و چرم,Fur and Leather Preparing Machine Operators,unit,kc_isco_815
+kc_isco_8156,kscheme_isco_08,8156,اپراتورهای ماشین‌های کفش‌سازی و موارد وابسته,Shoemaking and Related Machine Operators,unit,kc_isco_815
+kc_isco_8157,kscheme_isco_08,8157,اپراتورهای ماشین‌های رختشویی,Laundry Machine Operators,unit,kc_isco_815
+kc_isco_8159,kscheme_isco_08,8159,اپراتورهای ماشین‌های فراورده‌های نساجی، خز و چرم طبقه‌بندی‌نشده در جای دیگر,"Textile, Fur and Leather Products Machine Operators Not Elsewhere Classified",unit,kc_isco_815
+kc_isco_8160,kscheme_isco_08,8160,اپراتورهای ماشین‌های مواد غذایی و فراورده‌های وابسته,Food and Related Products Machine Operators,unit,kc_isco_816
+kc_isco_8171,kscheme_isco_08,8171,اپراتورهای تأسیسات خمیر کاغذ و کاغذسازی,Pulp and Papermaking Plant Operators,unit,kc_isco_817
+kc_isco_8172,kscheme_isco_08,8172,اپراتورهای تأسیسات فرآوری چوب,Wood Processing Plant Operators,unit,kc_isco_817
+kc_isco_8181,kscheme_isco_08,8181,اپراتورهای تأسیسات شیشه و سرامیک,Glass and Ceramics Plant Operators,unit,kc_isco_818
+kc_isco_8182,kscheme_isco_08,8182,اپراتورهای موتور بخار و دیگ بخار,Steam Engine and Boiler Operators,unit,kc_isco_818
+kc_isco_8183,kscheme_isco_08,8183,اپراتورهای ماشین‌های بسته‌بندی، بطری‌پرکنی و برچسب‌زنی,"Packing, Bottling and Labelling Machine Operators",unit,kc_isco_818
+kc_isco_8189,kscheme_isco_08,8189,اپراتورهای تأسیسات و ماشین‌آلات ثابت طبقه‌بندی‌نشده در جای دیگر,Stationary Plant and Machine Operators Not Elsewhere Classified,unit,kc_isco_818
+kc_isco_8211,kscheme_isco_08,8211,مونتاژکاران ماشین‌آلات مکانیکی,Mechanical Machinery Assemblers,unit,kc_isco_821
+kc_isco_8212,kscheme_isco_08,8212,مونتاژکاران تجهیزات برقی و الکترونیکی,Electrical and Electronic Equipment Assemblers,unit,kc_isco_821
+kc_isco_8219,kscheme_isco_08,8219,مونتاژکاران طبقه‌بندی‌نشده در جای دیگر,Assemblers Not Elsewhere Classified,unit,kc_isco_821
+kc_isco_8311,kscheme_isco_08,8311,رانندگان لکوموتیو,Locomotive Engine Drivers,unit,kc_isco_831
+kc_isco_8312,kscheme_isco_08,8312,متصدیان ترمز، علائم و سوزن‌بانی راه‌آهن,"Railway Brake, Signal and Switch Operators",unit,kc_isco_831
+kc_isco_8321,kscheme_isco_08,8321,رانندگان موتورسیکلت,Motorcycle Drivers,unit,kc_isco_832
+kc_isco_8322,kscheme_isco_08,8322,رانندگان خودروی سواری، تاکسی و ون,"Car, Taxi and Van Drivers",unit,kc_isco_832
+kc_isco_8331,kscheme_isco_08,8331,رانندگان اتوبوس و تراموا,Bus and Tram Drivers,unit,kc_isco_833
+kc_isco_8332,kscheme_isco_08,8332,رانندگان کامیون سنگین و تریلی,Heavy Truck and Lorry Drivers,unit,kc_isco_833
+kc_isco_8341,kscheme_isco_08,8341,اپراتورهای ماشین‌آلات متحرک کشاورزی و جنگلداری,Mobile Farm and Forestry Plant Operators,unit,kc_isco_834
+kc_isco_8342,kscheme_isco_08,8342,اپراتورهای ماشین‌آلات خاک‌برداری و موارد وابسته,Earthmoving and Related Plant Operators,unit,kc_isco_834
+kc_isco_8343,kscheme_isco_08,8343,اپراتورهای جرثقیل، بالابر و ماشین‌آلات وابسته,"Crane, Hoist and Related Plant Operators",unit,kc_isco_834
+kc_isco_8344,kscheme_isco_08,8344,اپراتورهای لیفتراک,Lifting Truck Operators,unit,kc_isco_834
+kc_isco_8350,kscheme_isco_08,8350,خدمه عرشه کشتی و کارکنان وابسته,Ships' Deck Crews and Related Workers,unit,kc_isco_835
+kc_isco_9111,kscheme_isco_08,9111,نظافت‌کاران و کمک‌کاران منازل,Domestic Cleaners and Helpers,unit,kc_isco_911
+kc_isco_9112,kscheme_isco_08,9112,نظافت‌کاران و کمک‌کاران ادارات، هتل‌ها و سایر مؤسسات,"Cleaners and Helpers in Offices, Hotels and Other Establishments",unit,kc_isco_911
+kc_isco_9121,kscheme_isco_08,9121,رختشویان و اتوکاران دستی,Hand Launderers and Pressers,unit,kc_isco_912
+kc_isco_9122,kscheme_isco_08,9122,شویندگان وسایل نقلیه,Vehicle Cleaners,unit,kc_isco_912
+kc_isco_9123,kscheme_isco_08,9123,نظافت‌کاران پنجره,Window Cleaners,unit,kc_isco_912
+kc_isco_9129,kscheme_isco_08,9129,سایر کارکنان نظافت,Other Cleaning Workers,unit,kc_isco_912
+kc_isco_9211,kscheme_isco_08,9211,کارکنان ساده مزارع زراعی,Crop Farm Labourers,unit,kc_isco_921
+kc_isco_9212,kscheme_isco_08,9212,کارکنان ساده دامداری,Livestock Farm Labourers,unit,kc_isco_921
+kc_isco_9213,kscheme_isco_08,9213,کارکنان ساده مزارع مختلط زراعی و دامی,Mixed Crop and Livestock Farm Labourers,unit,kc_isco_921
+kc_isco_9214,kscheme_isco_08,9214,کارکنان ساده باغ و گل‌وگیاه,Garden and Horticultural Labourers,unit,kc_isco_921
+kc_isco_9215,kscheme_isco_08,9215,کارکنان ساده جنگلداری,Forestry Labourers,unit,kc_isco_921
+kc_isco_9216,kscheme_isco_08,9216,کارکنان ساده ماهیگیری و آبزی‌پروری,Fishery and Aquaculture Labourers,unit,kc_isco_921
+kc_isco_9311,kscheme_isco_08,9311,کارکنان ساده معدن و استخراج سنگ,Mining and Quarrying Labourers,unit,kc_isco_931
+kc_isco_9312,kscheme_isco_08,9312,کارکنان ساده عمرانی,Civil Engineering Labourers,unit,kc_isco_931
+kc_isco_9313,kscheme_isco_08,9313,کارکنان ساده ساختمان‌سازی,Building Construction Labourers,unit,kc_isco_931
+kc_isco_9321,kscheme_isco_08,9321,بسته‌بندان دستی,Hand Packers,unit,kc_isco_932
+kc_isco_9329,kscheme_isco_08,9329,کارکنان ساده تولید صنعتی طبقه‌بندی‌نشده در جای دیگر,Manufacturing Labourers Not Elsewhere Classified,unit,kc_isco_932
+kc_isco_9331,kscheme_isco_08,9331,رانندگان وسایل نقلیه دستی و پدالی,Hand and Pedal Vehicle Drivers,unit,kc_isco_933
+kc_isco_9332,kscheme_isco_08,9332,رانندگان وسایل نقلیه و ماشین‌آلات با نیروی حیوانی,Drivers of Animal-drawn Vehicles and Machinery,unit,kc_isco_933
+kc_isco_9333,kscheme_isco_08,9333,جابه‌جاکنندگان بار,Freight Handlers,unit,kc_isco_933
+kc_isco_9334,kscheme_isco_08,9334,چینندگان قفسه‌ها,Shelf Fillers,unit,kc_isco_933
+kc_isco_9411,kscheme_isco_08,9411,آماده‌کنندگان غذای آماده (فست‌فود),Fast Food Preparers,unit,kc_isco_941
+kc_isco_9412,kscheme_isco_08,9412,کارکنان کمکی آشپزخانه,Kitchen Helpers,unit,kc_isco_941
+kc_isco_9510,kscheme_isco_08,9510,کارکنان خدمات خیابانی و وابسته,Street and Related Services Workers,unit,kc_isco_951
+kc_isco_9520,kscheme_isco_08,9520,فروشندگان خیابانی (به‌جز غذا),Street Vendors (excluding Food),unit,kc_isco_952
+kc_isco_9611,kscheme_isco_08,9611,جمع‌آوری‌کنندگان زباله و مواد بازیافتی,Garbage and Recycling Collectors,unit,kc_isco_961
+kc_isco_9612,kscheme_isco_08,9612,تفکیک‌کنندگان پسماند,Refuse Sorters,unit,kc_isco_961
+kc_isco_9613,kscheme_isco_08,9613,رفتگران و کارکنان وابسته,Sweepers and Related Labourers,unit,kc_isco_961
+kc_isco_9621,kscheme_isco_08,9621,پیک‌ها، تحویل‌دهندگان بسته و باربران چمدان,"Messengers, Package Deliverers and Luggage Porters",unit,kc_isco_962
+kc_isco_9622,kscheme_isco_08,9622,انجام‌دهندگان کارهای متفرقه,Odd-job Persons,unit,kc_isco_962
+kc_isco_9623,kscheme_isco_08,9623,قرائت‌کنندگان کنتور و جمع‌آوری‌کنندگان وجه دستگاه‌های فروش خودکار,Meter Readers and Vending-machine Collectors,unit,kc_isco_962
+kc_isco_9624,kscheme_isco_08,9624,گردآورندگان آب و هیزم,Water and Firewood Collectors,unit,kc_isco_962
+kc_isco_9629,kscheme_isco_08,9629,کارکنان مشاغل ساده طبقه‌بندی‌نشده در جای دیگر,Elementary Workers Not Elsewhere Classified,unit,kc_isco_962

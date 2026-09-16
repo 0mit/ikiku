@@ -1,109 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <!-- The protocols and attributes. Families, roles and skills are in ikiku.spec.node.csv,
+       which loads first so these can hang under spec_fnb. -->
   <data noupdate="1">
-    <record id="spec_fnb" model="ikiku.spec.node">
-      <field name="name">کافه و رستوران</field>
-      <field name="code">fnb</field>
-      <field name="kind">family</field>
-    </record>
-    <record id="spec_kitchen" model="ikiku.spec.node">
-      <field name="name">آشپزخانه</field>
-      <field name="code">kitchen</field>
-      <field name="kind">family</field>
-      <field name="parent_id" ref="spec_fnb"/>
-      <field name="hint_terms">آشپزخانه مطبخ</field>
-    </record>
-    <record id="spec_dishwashing" model="ikiku.spec.node">
-      <field name="name">ظرفشویی</field>
-      <field name="code">dishwashing</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_kitchen"/>
-      <field name="hint_terms">ظرفشور ظرفشویی ظرف بشوره ظرف‌شویی شستن ظروف</field>
-    </record>
-    <record id="spec_prep" model="ikiku.spec.node">
-      <field name="name">آماده‌سازی</field>
-      <field name="code">prep</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_kitchen"/>
-      <field name="hint_terms">آماده‌ساز پرپ خردکن سالادزن</field>
-    </record>
-    <record id="spec_line_cook" model="ikiku.spec.node">
-      <field name="name">آشپزِ خط</field>
-      <field name="code">line-cook</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_kitchen"/>
-      <field name="hint_terms">آشپز کباب‌پز گریل سرخ‌کن</field>
-    </record>
-    <record id="spec_chef" model="ikiku.spec.node">
-      <field name="name">سرآشپز</field>
-      <field name="code">chef</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_kitchen"/>
-      <field name="hint_terms">سرآشپز شف مدیر آشپزخانه</field>
-    </record>
-    <record id="spec_bar" model="ikiku.spec.node">
-      <field name="name">بار</field>
-      <field name="code">bar</field>
-      <field name="kind">family</field>
-      <field name="parent_id" ref="spec_fnb"/>
-      <field name="hint_terms">بار کافه</field>
-    </record>
-    <record id="spec_barista" model="ikiku.spec.node">
-      <field name="name">باریستا</field>
-      <field name="code">barista</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_bar"/>
-      <field name="hint_terms">باریستا قهوه‌ساز کافی‌من باریستا</field>
-    </record>
-    <record id="spec_espresso" model="ikiku.spec.node">
-      <field name="name">اسپرسو و اکسترکشن</field>
-      <field name="code">espresso</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_bar"/>
-      <field name="hint_terms">اسپرسو دم قهوه اکستراکشن</field>
-    </record>
-    <record id="spec_latte_art" model="ikiku.spec.node">
-      <field name="name">لته‌آرت</field>
-      <field name="code">latte-art</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_bar"/>
-      <field name="hint_terms">لته‌آرت طراحی شیر</field>
-    </record>
-    <record id="spec_brewbar" model="ikiku.spec.node">
-      <field name="name">بروبار</field>
-      <field name="code">brewbar</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_bar"/>
-      <field name="hint_terms">بروبار کمکس وی‌شصت دمی</field>
-    </record>
-    <record id="spec_floor" model="ikiku.spec.node">
-      <field name="name">سالن</field>
-      <field name="code">floor</field>
-      <field name="kind">family</field>
-      <field name="parent_id" ref="spec_fnb"/>
-      <field name="hint_terms">سالن پذیرایی</field>
-    </record>
-    <record id="spec_waiter" model="ikiku.spec.node">
-      <field name="name">گارسون</field>
-      <field name="code">waiter</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_floor"/>
-      <field name="hint_terms">گارسون ویتر سرو پیشخدمت</field>
-    </record>
-    <record id="spec_host" model="ikiku.spec.node">
-      <field name="name">میزبان</field>
-      <field name="code">host</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_floor"/>
-      <field name="hint_terms">میزبان هاست پذیرش</field>
-    </record>
-    <record id="spec_cashier" model="ikiku.spec.node">
-      <field name="name">صندوق</field>
-      <field name="code">cashier</field>
-      <field name="kind">competency</field>
-      <field name="parent_id" ref="spec_floor"/>
-      <field name="hint_terms">صندوق‌دار صندوق کاشیر</field>
-    </record>
     <record id="spec_hygiene" model="ikiku.spec.node">
       <field name="name">بهداشت و ایمنی</field>
       <field name="code">hygiene</field>
@@ -161,6 +60,5 @@
       <field name="hint_terms">شب شبانه وایسه شب‌کار</field>
     </record>
     <!-- Inside noupdate, so it runs on install only: a label a master changes survives -u. -->
-    <function model="ikiku.spec.node" name="_ikiku_apply_labels"/>
   </data>
 </odoo>

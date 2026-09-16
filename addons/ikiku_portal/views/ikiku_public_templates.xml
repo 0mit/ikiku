@@ -15,7 +15,7 @@
           </div>
         </div>
         <div class="ikiku__note">
-          اینجا کارِ این آدم رو می‌بینید. آدرس، شماره و ساعتِ کارش نوشته نمیشه و نمی‌شه.
+          اینجا کارهاش رو می‌بینید. آدرس، شماره و ساعتِ کارش نوشته نمیشه و نمی‌شه.
           <a href="/help/dide">چرا؟</a>
         </div>
 
@@ -31,10 +31,10 @@
                 <tr>
                   <td t-out="a.spec_node_id.name or a.value_text"/>
                   <td t-out="a.asserted_by_id.name"/>
-                  <td t-out="dict(a._fields['method'].selection).get(a.method)"/>
+                  <td t-out="claim_methods.get(a.method) or dict(a._fields['method'].selection).get(a.method)"/>
                   <td t-out="a.confirm_count"/>
                   <td t-out="a.dispute_count"/>
-                  <td t-out="dict(a._fields['state'].selection).get(a.state)"/>
+                  <td t-out="claim_states.get(a.state) or dict(a._fields['state'].selection).get(a.state)"/>
                 </tr>
               </t>
             </tbody>
@@ -72,7 +72,7 @@
         <p class="ikiku__kicker">همه می‌بینن</p>
         <h1 class="ikiku__question">کارهای باز</h1>
         <p class="ikiku__lead">
-          نیرویی که کافه‌ها و رستوران‌ها لازم دارن. اسمِ کافه یا رستوران اینجا نوشته نمیشه.
+          کارهایی که کافه‌ها و رستوران‌ها براش همکار می‌خوان. اسمِ کافه یا رستوران اینجا نوشته نمیشه.
           کار می‌خواید؟ <a href="/ki">ثبت‌نام کنید</a>.
         </p>
         <form class="ikiku__filter" action="/jobs" method="get">
@@ -88,7 +88,7 @@
         </form>
         <t t-call="ikiku_portal.job_cards"/>
         <p class="ikiku__lead">
-          اسمِ هر کار همون اسمِ رایجه، نه اسمی که هر مغازه خودش گذاشته؛ تا کسی که جای دیگه
+          اسمِ هر کار همون اسمِ رایجه، نه اسمی که هر کافه یا رستوران خودش گذاشته؛ تا کسی که جای دیگه
           کار کرده بفهمه این چه کاریه.
         </p>
       </div></div>
@@ -107,7 +107,7 @@
         <div class="ikiku__table">
           <table>
             <thead><tr>
-              <th>شماره‌ی قرار</th><th>کارگر</th><th>از</th><th>تا</th><th>استان</th>
+              <th>شماره‌ی قرار</th><th>نفر</th><th>از</th><th>تا</th><th>استان</th>
               <th>جای کار</th><th>وضعیت</th>
             </tr></thead>
             <tbody>
@@ -126,7 +126,7 @@
                     <t t-if="b['cancelled']">
                       <span class="ikiku__withheld">به هم خورد — <t t-out="b['cancel_reason']"/></span>
                     </t>
-                    <t t-else=""><span t-out="{'confirmed': 'قطعی', 'at_risk': 'در خطر', 'replaced': 'نفر عوض شد', 'in_progress': 'سرِ کار', 'done': 'تموم شد'}.get(b['state'], b['state'])"/></t>
+                    <t t-else=""><span t-out="{'confirmed': 'قطعی', 'at_risk': 'دوباره بررسی میشه', 'replaced': 'نفر عوض شد', 'in_progress': 'سرِ کار', 'done': 'تموم شد'}.get(b['state'], b['state'])"/></t>
                   </td>
                 </tr>
               </t>
@@ -142,7 +142,7 @@
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question">هزینه‌ی مشترک</h1>
         <div class="ikiku__note">
-          ایکیکو از مزدِ کارگر چیزی برنمی‌داره. خرجِ واقعیِ اداره‌کردنِ ایکیکو تو هر دوره بینِ
+          ایکیکو از حقوقِ هیچ‌کس چیزی برنمی‌داره. خرجِ واقعیِ اداره‌کردنِ ایکیکو تو هر دوره بینِ
           کافه‌ها و رستوران‌هایی که ازش استفاده کردن تقسیم میشه، به اندازه‌ی «روز-نفر»: یه نفر،
           یه روز کار. ایکیکو بزرگ‌تر بشه، سهمِ هر روز-نفر کمتر میشه، و عددش همین‌جا نوشته میشه.
           <a href="/help/hazine">مثال ببینید</a>

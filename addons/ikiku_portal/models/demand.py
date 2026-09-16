@@ -50,7 +50,7 @@ class IkikuDemand(models.Model):
 
     @api.model
     def ikiku_role_shortcuts(self):
-        """The home page's «نیرو برای» links: four common skills as (id, everyday name).
+        """The home page's «همکار برای» links: four common skills as (id, everyday name).
         Plain values, read with sudo, because a visitor who is not signed in may not read
         the skill tree itself; the names are the public standard."""
         out = []
