@@ -155,7 +155,10 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   }
 
   // ---- open jobs ---------------------------------------------------------------
-  &__jobs { display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: 1rem; }
+  &__jobs {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: 1rem;
+    margin-bottom: 1.25rem;  // the note that follows on /ikiku/jobs sat against the last card
+  }
   &__job {
     padding: 1.25rem 1.35rem; background: var(--ik-paper);
     border: 1px solid var(--ik-rule); border-radius: 20px; box-shadow: var(--ik-shadow);
@@ -171,7 +174,7 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   &__job-when { font-size: .9rem; }
   &__empty {
     padding: 1.5rem; border: 1px dashed var(--ik-rule); border-radius: 20px;
-    background: var(--ik-paper); color: var(--ik-ink-2); text-align: center;
+    background: var(--ik-paper); color: var(--ik-ink-2); text-align: center; margin-bottom: 1.25rem;
   }
   &__filter {
     display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-bottom: 1.25rem;
