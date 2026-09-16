@@ -44,6 +44,7 @@
         <h1 class="ikiku__question">کدی که براتون پیامک شد رو بنویسید</h1>
         <p class="ikiku__lead">به شماره‌ی <bdi dir="ltr" t-out="masked"/> فرستادیم.</p>
 
+        <p t-if="note" class="ikiku__notice" t-out="note"/>
         <p id="ikiku-otp" class="ikiku__status" role="status" aria-live="polite"
            data-state-url="/enter/code/state" t-att-data-state="status['state']"
            t-att-data-resend="status['resend_in']" t-out="status['text']"/>
@@ -60,7 +61,7 @@
         </form>
 
         <form id="ikiku-otp-resend" action="/enter/code/resend" method="post"
-              t-att-hidden="not failed and status['resend_in'] and 'hidden'">
+              t-att-hidden="not failed and not note and status['resend_in'] and 'hidden'">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
           <button class="ikiku__secondary ikiku__go--block" type="submit">دوباره بفرست</button>
         </form>

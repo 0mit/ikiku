@@ -41,9 +41,9 @@ class TestMobileChallenge(OtpSetup, TransactionCase):
         cls.partner = cls.env['res.partner'].create({'name': "نیرو"})
         cls.other = cls.env['res.partner'].create({'name': "دیگری"})
 
-    def start(self, partner=None, mobile=MOBILE):
+    def start(self, partner=None, mobile=MOBILE, force=False):
         with patch(RANDBELOW, return_value=CODE):
-            return self.Challenge.start(partner or self.partner, mobile)
+            return self.Challenge.start(partner or self.partner, mobile, force=force)
 
     def test_code_is_sent_then_forgotten(self):
         challenge, error = self.start()
@@ -84,20 +84,33 @@ class TestMobileChallenge(OtpSetup, TransactionCase):
         payload = challenge._payload()
         self.assertEqual((payload['state'], challenge.failure, challenge.pending_code), ('failed', 'timeout', False))
 
-    def test_resend_waits_a_minute(self):
+    def test_the_last_code_is_used_again_and_a_resend_replaces_it(self):
         first, _error = self.start()
+        self.send_queued()
+        self.assertEqual(first.expires_at - first.sent_at, timedelta(hours=24))
+        first.sent_at = fields.Datetime.now() - timedelta(hours=20)
         again, error = self.start()
-        self.assertEqual((again, error), (first, False))
-        first.queued_at = fields.Datetime.now() - timedelta(seconds=61)
-        fresh, _error = self.start()
+        self.assertEqual((again, error), (first, False), "a code that still works is not sent again")
+        self.assertTrue(again.env.context.get('ikiku_reused'))
+        fresh, _error = self.start(force=True)
         self.assertNotEqual(fresh, first)
-        self.assertEqual(first.state, 'expired')
+        self.assertEqual(first.state, 'expired', "only the last code works")
+        self.send_queued()
+        self.assertEqual(fresh.check('123456'), False)
 
-    def test_three_codes_an_hour_per_number(self):
-        for name in ("الف", "ب", "پ"):
-            _challenge, error = self.start(self.env['res.partner'].create({'name': name}))
+    def test_a_resend_still_waits_a_minute(self):
+        first, _error = self.start()
+        again, _error = self.start(force=True)
+        self.assertEqual(again, first)
+        first.queued_at = fields.Datetime.now() - timedelta(seconds=61)
+        fresh, _error = self.start(force=True)
+        self.assertNotEqual(fresh, first)
+
+    def test_ten_codes_an_hour_per_number(self):
+        for index in range(10):
+            _challenge, error = self.start(self.env['res.partner'].create({'name': "نفر %d" % index}))
             self.assertFalse(error)
-        _challenge, error = self.start(self.env['res.partner'].create({'name': "ت"}))
+        _challenge, error = self.start(self.env['res.partner'].create({'name': "یازدهم"}))
         self.assertEqual(error, 'limit')
 
     def test_proven_owner_takes_an_unproven_claim(self):

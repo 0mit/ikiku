@@ -38,26 +38,41 @@ from odoo.addons.ikiku_base.models.jalali import to_fa_digits, to_latin_digits
 from odoo.addons.sms_otp.tools.otp import SmsOtpError
 
 CODE_DIGITS = 6
-CODE_TTL = timedelta(minutes=5)
+# A code works for a day (operator, 2026-09-16): an SMS that arrives late, or a visitor
+# who comes back tomorrow, can still use the last code instead of paying for a new one.
+CODE_TTL = timedelta(hours=24)
 MAX_TRIES = 5
 RESEND_AFTER = timedelta(seconds=60)
-MAX_SENDS_PER_HOUR = 3
+MAX_SENDS_PER_HOUR = 10
 WAIT_LIMIT = timedelta(minutes=2)
-KEEP = timedelta(days=1)
+# Challenges are deleted a day after their code stops working, never while it works.
+KEEP = CODE_TTL + timedelta(days=1)
 LOGIN_TOKEN_TTL = timedelta(minutes=2)
 # A new SMS account's name until its owner writes their own on the first screen.
 NEW_PARTNER_NAME = "کاربرِ تازه"
 
+
+
+def duration_text(delta):
+    """timedelta(hours=24) -> ۲۴ ساعت, timedelta(minutes=5) -> ۵ دقیقه."""
+    seconds = int(delta.total_seconds())
+    if seconds >= 3600 and seconds % 3600 == 0:
+        return "%s ساعت" % to_fa_digits(seconds // 3600)
+    return "%s دقیقه" % to_fa_digits(max(1, seconds // 60))
+
+
 # What the visitor reads, in spoken, polite Persian (operator, D-9). Keys travel in
-# URLs; sentences never do.
+# URLs; sentences never do. Every number in them is read from the settings above.
 MESSAGES = {
     'queued': "پیامک داره می‌ره…",
-    'sent': "پیامک رفت. معمولاً تا یه دقیقه می‌رسه. کد تا ۵ دقیقه کار می‌کنه.",
+    'sent': "پیامک رفت. معمولاً تا یه دقیقه می‌رسه. کد تا %s کار می‌کنه." % duration_text(CODE_TTL),
+    'reused': "آخرین کدی که براتون فرستادیم هنوز کار می‌کنه، پس پیامکِ تازه نفرستادیم. همون رو بنویسید؛ "
+              "اگه پیداش نمی‌کنید، «دوباره بفرست» رو بزنید.",
     'wrong': "این کد درست نیست. دوباره نگاه کنید و بنویسید.",
     'expired': "وقتِ این کد تموم شد. یه کدِ تازه بخواید.",
     'tries': "چند بار اشتباه شد. یه کدِ تازه بخواید.",
-    'limit': "تو یه ساعت فقط ۳ بار کد می‌فرستیم. کمی بعد دوباره امتحان کنید.",
-    'limit_at': "تو یه ساعت فقط ۳ بار کد می‌فرستیم. ساعتِ %s دوباره امتحان کنید.",
+    'limit': "تو یه ساعت فقط %s بار کد می‌فرستیم. کمی بعد دوباره امتحان کنید." % to_fa_digits(MAX_SENDS_PER_HOUR),
+    'limit_at': "تو یه ساعت فقط " + to_fa_digits(MAX_SENDS_PER_HOUR) + " بار کد می‌فرستیم. ساعتِ %s دوباره امتحان کنید.",
     'taken': "این شماره مالِ یه حسابِ دیگه‌ست.",
     'held': "این شماره مالِ یه حسابِ دیگه‌ست.",
     'timeout': "پیامک نرفت. دوباره بخواید.",
@@ -148,10 +163,33 @@ class IkikuMobileChallenge(models.Model):
         return to_fa_digits(moment.strftime('%H:%M'))
 
     @api.model
-    def start(self, partner, mobile, session_key=None, as_role=None):
-        """Ask for a code for `mobile`, for a signed-in `partner` or, with no partner, for
-        the browser session `session_key`. Returns (challenge, error key or False)."""
+    def _reusable(self, partner, mobile):
+        """The last code sent to `mobile` that still works, if any: for a signed-in partner
+        only their own, for sign-in any visitor's. A queued code still on its way counts."""
         now = fields.Datetime.now()
+        domain = [('mobile', '=', mobile), ('tries', '<', MAX_TRIES),
+                  '|', '&', ('state', '=', 'sent'), ('expires_at', '>', now),
+                  '&', ('state', '=', 'queued'), ('queued_at', '>', now - WAIT_LIMIT)]
+        domain += [('partner_id', '=', partner.id)] if partner else [('purpose', '=', 'enter')]
+        return self.search(domain, order='id desc', limit=1)
+
+    @api.model
+    def start(self, partner, mobile, session_key=None, as_role=None, force=False):
+        """Ask for a code for `mobile`, for a signed-in `partner` or, with no partner, for
+        the browser session `session_key`. Returns (challenge, error key or False).
+
+        Unless `force` (the resend button), the last code that still works is used again
+        and no SMS is sent: for sign-in it moves to this browser session, so a code typed
+        the next day in another tab still opens the account. A reused challenge carries
+        ikiku_reused in its context so the page can say so. A forced resend replaces it,
+        so only the last code ever works."""
+        now = fields.Datetime.now()
+        if not force:
+            reusable = self._reusable(partner, mobile)
+            if reusable:
+                if not partner and session_key and reusable.session_key != session_key:
+                    reusable.write({'session_key': session_key, 'as_role': as_role or reusable.as_role})
+                return reusable.with_context(ikiku_reused=True), False
         latest = self._latest(partner=partner, session_key=None if partner else session_key)
         if (latest and latest.mobile == mobile and latest.state in ('queued', 'sent')
                 and now - (latest.sent_at or latest.queued_at) < RESEND_AFTER):

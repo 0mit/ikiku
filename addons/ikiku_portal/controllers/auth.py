@@ -106,7 +106,7 @@ class IkikuEnter(http.Controller):
             return self._render_mobile(role, mobile, MESSAGES['limit_at'] % at if at else MESSAGES['limit'])
         if error:
             return self._render_mobile(role, mobile, MESSAGES.get(error, MESSAGES['failed']))
-        return request.redirect('/enter/code')
+        return request.redirect('/enter/code' + ('?note=reused' if _challenge.env.context.get('ikiku_reused') else ''))
 
     @http.route('/enter/code', type='http', auth='public', website=True, sitemap=False)
     def enter_code(self, **kw):
@@ -119,6 +119,7 @@ class IkikuEnter(http.Controller):
             'masked': mask(challenge.mobile),
             'role': challenge.as_role or 'ki',
             'error': MESSAGES.get(kw.get('error')),
+            'note': MESSAGES['reused'] if kw.get('note') == 'reused' else None,
         })
 
     @http.route('/enter/code/state', type='http', auth='public', methods=['GET'], sitemap=False)
@@ -154,9 +155,9 @@ class IkikuEnter(http.Controller):
         user = request.env.user
         if user._is_public():
             _challenge, error = Challenge.start(False, latest.mobile, session_key=self._session_key(),
-                                                as_role=latest.as_role)
+                                                as_role=latest.as_role, force=True)
         else:
-            _challenge, error = Challenge.start(user.partner_id, latest.mobile)
+            _challenge, error = Challenge.start(user.partner_id, latest.mobile, force=True)
         return request.redirect('/enter/code' + ('?' + urlencode({'error': error}) if error else ''))
 
 

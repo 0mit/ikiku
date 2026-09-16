@@ -88,7 +88,7 @@ class IkikuHelp(http.Controller):
             values.update({
                 'resend_minutes': to_fa_digits(int(mobile_challenge.RESEND_AFTER.total_seconds() // 60)),
                 'per_hour': to_fa_digits(mobile_challenge.MAX_SENDS_PER_HOUR),
-                'code_minutes': to_fa_digits(int(mobile_challenge.CODE_TTL.total_seconds() // 60)),
+                'code_ttl': mobile_challenge.duration_text(mobile_challenge.CODE_TTL),
                 'code_digits': to_fa_digits(mobile_challenge.CODE_DIGITS),
             })
         elif page == 'etebar':

@@ -55,6 +55,26 @@ class TestSmsLogin(OtpSetup, HttpCase):
         self.enter(mobile='09121234567', code='123456')
         self.assertEqual(self.users_with_number(), first)
 
+    def test_the_last_code_still_signs_in_from_another_session(self):
+        page = self.url_open('/enter?as=ki').text
+        with patch(RANDBELOW, return_value=CODE):
+            self.url_open('/enter/send', data={'csrf_token': TOKEN.search(page).group(1), 'mobile': MOBILE})
+        self.send_queued()
+        Challenge = self.env['ikiku.mobile.challenge'].sudo()
+        before = Challenge.search_count([('mobile', '=', MOBILE)])
+        self.opener.cookies.clear()
+        page = self.url_open('/enter?as=ki').text
+        again = self.url_open('/enter/send', allow_redirects=False,
+                              data={'csrf_token': TOKEN.search(page).group(1), 'mobile': '09121234567'})
+        self.assertTrue(again.headers['Location'].endswith('/enter/code?note=reused'))
+        self.assertEqual(Challenge.search_count([('mobile', '=', MOBILE)]), before, "no new SMS")
+        page = self.url_open('/enter/code?note=reused').text
+        self.assertIn("آخرین کدی که براتون فرستادیم هنوز کار می‌کنه", page)
+        signed_in = self.url_open('/enter/code/submit', allow_redirects=False,
+                                  data={'csrf_token': TOKEN.search(page).group(1), 'code': '123456'})
+        self.assertTrue(signed_in.headers['Location'].endswith('/join'))
+        self.assertTrue(self.users_with_number())
+
     def test_a_wrong_code_does_not_sign_in(self):
         response = self.enter(code='000000')
         self.assertIn('error=wrong', response.headers['Location'])
