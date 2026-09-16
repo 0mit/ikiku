@@ -9,6 +9,7 @@ from odoo.exceptions import AccessDenied, UserError
 from odoo.tests import HttpCase, tagged
 
 from odoo.addons.ikiku_portal.tests.test_mobile_challenge import CODE, MOBILE, RANDBELOW, OtpSetup
+from odoo.addons.ikiku_portal.models.mobile_challenge import MESSAGES
 
 TOKEN = re.compile(r'name="csrf_token" value="([^"]+)"')
 
@@ -151,3 +152,133 @@ class TestSmsLogin(OtpSetup, HttpCase):
         self.authenticate('my-walker', 'my-walker-pass-1')
         response = self.url_open('/my', allow_redirects=False)
         self.assertTrue(response.headers['Location'].endswith('/me'))
+
+
+@tagged('post_install', '-at_install')
+class TestLoginPageSms(OtpSetup, HttpCase):
+    """SMS sign-in on Odoo's own /web/login (operator, 2026-09-16)."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.enable_otp()
+
+    def login_send(self, mobile='۰۹۱۲۱۲۳۴۵۶۷', redirect=None):
+        page = self.url_open('/web/login' + ('?redirect=%s' % redirect if redirect else ''))
+        self.assertEqual(page.status_code, 200)
+        data = {'csrf_token': TOKEN.search(page.text).group(1), 'mobile': mobile, 'origin': 'login'}
+        if redirect:
+            data['redirect'] = redirect
+        with patch(RANDBELOW, return_value=CODE):
+            return self.url_open('/enter/send', allow_redirects=False, data=data)
+
+    def submit(self, code='123456'):
+        self.send_queued()
+        page = self.url_open('/enter/code').text
+        return self.url_open('/enter/code/submit', allow_redirects=False, data={
+            'csrf_token': TOKEN.search(page).group(1), 'code': code})
+
+    def test_the_login_page_offers_sms_and_email(self):
+        page = self.url_open('/web/login').text
+        self.assertIn('action="/enter/send"', page)
+        self.assertIn('name="origin" value="login"', page)
+        self.assertIn("یا با ایمیل و رمز", page)
+        self.env.company.write({'sms_kavenegar_enabled': False})
+        off = self.url_open('/web/login').text
+        self.assertNotIn('action="/enter/send"', off)
+        self.assertIn("ورود با پیامک الان کار نمی‌کنه", off)
+
+    def test_signed_in_people_see_no_sms_box(self):
+        self.env['res.users'].create({'name': "همکار", 'login': 'login-staff', 'password': 'login-staff-pass-1',
+                                      'group_ids': [(6, 0, [self.env.ref('base.group_user').id])]})
+        self.authenticate('login-staff', 'login-staff-pass-1')
+        self.assertNotIn('action="/enter/send"', self.url_open('/web/login').text)
+
+    def test_sms_from_the_login_page_signs_in_and_keeps_the_redirect(self):
+        sent = self.login_send(redirect='/jobs')
+        self.assertTrue(sent.headers['Location'].endswith('/enter/code'))
+        self.assertIn('/web/login?redirect=%2Fjobs', self.url_open('/enter/code').text, "the back link returns")
+        wrong = self.submit('111111')
+        self.assertIn('error=wrong', wrong.headers['Location'])
+        done = self.submit()
+        self.assertTrue(done.headers['Location'].endswith('/jobs'), done.headers['Location'])
+        user = self.env['res.users'].search([('partner_id.ikiku_mobile', '=', MOBILE)])
+        self.assertTrue(user.share and user.login.startswith('m-'))
+
+    def test_a_new_account_from_the_login_page_chooses_a_door(self):
+        self.login_send()
+        self.assertTrue(self.submit().headers['Location'].endswith('/#ikiku-doors'))
+
+    def test_an_existing_worker_goes_home(self):
+        partner = self.env['res.partner'].create({'name': "نیرو", 'ikiku_mobile': MOBILE,
+                                                  'ikiku_mobile_verified_on': fields.Datetime.now()})
+        partner._ikiku_grant_role('ki')
+        self.login_send()
+        self.assertTrue(self.submit().headers['Location'].endswith('/me'))
+
+    def test_offsite_and_backend_redirects_are_dropped_for_portal(self):
+        for target in ('//evil.example', 'https://evil.example', '/odoo/action-1'):
+            with self.subTest(target=target):
+                self.url_open('/web/session/logout')
+                self.env['ikiku.mobile.challenge'].sudo().search([]).unlink()
+                self.login_send(redirect=target)
+                location = self.submit().headers['Location']
+                self.assertNotIn('evil', location)
+                self.assertNotIn('/odoo', location)
+
+    def test_an_error_keeps_the_number_out_of_the_url(self):
+        bad = self.login_send(mobile='0912123')
+        location = bad.headers['Location']
+        self.assertIn('/web/login?sms=1', location)
+        self.assertNotIn('0912123', location)
+        page = self.url_open(location).text
+        self.assertIn('value="0912123"', page)
+        self.assertIn(MESSAGES['mobile'], page)
+        self.assertNotIn(MESSAGES['mobile'], self.url_open('/web/login').text, "shown once")
+
+    def test_a_staff_number_is_refused_on_the_login_page(self):
+        staff = self.env['res.users'].create({'name': "همکار", 'login': 'login-staff-2',
+                                              'group_ids': [(6, 0, [self.env.ref('base.group_user').id])]})
+        staff.partner_id.write({'ikiku_mobile': MOBILE, 'ikiku_mobile_verified_on': fields.Datetime.now()})
+        self.login_send()
+        refused = self.submit()
+        self.assertIn('/web/login?sms=1', refused.headers['Location'])
+        self.assertIn(MESSAGES['staff_here'], self.url_open(refused.headers['Location']).text)
+        self.assertNotIn('ikiku__switch', self.url_open('/my', allow_redirects=False).text)
+        self.assertEqual(self.url_open('/my', allow_redirects=False).status_code, 303, "still signed out")
+
+    def test_a_posted_sms_credential_does_not_sign_in(self):
+        Challenge = self.env['ikiku.mobile.challenge'].sudo()
+        challenge = Challenge.create({'mobile': MOBILE, 'purpose': 'enter', 'session_key': 'k',
+                                      'code_hash': Challenge._hash('1'), 'state': 'done'})
+        user, token, _error = challenge._issue_login()
+        page = self.url_open('/web/login').text
+        response = self.url_open('/web/login', allow_redirects=False, data={
+            'csrf_token': TOKEN.search(page).group(1), 'type': 'ikiku_sms', 'login': user.login, 'token': token})
+        self.assertEqual(response.status_code, 200, "the login page again, not a redirect")
+
+    def test_password_login_is_unchanged_and_a_number_gets_a_hint(self):
+        self.env['res.users'].create({'name': "همکار", 'login': 'login-mail@example.com', 'password': 'login-mail-pass-1',
+                                      'group_ids': [(6, 0, [self.env.ref('base.group_user').id])]})
+        page = self.url_open('/web/login').text
+        ok = self.url_open('/web/login', allow_redirects=False, data={
+            'csrf_token': TOKEN.search(page).group(1), 'login': 'login-mail@example.com', 'password': 'login-mail-pass-1'})
+        self.assertIn('/odoo', ok.headers['Location'])
+        self.url_open('/web/session/logout')
+        hints = []
+        for login in ('09121234567', '09351234567'):
+            page = self.url_open('/web/login').text
+            wrong = self.url_open('/web/login', data={
+                'csrf_token': TOKEN.search(page).group(1), 'login': login, 'password': 'nope'}).text
+            hints.append(MESSAGES['login_is_mobile'] in wrong)
+        self.assertEqual(hints, [True, True])
+
+    def test_sms_sign_in_still_asks_for_two_factor(self):
+        partner = self.env['res.partner'].create({'name': "نیرو", 'ikiku_mobile': MOBILE,
+                                                  'ikiku_mobile_verified_on': fields.Datetime.now()})
+        user = self.env['ikiku.mobile.challenge'].sudo()._portal_user_for(partner)
+        with patch.object(type(self.env['res.users']), '_mfa_url', lambda self: '/web/login/totp'):
+            self.login_send()
+            location = self.submit().headers['Location']
+        self.assertIn('/web/login/totp', location)
+        self.assertTrue(user)

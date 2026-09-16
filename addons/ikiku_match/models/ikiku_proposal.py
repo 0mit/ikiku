@@ -130,7 +130,10 @@ class IkikuProposal(models.Model):
         no end date (operator, 2026-09-16) goes to anyone free from its start; the
         explanation then says how long they are free. Either way the kind of work must
         be one the worker accepts, or one they have not ruled out by naming none.
-        None of this changes a weight: it decides who is ranked, not how."""
+        None of this changes a weight: it decides who is ranked, not how.
+
+        Nobody is ranked for a business they hold (operator, 2026-09-16: one person may
+        hold a business and look for work): a filter on who, never a weight."""
         if demand.state not in ('open', 'proposed'):
             raise UserError("فقط برای نیازِ باز می‌توان پیشنهاد ساخت.")
         Availability = self.env['ikiku.availability']
@@ -141,6 +144,8 @@ class IkikuProposal(models.Model):
             '|', ('date_end', '=', False), ('date_end', '>=', until),
             '|', ('work_type_ids', '=', False), ('work_type_ids', 'in', demand.work_type_id.ids),
             ('resource_id.state', '=', 'active'),
+            ('resource_id.partner_id.commercial_partner_id', '!=',
+             demand.business_id.partner_id.commercial_partner_id.id),
             '|', ('province_id', '=', demand.province_id.id), ('can_relocate', '=', True),
         ])
         made = self.browse()

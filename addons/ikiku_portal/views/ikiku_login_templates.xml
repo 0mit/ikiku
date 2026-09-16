@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- Odoo's own login page with the SMS sign-in first (operator, 2026-09-16). The box posts
+       to /enter/send, so the limits, the reuse of the last code and the refusal of staff
+       numbers are the ones /enter has. Email and password stay below, unchanged. -->
+  <template id="login_sms" inherit_id="web.login" priority="40" name="ایکیکو — ورود با پیامک">
+    <xpath expr="//div[@id='oe_structure_login_top']" position="after">
+      <section t-if="ikiku_is_public" class="ikiku ikiku__login-sms">
+        <h2 class="ikiku__subhead">با شماره موبایل وارد بشید</h2>
+        <t t-if="ikiku_otp_enabled">
+          <p class="ikiku__lead">یه کد براتون پیامک می‌کنیم. رمز و ایمیل لازم نیست.</p>
+          <form action="/enter/send" method="post" class="ikiku__form">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <input type="hidden" name="origin" value="login"/>
+            <input type="hidden" name="redirect" t-att-value="redirect"/>
+            <label for="ikiku_login_mobile" class="ikiku__label">شماره موبایل</label>
+            <input class="ikiku__field ikiku__field--big" type="tel" id="ikiku_login_mobile" name="mobile"
+                   inputmode="numeric" dir="ltr" autocomplete="tel-national" maxlength="20"
+                   t-att-value="ikiku_sms_mobile" placeholder="۰۹۱۲۱۲۳۴۵۶۷" required="required"
+                   t-att-autofocus="None if login else 'autofocus'"
+                   t-att-aria-invalid="ikiku_sms_error and 'true'"
+                   t-att-aria-describedby="'ikiku-login-mobile-error' if ikiku_sms_error else 'ikiku-login-mobile-help'"/>
+            <p t-if="ikiku_sms_error" id="ikiku-login-mobile-error" class="ikiku__error" role="alert" t-out="ikiku_sms_error"/>
+            <p id="ikiku-login-mobile-help" class="ikiku__lead">شماره‌تون رو به هیچ‌کس نشون نمی‌دیم.</p>
+            <button class="ikiku__go ikiku__go--block" type="submit">کد رو بفرست</button>
+          </form>
+          <p class="ikiku__links"><a href="/help/code">کد نمیاد؟ راهنما</a></p>
+        </t>
+        <p t-else="" class="ikiku__note">ورود با پیامک الان کار نمی‌کنه. پایینِ همین صفحه با ایمیل وارد بشید.</p>
+      </section>
+    </xpath>
+    <!-- oe_login_form gets its class from t-attf-class, which hasclass() does not match. -->
+    <xpath expr="//div[hasclass('field-login')]" position="before">
+      <p t-if="ikiku_is_public" class="fw-bold mb-3">یا با ایمیل و رمز</p>
+    </xpath>
+    <xpath expr="//p[hasclass('alert-danger')]" position="after">
+      <p t-if="ikiku_login_hint" class="alert alert-info" role="status" t-out="ikiku_login_hint"/>
+    </xpath>
+  </template>
+
+</odoo>

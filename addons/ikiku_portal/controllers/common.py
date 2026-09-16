@@ -17,6 +17,15 @@ from odoo.addons.ikiku_base.models.jalali import (
 
 TEHRAN = 'Asia/Tehran'
 
+
+def mask(mobile):
+    """+989121234567 -> ۰۹۱۲•••۴۵۶۷: enough for a person to know their own number, and
+    never the whole number in a page."""
+    if not mobile or len(mobile) < 10:
+        return ''
+    local = '0' + mobile[-10:]
+    return to_fa_digits(local[:4]) + '•••' + to_fa_digits(local[-4:])
+
 DATE_ERRORS = {
     'start_missing': "روزِ شروع رو انتخاب کنید.",
     'start_bad': "این تاریخ درست نیست. روز و ماه رو دوباره انتخاب کنید.",

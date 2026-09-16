@@ -11,6 +11,7 @@ staff read these records, and the page never shows one back.
 from datetime import timedelta
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 MAX_PER_NUMBER_PER_DAY = 3
 
@@ -29,9 +30,28 @@ class IkikuHelpRequest(models.Model):
     topic = fields.Text("کجا گیر کرده")
     from_page = fields.Char("از صفحه‌ی")
     partner_id = fields.Many2one('res.partner', string="حساب", readonly=True)
+    matched_partner_id = fields.Many2one(
+        'res.partner', string="حسابی با همین شماره", compute='_compute_matched_partner_id', compute_sudo=True,
+        help="حسابی که همین شماره شمارهٔ ورودش است، تا همکار پیش از زنگ زدن بداند با کی حرف می‌زند.")
+    matched_partner_state = fields.Selection(
+        [('proven', "تأییدشده با کدِ پیامک"), ('staff', "نوشتهٔ همکار، هنوز تأییدنشده"), ('unproven', "تأییدنشده")],
+        string="وضعِ شماره", compute='_compute_matched_partner_id', compute_sudo=True)
+
     state = fields.Selection([
         ('new', "تازه"), ('called', "زنگ زدیم"), ('closed', "بسته شد"),
     ], string="وضعیت", default='new', required=True, tracking=True)
+
+    @api.depends('mobile')
+    def _compute_matched_partner_id(self):
+        Partner = self.env['res.partner'].sudo().with_context(active_test=False)
+        for request in self:
+            try:
+                mobile = Partner.normalise_mobile(request.mobile)
+            except ValidationError:
+                mobile = False
+            partner = Partner.search([('ikiku_mobile', '=', mobile)], limit=1) if mobile else Partner
+            request.matched_partner_id = partner
+            request.matched_partner_state = partner.ikiku_mobile_state if partner else False
 
     @api.model
     def too_many(self, mobile):

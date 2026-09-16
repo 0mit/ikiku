@@ -14,7 +14,14 @@
           <field name="name"/>
           <field name="mobile" placeholder="۰۹۱۲۱۲۳۴۵۶۷"/>
           <field name="role" widget="radio"/>
-          <field name="business_name" invisible="role != 'ku'" required="role == 'ku'"/>
+          <field name="business_name" invisible="role == 'ki'" required="role != 'ki'"/>
+        </group>
+        <div invisible="not existing_partner_ids" class="alert alert-warning" role="alert">
+          مخاطبی با همین تلفن هست. تلفنی که کسی تایپ کرده گواهِ مالکیت نیست؛ خودتان انتخاب کنید.
+        </div>
+        <group invisible="not existing_partner_ids">
+          <field name="existing_partner_ids" widget="many2many_tags" readonly="1"/>
+          <field name="match_action" widget="radio" required="existing_partner_ids"/>
         </group>
         <footer>
           <button name="action_create" type="object" string="ساختِ حساب" class="btn-primary"/>
@@ -46,6 +53,35 @@
     </field>
   </record>
 
+  <record id="ikiku_staff_role_form" model="ir.ui.view">
+    <field name="name">ikiku.staff.role.form</field>
+    <field name="model">ikiku.staff.role</field>
+    <field name="arch" type="xml">
+      <form string="دادنِ نقشِ دوم">
+        <p class="text-muted">
+          یک نفر با یک شماره می‌تواند هم دنبالِ کار باشد هم کافه داشته باشد. حسابِ دوم نسازید؛ نقشِ دوم را
+          همین‌جا بدهید. نامِ شما در تاریخچهٔ حساب می‌ماند.
+        </p>
+        <group>
+          <field name="partner_id" options="{'no_create': True}"/>
+          <field name="role" widget="radio"/>
+          <field name="business_name" invisible="role != 'ku'" required="role == 'ku'"/>
+        </group>
+        <footer>
+          <button name="action_apply" type="object" string="بده" class="btn-primary"/>
+          <button special="cancel" string="انصراف"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_ikiku_staff_role" model="ir.actions.act_window">
+    <field name="name">دادنِ نقشِ دوم</field>
+    <field name="res_model">ikiku.staff.role</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
   <record id="action_ikiku_staff_account" model="ir.actions.act_window">
     <field name="name">ساختِ حساب برای کسی</field>
     <field name="res_model">ikiku.staff.account</field>
@@ -64,6 +100,8 @@
             sequence="40" groups="ikiku_base.group_ikiku_staff"/>
   <menuitem id="menu_ikiku_staff_account" parent="menu_ikiku_people_help" sequence="10"
             action="action_ikiku_staff_account" groups="ikiku_base.group_ikiku_staff"/>
+  <menuitem id="menu_ikiku_staff_role" parent="menu_ikiku_people_help" sequence="15"
+            action="action_ikiku_staff_role" groups="ikiku_base.group_ikiku_staff"/>
   <menuitem id="menu_ikiku_mobile_change" parent="menu_ikiku_people_help" sequence="20"
             action="action_ikiku_mobile_change" groups="ikiku_base.group_ikiku_staff"/>
 

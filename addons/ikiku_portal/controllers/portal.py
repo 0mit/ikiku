@@ -12,8 +12,13 @@ Rules, applied on both sides:
   4. At most six screens after signing in. These users are on phones, often mid-shift.
 
 The worker screens double as edit screens: ?edit=1 comes back to /me.
+
+One account may hold both sides (operator, 2026-09-16). The person's own place (استان و
+شهر on /join/where) and a café's place are kept apart; either page offers the other side.
 """
 from datetime import date
+
+from werkzeug.exceptions import Forbidden
 
 from odoo import http
 from odoo.exceptions import ValidationError
@@ -21,8 +26,9 @@ from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
 from odoo.addons.ikiku_base.models.partner import STANDING_MAX, STANDING_PER_SUPPORTED, STANDING_VERIFIED
+from odoo.addons.ikiku_portal.controllers.auth import ikiku_sides, remember_side
 from odoo.addons.ikiku_portal.controllers.common import (
-    DATE_ERRORS, date_widget, dates_text, parse_jalali, read_dates, tehran_today, to_int)
+    DATE_ERRORS, date_widget, dates_text, mask, parse_jalali, read_dates, tehran_today, to_int)
 from odoo.addons.ikiku_portal.models.mobile_challenge import NEW_PARTNER_NAME
 
 # Older imports keep working.
@@ -71,13 +77,31 @@ class IkikuPortal(http.Controller):
     def _needs_name(self, partner):
         return not (partner.name or '').strip() or partner.name == NEW_PARTNER_NAME
 
+    def _staff_elsewhere(self):
+        """A staff (internal) account has no worker page or café: it belongs in the backend."""
+        return None if request.env.user.share else request.redirect('/odoo')
+
+    def _number(self, partner):
+        """The person's own number, masked, as their own pages show it."""
+        return {
+            'masked': mask(partner.ikiku_mobile),
+            'proven': bool(partner.ikiku_mobile_verified_on),
+            'can_prove': request.env['ikiku.mobile.challenge'].sudo()._enabled(),
+        }
+
+    def _availability_referenced(self, availability):
+        return bool(availability) and bool(
+            request.env['ikiku.proposal'].sudo().search_count([('availability_id', '=', availability.id)], limit=1)
+            or request.env['ikiku.booking'].sudo().search_count([('availability_id', '=', availability.id)], limit=1))
+
     # ---------------------------------------------------------------- workers
     def _resource(self, create=False):
         Resource = request.env['ikiku.resource'].sudo()
         resource = Resource.search([('partner_id', '=', request.env.user.partner_id.id)], limit=1)
         if not resource and create:
-            resource = Resource.create({'partner_id': request.env.user.partner_id.id})
-            request.env.user.sudo().group_ids = [(4, request.env.ref('ikiku_base.group_ikiku_resource').id)]
+            if not request.env.user.share:
+                raise Forbidden()
+            resource = self._partner()._ikiku_grant_role('ki')
         return resource
 
     def _availability(self, resource):
@@ -115,6 +139,9 @@ class IkikuPortal(http.Controller):
 
     @http.route('/join', type='http', auth='user', website=True, sitemap=False)
     def join(self, **kw):
+        staff = self._staff_elsewhere()
+        if staff:
+            return staff
         return request.redirect(self._worker_next(self._resource(create=True)))
 
     @http.route('/join/name', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
@@ -152,10 +179,15 @@ class IkikuPortal(http.Controller):
                 errors['city'] = "شهر رو ننوشتید."
             if not errors:
                 partner.write({'ikiku_province_id': province.id, 'ikiku_city': city})
-                return self._after_worker_save(self._resource(create=True), edit)
+                resource = self._resource(create=True)
+                availability = self._availability(resource)
+                if availability and not self._availability_referenced(availability):
+                    availability.write({'province_id': province.id, 'city': city})
+                return self._after_worker_save(resource, edit)
         return self._worker_page('ikiku_portal.join_where', 2, {
             'provinces': request.env['ikiku.province'].sudo().search([]),
             'cities': self._city_suggestions(),
+            'has_business': 'ku' in ikiku_sides(request.env.user),
             'province_id': province_id, 'city': city, 'errors': errors, 'edit': edit})
 
     @http.route('/join/skills', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
@@ -195,9 +227,7 @@ class IkikuPortal(http.Controller):
             if not error:
                 Availability = request.env['ikiku.availability'].sudo()
                 current = self._availability(resource)
-                referenced = current and (
-                    request.env['ikiku.proposal'].sudo().search_count([('availability_id', '=', current.id)], limit=1)
-                    or request.env['ikiku.booking'].sudo().search_count([('availability_id', '=', current.id)], limit=1))
+                referenced = self._availability_referenced(current)
                 vals = {'date_start': start, 'date_end': end or False,
                         'province_id': partner.ikiku_province_id.id, 'city': partner.ikiku_city}
                 try:
@@ -256,6 +286,7 @@ class IkikuPortal(http.Controller):
         if not resource:
             business = self._business()
             return request.redirect('/business' if business else '/join')
+        remember_side('ki')
         partner = self._partner()
         availability = self._availability(resource)
         next_step = self._worker_next(resource)
@@ -276,6 +307,8 @@ class IkikuPortal(http.Controller):
             'standing_max': to_fa_digits('%g' % STANDING_MAX),
             'bookings': bookings,
             'first_visit': kw.get('saved') == '1',
+            'sides': ikiku_sides(request.env.user),
+            'number': self._number(partner),
         })
 
     # ------------------------------------------------------------- businesses
@@ -305,6 +338,7 @@ class IkikuPortal(http.Controller):
         business = self._business()
         if not business:
             return request.redirect('/business/name')
+        remember_side('ku')
         demands = request.env['ikiku.demand'].sudo().search([('business_id', '=', business.id)],
                                                             order='create_date desc')
         today = tehran_today()
@@ -312,11 +346,16 @@ class IkikuPortal(http.Controller):
             'business': business,
             'needs': [{'demand': d, 'seats': to_fa_digits(d.seats),
                        'dates': dates_text(d.date_start, d.date_end, today)} for d in demands],
+            'sides': ikiku_sides(request.env.user),
+            'number': self._number(self._partner()),
         })
 
     @http.route('/business/name', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
     def business_name(self, **post):
         """The first question of کو؟, and the way to change the answer later."""
+        staff = self._staff_elsewhere()
+        if staff:
+            return staff
         if self._needs_name(self._partner()):
             return request.redirect('/join/name?for=ku')
         business = self._business()
@@ -327,14 +366,15 @@ class IkikuPortal(http.Controller):
                 if business:
                     business.name = name
                     return request.redirect('/business')
-                request.env['ikiku.business'].sudo().create({
-                    'partner_id': request.env.user.partner_id.commercial_partner_id.id, 'name': name})
-                request.env.user.sudo().group_ids = [(4, request.env.ref('ikiku_base.group_ikiku_business').id)]
+                self._partner()._ikiku_grant_role('ku', business_name=name)
+                remember_side('ku')
                 return request.redirect('/business/need/who')
             error = "اسم رو ننوشتید. اینجا بنویسید."
         else:
             name = business.name if business else ''
-        return request.render('ikiku_portal.business_name', {'business': business, 'name': name, 'error': error})
+        return request.render('ikiku_portal.business_name', {
+            'business': business, 'name': name, 'error': error,
+            'has_resource': 'ki' in ikiku_sides(request.env.user)})
 
     @http.route('/business/need/who', type='http', auth='user', methods=['GET', 'POST'], website=True,
                 sitemap=False)
@@ -455,12 +495,16 @@ class IkikuPortal(http.Controller):
                     'city': city,
                     'state': 'open',
                 })
+                if not business.province_id:
+                    # A café's first need teaches it its place; the holder's own place stays.
+                    business.write({'province_id': province.id, 'city': city})
                 request.session.pop('ikiku_need', None)
                 request.env['ikiku.proposal'].sudo().build_for_demand(demand)
                 return request.redirect('/business/need/%d' % demand.id)
         else:
-            province_id = (last.province_id or business.province_id).id
-            city = last.city or business.city or ''
+            partner = self._partner()
+            province_id = (last.province_id or business.province_id or partner.ikiku_province_id).id
+            city = last.city or business.city or partner.ikiku_city or ''
         node = request.env['ikiku.spec.node'].sudo().browse(draft.get('node_id') or 0).exists()
         work_type = request.env['ikiku.work.type'].sudo().browse(draft['work_type_id']).exists()
         today = tehran_today()
@@ -470,6 +514,7 @@ class IkikuPortal(http.Controller):
             'provinces': request.env['ikiku.province'].sudo().search([]),
             'cities': self._city_suggestions(),
             'province_id': province_id, 'city': city, 'errors': errors,
+            'has_resource': 'ki' in ikiku_sides(request.env.user),
             'summary': {
                 'seats': to_fa_digits(draft['seats']),
                 'who': node.plain_label or node.name if node else '',

@@ -12,7 +12,7 @@ actually lives: a commitment cannot be quietly withdrawn by either side.
 iKiKu is not the employer. `employer_business_id` names who is.
 """
 from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 from odoo.addons.ikiku_base.models.jalali import format_jalali
 
@@ -82,6 +82,29 @@ class IkikuBooking(models.Model):
         for rec in self:
             started = bool(rec.date_start and rec.date_start <= today)
             rec.venue_disclosed = bool(rec.venue_public or started)
+
+    @api.constrains('resource_id', 'demand_id')
+    def _check_not_own_business(self):
+        """A person who holds a business and also looks for work (operator, 2026-09-16) is
+        never booked at their own business through iKiKu: the public register would record
+        a commitment nobody else made."""
+        for rec in self:
+            holder = rec.demand_id.business_id.partner_id.commercial_partner_id
+            if holder and rec.resource_id.partner_id.commercial_partner_id == holder:
+                raise ValidationError("دارندهٔ یک کسب‌وکار از راهِ ایکیکو در همان کسب‌وکار گمارده نمی‌شود.")
+
+    @api.model
+    def _ikiku_flag_own_bookings(self):
+        """Bookings made before the rule above: flagged for staff, never cancelled here,
+        because a public booking may only be withdrawn publicly and with a reason."""
+        flagged = self.browse()
+        for rec in self.search([]):
+            holder = rec.demand_id.business_id.partner_id.commercial_partner_id
+            if holder and rec.resource_id.partner_id.commercial_partner_id == holder:
+                rec.message_post(body="نیرو دارندهٔ همین کسب‌وکار است. این گمارش پیش از قاعدهٔ منعِ آن "
+                                      "ثبت شده؛ اگر باید برداشته شود، با دلیل لغو کنید تا عمومی بماند.")
+                flagged |= rec
+        return flagged
 
     @api.model_create_multi
     def create(self, vals_list):

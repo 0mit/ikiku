@@ -33,6 +33,7 @@
         <t t-call="ikiku_portal.step_head"/>
         <h1 class="ikiku__question">کدوم استان و کدوم شهر؟</h1>
         <p class="ikiku__lead">آدرسِ خونه رو نمی‌خوایم. فقط شهر.</p>
+        <p t-if="has_business" class="ikiku__lead">اینجا شهرِ خودتونه که توش دنبالِ کار می‌گردید. شهرِ کافه‌تون عوض نمیشه.</p>
         <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
           <input t-if="edit" type="hidden" name="edit" value="1"/>
@@ -179,6 +180,7 @@
   <template id="resource_home" name="ایکیکو — صفحه‌ی من">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
+        <t t-if="len(sides) == 2" t-call="ikiku_portal.side_switch"><t t-set="side" t-value="'ki'"/></t>
         <p class="ikiku__step">صفحه‌ی من</p>
         <h1 class="ikiku__question" t-out="partner.name"/>
 
@@ -223,6 +225,8 @@
           <p><a href="/help/etebar">این عدد از کجا میاد؟</a></p>
         </section>
 
+        <t t-call="ikiku_portal.my_number"/>
+
         <section>
           <h2 class="ikiku__subhead">قرارهای کارِ من</h2>
           <t t-if="bookings">
@@ -236,6 +240,7 @@
           <p t-else="" class="ikiku__lead">هنوز قرارِ کاری ندارید.</p>
         </section>
 
+        <p t-if="'ku' not in sides" class="ikiku__lead">کافه یا رستوران هم دارید؟ <a href="/ku">با همین شماره نیرو بخواید</a></p>
         <p class="ikiku__links"><a href="/help">راهنما</a> <a href="/web/session/logout?redirect=/">خروج</a></p>
       </div></div>
     </t>
@@ -249,6 +254,7 @@
         <p class="ikiku__step"><t t-if="business">عوض کردن</t><t t-else="">شروع</t></p>
         <h1 class="ikiku__question">اسمِ کافه یا رستورانتون چیه؟</h1>
         <p class="ikiku__lead">همون اسمی که سرِ در نوشته.</p>
+        <p t-if="has_resource and not business" class="ikiku__lead">صفحه‌ی کاری‌تون سرِ جاشه. این فقط برای کافه‌تونه.</p>
         <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
           <label for="name" class="ikiku__label">اسمِ کافه یا رستوران</label>
@@ -388,6 +394,7 @@
         </dl>
         <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <p t-if="has_resource" class="ikiku__lead">این شهرِ کافه‌ست. شهری که خودتون توش دنبالِ کار می‌گردید عوض نمیشه.</p>
           <t t-call="ikiku_portal.place_fields"/>
           <p class="ikiku__notice">این درخواست تو «کارهای باز» دیده میشه: چه کاری، چه جور، چند نفر، کدوم
             استان و شهر، از کِی تا کِی. اسمِ کافه‌تون دیده نمیشه.</p>
@@ -423,6 +430,7 @@
   <template id="business_home" name="ایکیکو — درخواست‌های من">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
+        <t t-if="len(sides) == 2" t-call="ikiku_portal.side_switch"><t t-set="side" t-value="'ku'"/></t>
         <p class="ikiku__step" t-out="business.name"/>
         <h1 class="ikiku__question">درخواست‌های نیروی شما</h1>
         <a class="ikiku__go ikiku__go--block" href="/business/need/who">نیروی تازه می‌خوام</a>
@@ -438,6 +446,8 @@
           </t>
         </t>
         <p t-else="" class="ikiku__lead">هنوز درخواستی ندارید.</p>
+        <t t-call="ikiku_portal.my_number"/>
+        <p t-if="'ki' not in sides" class="ikiku__lead">خودتون هم دنبالِ کار هستید؟ <a href="/ki">با همین شماره ثبت‌نام کنید</a></p>
         <p class="ikiku__links">
           <a href="/business/name">عوض کردنِ اسمِ کافه</a>
           <a href="/help/niroo">راهنما</a>
@@ -445,6 +455,49 @@
         </p>
       </div></div>
     </t>
+  </template>
+
+  <!-- ============================================================ one account, two sides -->
+
+  <!-- /my for a person with both sides who has not opened either in this browser. -->
+  <template id="choose_side" name="ایکیکو — امروز برای چی اومدید">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step">صفحه‌ی من</p>
+        <h1 class="ikiku__question">امروز برای چی اومدید؟</h1>
+        <div class="ikiku__tiles ikiku__tiles--one">
+          <a class="ikiku__tile ikiku__tile--link" href="/me"><span>کار می‌خوام<small>صفحه‌ی کاریِ خودتون</small></span></a>
+          <a class="ikiku__tile ikiku__tile--link" href="/business"><span>نیرو می‌خوام<small>درخواست‌های <t t-out="business.name"/></small></span></a>
+        </div>
+        <p class="ikiku__lead">هر وقت خواستید، بالای صفحه عوضش کنید.</p>
+        <p class="ikiku__links"><a href="/help/hardo">راهنما</a> <a href="/web/session/logout?redirect=/">خروج</a></p>
+      </div></div>
+    </t>
+  </template>
+
+  <!-- On /me and /business when the account holds both sides. On the page, not only in the
+       menu: on a phone the menu is folded away. -->
+  <template id="side_switch" name="ایکیکو — کار یا نیرو">
+    <nav class="ikiku__switch" aria-label="صفحه‌ی کار یا صفحه‌ی نیرو">
+      <a href="/me" t-att-class="'is-on' if side == 'ki' else None" t-att-aria-current="'page' if side == 'ki' else None">کار می‌خوام</a>
+      <a href="/business" t-att-class="'is-on' if side == 'ku' else None" t-att-aria-current="'page' if side == 'ku' else None">نیرو می‌خوام</a>
+    </nav>
+  </template>
+
+  <!-- The person's own number, masked: it is the number they sign in with and the one staff
+       call. The whole number is never in the page. -->
+  <template id="my_number" name="ایکیکو — شماره‌ی شما">
+    <section class="ikiku__card ikiku__number">
+      <h2 class="ikiku__subhead">شماره موبایلِ شما</h2>
+      <t t-if="number['masked']">
+        <p><bdi dir="ltr" t-out="number['masked']"/> ·
+          <t t-if="number['proven']">تأیید شده</t><t t-else="">هنوز تأیید نشده</t></p>
+      </t>
+      <p t-else="">هنوز شماره‌ای ثبت نکردید.</p>
+      <p class="ikiku__lead">با همین شماره وارد میشید. فقط همکارای ایکیکو می‌بینن‌ش. کافه‌ها و نیروها نمی‌بینن.</p>
+      <p t-if="not number['proven'] and number['can_prove']"><a class="ikiku__go" href="/enter">تأیید با کدِ پیامک</a></p>
+      <p><a href="/help/shomare">شماره‌تون عوض شده؟</a></p>
+    </section>
   </template>
 
 </odoo>

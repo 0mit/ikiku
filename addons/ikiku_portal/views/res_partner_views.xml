@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- The number a person signs in with is the phone staff see (operator, 2026-09-16).
+       ikiku_base keeps `phone` a copy of ikiku_mobile; here the copy cannot be typed over,
+       and staff see whether the SIM's owner proved it, with the one way to change it. -->
+  <record id="ikiku_view_partner_form_login_number" model="ir.ui.view">
+    <field name="name">res.partner.form.ikiku.login.number</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="(//field[@name='phone'])[1]" position="attributes">
+        <attribute name="readonly">ikiku_mobile</attribute>
+      </xpath>
+      <xpath expr="(//field[@name='phone'])[1]/.." position="after">
+        <field name="ikiku_mobile" invisible="1"/>
+        <div class="d-flex align-items-baseline gap-2 w-md-50" invisible="not ikiku_mobile"
+             groups="ikiku_base.group_ikiku_staff">
+          <span class="text-muted">شمارهٔ ورود</span>
+          <field name="ikiku_mobile_state" widget="badge" nolabel="1"
+                 decoration-success="ikiku_mobile_state == 'proven'"
+                 decoration-warning="ikiku_mobile_state == 'staff'"
+                 decoration-danger="ikiku_mobile_state == 'unproven'"/>
+          <button name="%(ikiku_portal.action_ikiku_mobile_change)d" type="action" class="btn btn-link p-0"
+                  string="تغییرِ شماره" context="{'default_partner_id': id}"/>
+        </div>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="ikiku_view_res_partner_filter_login_number" model="ir.ui.view">
+    <field name="name">res.partner.search.ikiku.login.number</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='email']" position="after">
+        <field name="ikiku_mobile_lookup" groups="ikiku_base.group_ikiku_staff"/>
+      </xpath>
+      <xpath expr="//filter[@name='type_company']" position="after">
+        <separator groups="ikiku_base.group_ikiku_staff"/>
+        <filter name="ikiku_mobile_proven" string="شمارهٔ ورودِ تأییدشده" groups="ikiku_base.group_ikiku_staff"
+                domain="[('ikiku_mobile_verified_on', '!=', False)]"/>
+        <filter name="ikiku_mobile_unproven" string="شمارهٔ ورودِ تأییدنشده" groups="ikiku_base.group_ikiku_staff"
+                domain="[('ikiku_mobile', '!=', False), ('ikiku_mobile_verified_on', '=', False)]"/>
+      </xpath>
+    </field>
+  </record>
+
+</odoo>

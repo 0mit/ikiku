@@ -30,6 +30,12 @@
             <field name="name"/><field name="mobile"/><field name="best_time"/>
             <field name="from_page"/><field name="partner_id"/>
           </group>
+          <group invisible="not matched_partner_id">
+            <field name="matched_partner_id"/>
+            <field name="matched_partner_state" string="وضعِ شماره"/>
+            <button name="%(ikiku_portal.action_ikiku_mobile_change)d" type="action" class="btn btn-link p-0"
+                    string="تغییرِ شماره" context="{'default_partner_id': matched_partner_id}"/>
+          </group>
           <field name="topic"/>
         </sheet>
         <chatter/>

@@ -15,7 +15,7 @@ resources are employed by the businesses they are placed with.
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Human Resources',
-    'version': '19.0.0.1.2',
+    'version': '19.0.0.1.3',
     'license': 'AGPL-3',
     'depends': ['base', 'mail', 'portal'],
     'data': [

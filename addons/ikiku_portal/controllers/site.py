@@ -13,7 +13,7 @@ from odoo import http
 from odoo.http import request
 from odoo.tools.misc import file_path
 
-from odoo.addons.ikiku_portal.controllers.auth import ikiku_home_for
+from odoo.addons.ikiku_portal.controllers.auth import SIDE_HOME, SIDE_START, ikiku_sides
 
 # The مرام‌نامه the site publishes. tools/validate.py fails the build if this
 # copy is not byte-identical to docs/MANIFEST.fa.md, which is the law.
@@ -74,9 +74,18 @@ RENAMED = {
 
 class IkikuSite(http.Controller):
 
-    def _door(self, template, role, next_url):
-        if not request.env.user._is_public():
-            return request.redirect(next_url)
+    def _door(self, template, role):
+        user = request.env.user
+        if not user._is_public():
+            if not user.share:
+                return request.redirect('/odoo')
+            sides = ikiku_sides(user)
+            if role in sides:
+                return request.redirect(SIDE_HOME[role])
+            if sides:
+                # Holding the other side: ask before a second one is made.
+                return request.render('ikiku_portal.door_add_%s' % role, {})
+            return request.redirect(SIDE_START[role])
         return request.render(template, {
             'start_url': '/enter?as=%s' % role,
             'otp_enabled': request.env.company._sms_otp_ready(),
@@ -84,7 +93,7 @@ class IkikuSite(http.Controller):
 
     @http.route('/ki', type='http', auth='public', website=True)
     def door_ki(self, **kw):
-        return self._door('ikiku_portal.door_ki', 'ki', ikiku_home_for(request.env.user) or '/join')
+        return self._door('ikiku_portal.door_ki', 'ki')
 
     @http.route('/ku', type='http', auth='public', website=True)
     def door_ku(self, node=None, **kw):
@@ -94,10 +103,7 @@ class IkikuSite(http.Controller):
             int(node) if node and str(node).isdigit() else 0).exists()
         if chosen and chosen.kind == 'competency':
             request.session['ikiku_need'] = {'node_id': chosen.id}
-        user = request.env.user
-        has_business = not user._is_public() and request.env['ikiku.business'].sudo().search_count(
-            [('partner_id', '=', user.partner_id.commercial_partner_id.id)], limit=1)
-        return self._door('ikiku_portal.door_ku', 'ku', '/business' if has_business else '/business/name')
+        return self._door('ikiku_portal.door_ku', 'ku')
 
     @http.route('/manifest', type='http', auth='public', website=True)
     def manifest(self, **kw):

@@ -81,6 +81,8 @@ MESSAGES = {
     'mobile': "این شماره درست نیست. باید ۱۱ رقم باشه و با ۰۹ شروع بشه. مثلِ ۰۹۱۲۱۲۳۴۵۶۷",
     'staff': "این شماره مالِ حسابِ همکارانِ ایکیکوست. از «ورود با ایمیل» وارد بشید.",
     'session': "این صفحه کهنه شده. شماره رو دوباره بنویسید.",
+    'staff_here': "این شماره مالِ حسابِ همکارانِ ایکیکوست. پایینِ همین صفحه با ایمیل و رمز وارد بشید.",
+    'login_is_mobile': "اگه با شماره موبایل ثبت‌نام کردید، رمز ندارید: بالای همین صفحه کدِ پیامک بخواید.",
 }
 
 
@@ -188,7 +190,7 @@ class IkikuMobileChallenge(models.Model):
             reusable = self._reusable(partner, mobile)
             if reusable:
                 if not partner and session_key and reusable.session_key != session_key:
-                    reusable.write({'session_key': session_key, 'as_role': as_role or reusable.as_role})
+                    reusable.write({'session_key': session_key, 'as_role': as_role or False})
                 return reusable.with_context(ikiku_reused=True), False
         latest = self._latest(partner=partner, session_key=None if partner else session_key)
         if (latest and latest.mobile == mobile and latest.state in ('queued', 'sent')

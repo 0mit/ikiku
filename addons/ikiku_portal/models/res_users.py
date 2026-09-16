@@ -20,4 +20,6 @@ class ResUsers(models.Model):
         if not user.share or not self.env['ikiku.mobile.challenge'].sudo()._consume_login_token(
                 user, credential.get('token')):
             raise AccessDenied()
-        return {'uid': user.id, 'auth_method': 'ikiku_sms', 'mfa': 'skip'}
+        # 'default', not 'skip': a portal user who turned on two-factor sign-in at /my/security
+        # is still asked for it after the SMS code.
+        return {'uid': user.id, 'auth_method': 'ikiku_sms', 'mfa': 'default'}

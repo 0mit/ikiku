@@ -18,7 +18,7 @@ from odoo.addons.ikiku_portal.controllers.common import day_label, tehran_today
 from odoo.addons.ikiku_portal.models import mobile_challenge
 
 PAGES = ('kar', 'niroo', 'code', 'tarikh', 'dide', 'etebar', 'daftar', 'hazine', 'kalame', 'maram',
-         'shomare', 'tamas')
+         'shomare', 'tamas', 'hardo')
 
 # How each classified field is named on the help page. A row with no label here is still
 # listed, under its field's own label, so a new row can never silently disappear.
@@ -31,7 +31,9 @@ PLAIN_FIELDS = {
     ('res.partner', 'ikiku_is_verified'): "اینکه هویتتون تأیید شده یا نه",
     ('res.partner', 'ikiku_mobile'): "شماره موبایل",
     ('res.partner', 'ikiku_mobile_verified_on'): None,
-    ('res.partner', 'phone'): "تلفن",
+    ('res.partner', 'phone'): None,   # the same number as ikiku_mobile since 2026-09-16
+    ('res.partner', 'ikiku_mobile_set_by_id'): None,
+    ('res.partner', 'ikiku_mobile_state'): None,
     ('res.partner', 'mobile'): None,
     ('res.partner', 'email'): "ایمیل",
     ('res.partner', 'street'): "آدرسِ خونه",
@@ -48,6 +50,9 @@ PLAIN_FIELDS = {
     ('ikiku.demand', 'business_id'): "اسمِ کافه یا رستوران",
     ('ikiku.demand', 'position_id'): "اسمی که خودِ کافه روی اون کار گذاشته",
     ('ikiku.demand', 'note'): "یادداشتِ کافه",
+    ('ikiku.business', 'partner_id'): "اینکه کافه مالِ کیه",
+    ('ikiku.business', 'province_id'): "استان و شهرِ کافه",
+    ('ikiku.business', 'city'): None,
 }
 
 # The booking states as a person says them (D-10: قرار کار).
@@ -110,6 +115,7 @@ class IkikuHelp(http.Controller):
                 'person': self._rows('res.partner'),
                 'job': self._rows('ikiku.demand'),
                 'availability': self._rows('ikiku.availability'),
+                'cafe': self._rows('ikiku.business'),
             })
         elif page == 'daftar':
             values['states'] = list(BOOKING_STATES.values())

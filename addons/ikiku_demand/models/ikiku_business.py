@@ -25,16 +25,20 @@ class IkikuBusiness(models.Model):
     name = fields.Char("نام کسب‌وکار", required=True, tracking=True,
                        help="همان نامی که روی سردر است.")
     slug = fields.Char("نشانیِ عمومی", copy=False, index=True)
-    province_id = fields.Many2one(related='partner_id.ikiku_province_id',
-                                  store=True, readonly=False, string="استان")
-    city = fields.Char(related='partner_id.ikiku_city', store=True, readonly=False, string="شهر")
+    # The café's own place. Until 2026-09-16 these were related to the holder's partner, so a
+    # holder who also looks for work (operator, 2026-09-16) moved the café by saying where they
+    # live, and a staff edit of the café moved the person. The columns and values are kept.
+    province_id = fields.Many2one('ikiku.province', string="استان", tracking=True,
+                                  help="جای کسب‌وکار، نه جای زندگیِ دارنده‌اش.")
+    city = fields.Char("شهر", tracking=True)
     kind = fields.Selection([
         ('cafe', "کافه"), ('restaurant', "رستوران"),
         ('bakery', "نانوایی/قنادی"), ('other', "دیگر"),
     ], string="نوع", default='cafe', required=True)
     seats = fields.Integer("ظرفیت سالن")
     is_verified = fields.Boolean(related='partner_id.ikiku_is_verified', store=True,
-                                 string="تأییدشده")
+                                 string="هویتِ دارنده تأییدشده",
+                                 help="کدِ ملیِ دارنده بررسی شده؛ این بررسیِ خودِ کسب‌وکار نیست.")
     state = fields.Selection([
         ('draft', "پیش‌نویس"), ('active', "فعال"), ('suspended', "معلق"),
     ], default='draft', required=True, tracking=True, string="وضعیت")

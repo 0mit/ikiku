@@ -5,3 +5,4 @@ access_ikiku_staff_account_staff,ikiku staff account staff,model_ikiku_staff_acc
 access_ikiku_mobile_change_staff,ikiku mobile change staff,model_ikiku_mobile_change,ikiku_base.group_ikiku_staff,1,1,1,1
 access_ikiku_help_request_staff,ikiku help request staff,model_ikiku_help_request,ikiku_base.group_ikiku_staff,1,1,1,0
 access_ikiku_help_request_system,ikiku help request system,model_ikiku_help_request,base.group_system,1,1,1,1
+access_ikiku_staff_role_staff,ikiku staff role staff,model_ikiku_staff_role,ikiku_base.group_ikiku_staff,1,1,1,1

@@ -205,4 +205,32 @@
     </t>
   </template>
 
+  <!-- A signed-in person at the other door: asked once, on its own screen, before a second
+       side is made (operator, 2026-09-16: one person may hold both). -->
+  <template id="door_add_ki" name="ایکیکو — کی؟ برای کسی که کافه داره">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__kicker">کار می‌خوام</p>
+        <h1 class="ikiku__question">خودتون هم دنبالِ کار هستید؟</h1>
+        <p class="ikiku__plain">با همین شماره میشه. حسابِ تازه لازم نیست. کافه‌تون و درخواست‌هاش سرِ جاشه.</p>
+        <a class="ikiku__go ikiku__go--block" href="/join">آره، دنبالِ کار هم هستم</a>
+        <a class="ikiku__secondary ikiku__go--block" href="/business">نه، برگردم به کافه‌م</a>
+        <p class="ikiku__links"><a href="/help/hardo">راهنما</a></p>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="door_add_ku" name="ایکیکو — کو؟ برای کسی که دنبالِ کاره">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__kicker">نیرو می‌خوام</p>
+        <h1 class="ikiku__question">کافه یا رستوران دارید و نیرو می‌خواید؟</h1>
+        <p class="ikiku__plain">با همین شماره میشه. حسابِ تازه لازم نیست. صفحه‌ی کاری‌تون سرِ جاشه و عوض نمیشه.</p>
+        <a class="ikiku__go ikiku__go--block" href="/business/name">آره، نیرو می‌خوام</a>
+        <a class="ikiku__secondary ikiku__go--block" href="/me">نه، برگردم به صفحه‌ی کاری‌م</a>
+        <p class="ikiku__links"><a href="/help/hardo">راهنما</a></p>
+      </div></div>
+    </t>
+  </template>
+
 </odoo>

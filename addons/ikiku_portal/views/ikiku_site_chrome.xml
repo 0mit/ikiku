@@ -52,16 +52,18 @@
   </template>
 
   <!-- The header button led to /contactus, whose form mails a company address that does
-       not exist. A visitor gets «ثبت‌نام» (the two doors), a signed-in person «صفحه‌ی من».
+       not exist. A visitor gets «ثبت‌نام» (the two doors), a signed-in person «صفحه‌ی من»,
+       which is /my: the side they last opened, a question when they hold both, and the
+       backend for staff.
        Inside a flow it is hidden, so nobody leaves a half-filled step by mistake. The
        classes stay: header_call_to_action_large and _sidebar address the link by
        oe_unremovable. -->
   <template id="header_call_to_action" inherit_id="website.header_call_to_action" name="ایکیکو — دکمهٔ سرصفحه">
     <xpath expr="//a[hasclass('btn_cta')]" position="replace">
-      <t t-set="ikiku_in_flow" t-value="request.httprequest.path.startswith(('/join', '/enter', '/business/need'))"/>
+      <t t-set="ikiku_in_flow" t-value="request.httprequest.path.startswith(('/join', '/enter', '/business/need', '/web/login'))"/>
       <a t-if="not ikiku_in_flow and request.env.user._is_public()" href="/#ikiku-doors"
          class="oe_unremovable btn btn-primary btn_cta">ثبت‌نام</a>
-      <a t-elif="not ikiku_in_flow" href="/me" class="oe_unremovable btn btn-primary btn_cta">صفحه‌ی من</a>
+      <a t-elif="not ikiku_in_flow" href="/my" class="oe_unremovable btn btn-primary btn_cta">صفحه‌ی من</a>
     </xpath>
   </template>
 

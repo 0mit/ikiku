@@ -152,4 +152,38 @@
       <field name="reason">نوعِ همکاری؛ دربارهٔ کار است.</field>
     </record>
   </data>
+  <!-- 2026-09-16: the number's audit fields, and a business with its own place and a holder
+       who may also look for work. New records load on upgrade even though noupdate. -->
+  <data noupdate="1">
+    <record id="vis_res_partner_ikiku_mobile_set_by_id" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_mobile_set_by_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">بند ۷: دربارهٔ شمارهٔ تماس است.</field>
+    </record>
+    <record id="vis_res_partner_ikiku_mobile_state" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_mobile_state</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">بند ۷: دربارهٔ شمارهٔ تماس است.</field>
+    </record>
+    <record id="vis_ikiku_business_partner_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">partner_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">بند ۷: دارندهٔ کافه یک شخص است؛ از صفحه‌های عمومی به کافه‌اش وصل نمی‌شود.</field>
+    </record>
+    <record id="vis_ikiku_business_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">province_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">جای خودِ کافه؛ جای هر نیاز روی خودِ نیاز می‌آید.</field>
+    </record>
+    <record id="vis_ikiku_business_city" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">city</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
+  </data>
 </odoo>
