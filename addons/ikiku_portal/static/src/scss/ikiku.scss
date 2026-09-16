@@ -35,109 +35,293 @@ body :is(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
   font-family: 'Vazirmatn', Tahoma, sans-serif;
 }
 
-.ikiku {
-  --ik-cobalt: #1B4C9E;
-  --ik-copper: #A8632A;
-  --ik-ink: #14191B;
-  --ik-ink-2: #566065;
-  --ik-rule: #D5DBD9;
-  --ik-ground: #F1F3F2;
+// iKiKu's own pages. The look (2026-09-16) follows a friend's mockup reviewed with the
+// operator: a soft ground, white cards, one blue, rounded corners. What that mockup
+// assumed and the مرام‌نامه does not allow (match percentages, visible availability,
+// a public search for people) was left out; this file only styles.
+//
+// NO `direction` and NO left/right anywhere below, on purpose. Odoo builds the RTL
+// bundle by running rtlcss over every frontend stylesheet, which mirrors direction,
+// left/right and 4-value paddings. `direction: rtl; text-align: right` came out of it
+// as ltr/left and put every page left-to-right (seen live 2026-09-13). The page's own
+// dir="rtl" drives the layout; only logical values (start/end, *-inline-*, *-block-*)
+// are used, and rtlcss leaves those alone.
 
-  // NO `direction` and NO left/right here, on purpose. Odoo builds the RTL bundle by running
-  // rtlcss over every frontend stylesheet, which mirrors direction, left/right and 4-value
-  // paddings. `direction: rtl; text-align: right` came out of it as ltr/left and put every page
-  // left-to-right (seen live 2026-09-13). The page's own dir="rtl" drives the layout; only
-  // logical values (start/end, *-inline-*) are used below, and rtlcss leaves those alone.
+// The header's call to action is Odoo's primary button, purple in the default theme.
+header .btn-primary.btn_cta {
+  --btn-bg: #2461C9; --btn-border-color: #2461C9;
+  --btn-hover-bg: #173F86; --btn-hover-border-color: #173F86;
+  --btn-active-bg: #173F86; --btn-active-border-color: #173F86;
+}
+
+// The whole page area takes the ground, or a white strip shows between the header and it.
+main:has(.ikiku), main .ikiku { background: #F6F8FB; }
+
+.ikiku {
+  --ik-blue: #2461C9;       // 5.6:1 on white, so white text on it passes AA
+  --ik-blue-deep: #173F86;
+  --ik-blue-soft: #E9F1FD;
+  --ik-copper: #A8632A;     // kept for what is withheld: privacy, not decoration
+  --ik-ink: #17181C;
+  --ik-ink-2: #5B6472;
+  --ik-rule: #E3E8F0;
+  --ik-ground: #F6F8FB;
+  --ik-paper: #FFFFFF;
+  --ik-night: #1D2430;
+  --ik-shadow: 0 10px 30px rgba(24, 39, 75, .07);
+  --ik-shadow-lift: 0 18px 44px rgba(24, 39, 75, .11);
+  --ik-cobalt: var(--ik-blue);
+
   text-align: start;
   font-family: 'Vazirmatn', Tahoma, sans-serif;
   line-height: 1.9;
   color: var(--ik-ink);
 
-  h1, h2, h3 { font-weight: 700; line-height: 1.5; }
+  h1, h2, h3 { font-weight: 700; line-height: 1.45; color: var(--ik-ink); }
+  h2 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); margin-bottom: .5rem; }
+  a { color: var(--ik-blue); }
+  a:hover { color: var(--ik-blue-deep); }
 
-  &__shell { max-width: 42rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+  // ---- page frames -------------------------------------------------------------
+  &__wide { max-width: 72rem; margin-inline: auto; padding-inline: 1rem; }
 
-  &__step {
-    font-size: .75rem; letter-spacing: .1em; color: var(--ik-copper);
-    font-weight: 700; margin-bottom: .5rem;
+  &__shell {
+    width: calc(100% - 2rem); max-width: 46rem;
+    margin-block: 2rem 4rem; margin-inline: auto;
+    padding-block: 2rem 2.25rem; padding-inline: clamp(1.1rem, 4vw, 2.5rem);
+    background: var(--ik-paper); border: 1px solid var(--ik-rule);
+    border-radius: 26px; box-shadow: var(--ik-shadow);
   }
-  &__question { font-size: 1.5rem; font-weight: 700; margin-bottom: .25rem; }
-  &__help { color: var(--ik-ink-2); font-size: .95rem; margin-bottom: 1.5rem; }
+  &__shell--wide { max-width: 72rem; }
 
-  &__field { width: 100%; padding: .8rem 1rem; border: 1px solid var(--ik-rule);
-             border-radius: 4px; font-family: inherit; font-size: 1.05rem;
-             background: #fff; color: var(--ik-ink); }
-  &__field:focus { outline: 2px solid var(--ik-cobalt); outline-offset: 1px; }
+  &__band { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  &__band--hero {
+    background:
+      radial-gradient(30rem 30rem at 85% 10%, rgba(36, 97, 201, .12), transparent 70%),
+      radial-gradient(22rem 22rem at 10% 90%, rgba(36, 97, 201, .06), transparent 70%),
+      linear-gradient(180deg, #F9FBFF, var(--ik-ground));
+  }
+  &__band--soft { background: var(--ik-paper); border-block: 1px solid var(--ik-rule); }
+  &__band-head {
+    display: flex; flex-wrap: wrap; gap: 1rem 2rem;
+    justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;
+    p { margin-bottom: 0; }
+    .ikiku__secondary { margin-top: 0; }
+  }
 
-  &__go { background: var(--ik-cobalt); color: #fff; border: 0; border-radius: 4px;
-          padding: .8rem 1.6rem; font-family: inherit; font-size: 1.05rem;
-          font-weight: 700; cursor: pointer; margin-top: 1.25rem; }
-
-  // The proposal list: we guessed, you decide.
-  &__proposals { list-style: none; padding: 0; margin: 1rem 0; display: flex;
-                 flex-direction: column; gap: .5rem; }
-  &__proposal { border: 1px solid var(--ik-rule); border-radius: 4px; padding: .8rem 1rem;
-                background: #fff; display: flex; justify-content: space-between;
-                align-items: center; gap: 1rem; }
-  &__proposal button { border: 0; background: var(--ik-cobalt); color: #fff;
-                       border-radius: 3px; padding: .4rem 1rem; cursor: pointer;
-                       font-family: inherit; }
-
-  &__note { border-inline-start: 3px solid var(--ik-copper); padding-inline-start: 1rem;
-            color: var(--ik-ink-2); font-size: .9rem; margin: 1.25rem 0; }
-
-  &__card { border: 1px solid var(--ik-rule); border-radius: 4px; padding: 1rem;
-            background: #fff; margin-bottom: .75rem; }
+  // ---- type --------------------------------------------------------------------
+  &__kicker, &__step {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .8rem; font-weight: 700; color: var(--ik-blue); margin-bottom: .35rem;
+  }
+  &__kicker::before, &__step::before {
+    content: ""; width: 1.5rem; height: 2px; border-radius: 2px; background: currentColor;
+  }
+  &__ask { font-size: clamp(3rem, 9vw, 5.5rem); font-weight: 700; line-height: 1.2; margin-block: 0 .75rem; }
+  &__lede { font-size: 1.15rem; color: #3F4652; max-width: 38rem; }
+  &__question { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: .25rem; }
+  &__help { color: var(--ik-ink-2); font-size: .98rem; margin-bottom: 1.5rem; }
   &__muted { color: var(--ik-ink-2); font-size: .88rem; }
   &__withheld { color: var(--ik-copper); font-size: .85rem; }
-
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: start; font-size: .75rem; letter-spacing: .06em;
-       color: var(--ik-ink-2); border-bottom: 1px solid var(--ik-rule);
-       padding-block: 0 .5rem; padding-inline: .5rem 0; }
-  td { padding-block: .6rem; padding-inline: .5rem 0; border-bottom: 1px solid var(--ik-rule); }
-  ol { list-style-type: persian; }
-
-  // The site: home, the two doors, the manifest, the footer.
-  &__wide { max-width: 64rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
-  &__kicker { font-size: .8rem; letter-spacing: .08em; color: var(--ik-copper);
-              font-weight: 700; margin-bottom: .25rem; }
-  &__ask { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 700; line-height: 1.3;
-           margin: 0 0 .75rem; }
-  &__lede { font-size: 1.15rem; max-width: 40rem; }
-  &__hero { padding: 1rem 0; }
-
-  &__doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-             gap: 1rem; margin: 1.5rem 0 2.5rem; }
-  &__door { display: flex; flex-direction: column; gap: .5rem; padding: 1.5rem;
-            background: #fff; border: 1px solid var(--ik-rule); border-radius: 6px;
-            color: var(--ik-ink); text-decoration: none; }
-  &__door:hover, &__door:focus-visible { border-color: var(--ik-cobalt); color: var(--ik-ink); }
-  &__door-ask { font-size: 2.5rem; font-weight: 700; color: var(--ik-cobalt); line-height: 1.2; }
-  &__door-who { font-size: 1.2rem; }
-  &__door-go { margin-top: auto; color: var(--ik-cobalt); font-weight: 700; }
-
-  &__section { margin: 2.5rem 0; }
-  &__steps, &__tenets, &__ledgers { padding-inline-start: 1.25rem; }
-  &__steps li, &__tenets li, &__ledgers li { margin-bottom: .6rem; }
   &__link { font-weight: 700; }
 
+  // ---- home: hero and the two doors -------------------------------------------
+  &__hero {
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center;
+  }
+  &__doors { display: grid; gap: 1rem; }
+  &__door {
+    display: grid; grid-template-columns: auto 1fr; column-gap: 1.25rem; row-gap: .3rem;
+    padding: 1.4rem 1.5rem; background: var(--ik-paper); color: var(--ik-ink);
+    border: 1px solid var(--ik-rule); border-radius: 22px; box-shadow: var(--ik-shadow);
+    text-decoration: none; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    > * { grid-column: 2; }
+  }
+  a.ikiku__door { color: var(--ik-ink); }
+  &__door:hover, &__door:focus-visible {
+    color: var(--ik-ink); border-color: rgba(36, 97, 201, .4);
+    box-shadow: var(--ik-shadow-lift); transform: translateY(-3px);
+  }
+  &__door-ask {
+    grid-column: 1 !important; grid-row: 1 / span 3;
+    font-size: 2.75rem; font-weight: 700; line-height: 1.1; color: var(--ik-blue);
+  }
+  &__door-who { font-size: 1.2rem; }
+  &__door span:not([class]) { color: var(--ik-ink-2); font-size: .95rem; }
+  &__door-go {
+    justify-self: start; margin-top: .5rem; padding-block: .4rem; padding-inline: 1rem;
+    border-radius: 12px; background: var(--ik-blue); color: #fff; font-weight: 700; font-size: .95rem;
+  }
+
+  // ---- open jobs ---------------------------------------------------------------
+  &__jobs { display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: 1rem; }
+  &__job {
+    padding: 1.25rem 1.35rem; background: var(--ik-paper);
+    border: 1px solid var(--ik-rule); border-radius: 20px; box-shadow: var(--ik-shadow);
+    h3 { font-size: 1.15rem; margin-block: .6rem .15rem; }
+    p { margin: 0; }
+  }
+  &__shell &__job { box-shadow: none; }
+  &__job-seats {
+    display: inline-block; padding-block: .1rem; padding-inline: .75rem; border-radius: 999px;
+    background: var(--ik-blue-soft); color: var(--ik-blue); font-size: .8rem; font-weight: 700;
+  }
+  &__job-where { color: var(--ik-ink-2); }
+  &__job-when { font-size: .9rem; }
+  &__empty {
+    padding: 1.5rem; border: 1px dashed var(--ik-rule); border-radius: 20px;
+    background: var(--ik-paper); color: var(--ik-ink-2); text-align: center;
+  }
+  &__filter {
+    display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-bottom: 1.25rem;
+    .ikiku__field { width: auto; min-width: 14rem; flex: 1 1 14rem; }
+    .ikiku__go { margin-top: 0; }
+  }
+
+  // ---- how it works: numbered cards ---------------------------------------------
+  ol.ikiku__steps, &__steps {
+    list-style: none; padding: 0; margin-block: 1.5rem; counter-reset: ik-step;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem;
+  }
+  &__steps li {
+    counter-increment: ik-step; margin: 0; padding: 1.25rem;
+    background: var(--ik-paper); border: 1px solid var(--ik-rule); border-radius: 20px;
+    color: var(--ik-ink-2); font-size: .95rem; line-height: 1.8;
+    strong { display: block; color: var(--ik-ink); font-size: 1.05rem; margin-bottom: .2rem; }
+  }
+  &__steps li::before {
+    content: counter(ik-step, persian);
+    display: grid; place-items: center; width: 2.25rem; height: 2.25rem; margin-bottom: .75rem;
+    border-radius: 12px; background: var(--ik-blue-soft); color: var(--ik-blue); font-weight: 700;
+  }
+  &__shell &__steps li { background: var(--ik-ground); border-color: transparent; }
+  &__band--soft &__steps li { background: var(--ik-ground); border-color: transparent; }
+
+  // ---- what we hold to, and what is in the open ------------------------------------
+  &__trust { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 1.25rem; }
+  &__tenets-panel {
+    padding: clamp(1.4rem, 3vw, 2.2rem); border-radius: 26px;
+    background: linear-gradient(180deg, #1D2430, #243040); color: rgba(255, 255, 255, .78);
+    box-shadow: var(--ik-shadow);
+    h2 { color: #fff; }
+    .ikiku__kicker { color: #B8D3FF; }
+    a.ikiku__link { color: #B8D3FF; }
+  }
+  &__tenets {
+    list-style: none; padding: 0; margin-block: 1rem;
+    li {
+      margin-bottom: .6rem; padding-block: .8rem; padding-inline: 1rem; border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .1); background: rgba(255, 255, 255, .04); font-size: .95rem;
+    }
+    strong { display: block; color: #fff; }
+  }
+  &__ledgers-panel {
+    padding: clamp(1.4rem, 3vw, 2.2rem); border-radius: 26px;
+    background: var(--ik-paper); border: 1px solid var(--ik-rule); box-shadow: var(--ik-shadow);
+  }
+  &__ledgers {
+    list-style: none; padding: 0; margin-block: 1rem 0;
+    li { margin-bottom: .6rem; }
+    a {
+      display: block; padding-block: .85rem; padding-inline: 1rem; border-radius: 14px;
+      background: var(--ik-ground); border: 1px solid transparent; color: var(--ik-ink); text-decoration: none;
+    }
+    a:hover, a:focus-visible { border-color: rgba(36, 97, 201, .35); color: var(--ik-ink); }
+    strong { display: block; }
+    span { display: block; color: var(--ik-ink-2); font-size: .88rem; }
+  }
+
+  // ---- forms and actions (the join flows) ----------------------------------------
+  label { font-weight: 700; font-size: .9rem; }
+  &__field {
+    width: 100%; padding-block: .75rem; padding-inline: 1rem; border: 1px solid var(--ik-rule);
+    border-radius: 12px; font-family: inherit; font-size: 1.05rem; background: #fff; color: var(--ik-ink);
+  }
+  &__field:focus { outline: 2px solid var(--ik-blue); outline-offset: 1px; border-color: transparent; }
+
+  &__go {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 3rem;
+    background: var(--ik-blue); color: #fff; border: 0; border-radius: 12px;
+    padding-block: .65rem; padding-inline: 1.6rem; font-family: inherit; font-size: 1.02rem;
+    font-weight: 700; cursor: pointer; margin-top: 1.25rem; text-decoration: none;
+    box-shadow: 0 8px 20px rgba(36, 97, 201, .2); transition: background-color .2s ease;
+  }
+  a.ikiku__go, a.ikiku__go:hover { color: #fff; }
+  &__go:hover { background: var(--ik-blue-deep); }
+  &__secondary {
+    display: inline-flex; align-items: center; min-height: 3rem; margin-top: 1.25rem;
+    padding-block: .6rem; padding-inline: 1.4rem; border-radius: 12px; text-decoration: none;
+    background: var(--ik-paper); border: 1px solid var(--ik-rule); color: var(--ik-ink); font-weight: 700;
+    font-family: inherit; font-size: 1rem; cursor: pointer;
+  }
+  a.ikiku__secondary { color: var(--ik-ink); }
+  &__secondary:hover, a.ikiku__secondary:hover { border-color: var(--ik-blue); color: var(--ik-blue); }
   &__actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
-  a.ikiku__go { display: inline-block; text-decoration: none; }
-  a.ikiku__go:hover { color: #fff; opacity: .92; }
-  &__secondary { display: inline-block; text-decoration: none; margin-top: 1.25rem;
-                 border: 1px solid var(--ik-cobalt); color: var(--ik-cobalt);
-                 border-radius: 4px; padding: .75rem 1.4rem; font-weight: 700; }
 
+  // The proposal list: we guessed, you decide.
+  &__proposals { list-style: none; padding: 0; margin-block: 1rem; display: flex; flex-direction: column; gap: .5rem; }
+  &__proposal {
+    border: 1px solid var(--ik-rule); border-radius: 14px; padding-block: .8rem; padding-inline: 1rem;
+    background: #fff; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  }
+  &__proposal button {
+    border: 0; background: var(--ik-blue); color: #fff; border-radius: 10px;
+    padding-block: .4rem; padding-inline: 1rem; cursor: pointer; font-family: inherit; font-weight: 700;
+  }
+
+  &__note {
+    border-inline-start: 3px solid var(--ik-copper); border-radius: 12px;
+    background: rgba(168, 99, 42, .06); padding-block: .75rem; padding-inline: 1rem;
+    color: #4A4F57; font-size: .92rem; margin-block: 1.25rem;
+  }
+  &__card {
+    border: 1px solid var(--ik-rule); border-radius: 16px; padding: 1rem 1.15rem;
+    background: #fff; margin-bottom: .75rem;
+  }
+
+  // ---- tables: the public ledgers ------------------------------------------------
+  &__table { overflow-x: auto; margin-block: 1rem; border: 1px solid var(--ik-rule); border-radius: 16px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  &__table table { min-width: 36rem; }
+  th {
+    text-align: start; font-size: .8rem; font-weight: 700; color: var(--ik-ink-2);
+    background: var(--ik-ground); padding-block: .6rem; padding-inline: .9rem;
+  }
+  td { padding-block: .65rem; padding-inline: .9rem; border-top: 1px solid var(--ik-rule); }
+  ol { list-style-type: persian; }
+
+  &__manifest { line-height: 2.05; }
   &__manifest h1 { font-size: 2.25rem; }
-  &__manifest h2 { margin-top: 2rem; }
-  &__manifest hr { margin: 2rem 0; border-color: var(--ik-rule); }
+  &__manifest h2 { margin-top: 2rem; font-size: 1.5rem; }
+  &__manifest hr { margin-block: 2rem; border-color: var(--ik-rule); }
 
-  &__footer { background: var(--ik-ground); border-top: 1px solid var(--ik-rule); }
-  &__footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-                   gap: 1.5rem; padding-bottom: 1.5rem; }
+  // ---- footer and header brand ----------------------------------------------------
+  &__footer { background: var(--ik-paper); border-top: 1px solid var(--ik-rule); padding-top: 2.5rem; }
+  &__footer-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1.5rem; padding-bottom: 1.5rem;
+  }
   &__footer h5 { font-weight: 700; }
+  &__footer a { color: var(--ik-ink-2); }
+  &__footer a:hover { color: var(--ik-blue); }
 
-  &__brand { font-family: 'Vazirmatn', Tahoma, sans-serif; font-weight: 700; font-size: 1.5rem;
-             color: var(--ik-ink); line-height: 1; }
+  &__brand {
+    font-family: 'Vazirmatn', Tahoma, sans-serif; font-weight: 700; font-size: 1.5rem;
+    color: var(--ik-blue); line-height: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .ikiku__hero, .ikiku__trust { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .ikiku__door { grid-template-columns: 1fr; padding: 1.2rem; }
+  .ikiku__door > *, .ikiku__door-ask { grid-column: 1 !important; grid-row: auto; }
+  .ikiku__door-ask { font-size: 2.25rem; }
+  .ikiku__band-head .ikiku__secondary { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ikiku * { transition: none !important; }
+  .ikiku__door:hover { transform: none; }
 }

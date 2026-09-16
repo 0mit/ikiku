@@ -10,75 +10,134 @@
   </template>
 
   <template id="home_content" name="ایکیکو — محتوای خانه">
-    <div class="ikiku"><div class="ikiku__wide">
+    <t t-set="Demand" t-value="request.env['ikiku.demand']"/>
+    <t t-set="jobs" t-value="Demand.ikiku_public_open(limit=6)"/>
+    <t t-set="jobs_count" t-value="Demand.ikiku_public_open_count()"/>
+    <div class="ikiku">
 
-      <section class="ikiku__hero">
-        <p class="ikiku__kicker">ایکیکو · نیروی حرفه‌ای و کسب‌وکارِ کافه و رستوران</p>
-        <h1 class="ikiku__ask">آیکی؟ کو؟</h1>
-        <p class="ikiku__lede">
-          این نام دو پرسش است: <strong>کی؟</strong> و <strong>کو؟</strong> — چه کسی، و کجا.
-          کارِ ایکیکو این است که آیکی، حتی آن کس که هنوز نمی‌شناسی‌اش، بدل شود به کسی
-          که می‌شناسی‌اش، و می‌دانی کجاست.
-        </p>
+      <section class="ikiku__band ikiku__band--hero">
+        <div class="ikiku__wide ikiku__hero">
+          <div class="ikiku__hero-copy">
+            <p class="ikiku__kicker">ایکیکو · نیروی حرفه‌ای و کسب‌وکارِ کافه و رستوران</p>
+            <h1 class="ikiku__ask">آیکی؟ کو؟</h1>
+            <p class="ikiku__lede">
+              این نام دو پرسش است: <strong>کی؟</strong> و <strong>کو؟</strong> — چه کسی، و کجا.
+              کارِ ایکیکو این است که آیکی، حتی آن کس که هنوز نمی‌شناسی‌اش، بدل شود به کسی
+              که می‌شناسی‌اش، و می‌دانی کجاست.
+            </p>
+          </div>
+
+          <div id="ikiku-doors" class="ikiku__doors">
+            <a class="ikiku__door" href="/ikiku/ki">
+              <span class="ikiku__door-ask">کی؟</span>
+              <strong class="ikiku__door-who">نیروی کار هستم</strong>
+              <span>ظرفشور، باریستا، آشپز، گارسون. پرونده‌ای روشن از مهارت و سابقه‌تان به نامِ خودتان
+                بسازید، و بگویید از کِی تا کِی و در کجا می‌توانید کار کنید.</span>
+              <span class="ikiku__door-go">ساختِ پرونده</span>
+            </a>
+            <a class="ikiku__door" href="/ikiku/ku">
+              <span class="ikiku__door-ask">کو؟</span>
+              <strong class="ikiku__door-who">کسب‌وکار دارم</strong>
+              <span>کافه یا رستوران. جایگاه‌های کاری‌تان را تعریف کنید و نیازِ سه ماهِ بعد را
+                همین حالا اعلام کنید؛ هرچه زودتر، انتخابِ بیشتر.</span>
+              <span class="ikiku__door-go">تعریفِ جایگاه</span>
+            </a>
+          </div>
+        </div>
       </section>
 
-      <section id="ikiku-doors" class="ikiku__doors">
-        <a class="ikiku__door" href="/ikiku/ki">
-          <span class="ikiku__door-ask">کی؟</span>
-          <strong class="ikiku__door-who">نیروی کار هستم</strong>
-          <span>ظرفشور، باریستا، آشپز، گارسون. پرونده‌ای روشن از مهارت و سابقه‌تان به نامِ خودتان
-            بسازید، و بگویید از کِی تا کِی و در کجا می‌توانید کار کنید.</span>
-          <span class="ikiku__door-go">ساختِ پرونده</span>
-        </a>
-        <a class="ikiku__door" href="/ikiku/ku">
-          <span class="ikiku__door-ask">کو؟</span>
-          <strong class="ikiku__door-who">کسب‌وکار دارم</strong>
-          <span>کافه یا رستوران. جایگاه‌های کاری‌تان را تعریف کنید و نیازِ سه ماهِ بعد را
-            همین حالا اعلام کنید؛ هرچه زودتر، انتخابِ بیشتر.</span>
-          <span class="ikiku__door-go">تعریفِ جایگاه</span>
-        </a>
+      <section class="ikiku__band">
+        <div class="ikiku__wide">
+          <div class="ikiku__band-head">
+            <div>
+              <p class="ikiku__kicker">در روشنایی</p>
+              <h2>کارهای باز</h2>
+              <p class="ikiku__muted">نیازهایی که کسب‌وکارها اعلام کرده‌اند. نامِ کسب‌وکار و محلِ کار
+                اینجا نوشته نمی‌شود.</p>
+            </div>
+            <a t-if="jobs_count" class="ikiku__secondary" href="/ikiku/jobs">
+              همهٔ کارهای باز (<t t-out="Demand.ikiku_fa_digits(jobs_count)"/>)</a>
+          </div>
+          <t t-call="ikiku_portal.job_cards"/>
+        </div>
       </section>
 
-      <section class="ikiku__section">
-        <h2>چطور کار می‌کند</h2>
-        <ol class="ikiku__steps">
-          <li><strong>پرونده.</strong> نیرو مهارت‌هایش را به زبانِ خودش می‌نویسد؛ سامانه مهارتِ
-            استاندارد را پیشنهاد می‌دهد و خودِ او تأیید می‌کند.</li>
-          <li><strong>نیاز.</strong> کسب‌وکار جایگاهش را تعریف می‌کند و نیازِ هر دوره را از پیش
-            اعلام می‌کند: چند نفر، از کِی تا کِی، کجا.</li>
-          <li><strong>پیشنهاد.</strong> این دو پیش از موعد به هم می‌رسند، با رتبه‌ای که راهِ
-            رسیدن به هر عددش پیداست.</li>
-          <li><strong>تعهد.</strong> هر گمارش در دفترِ عمومی ثبت می‌شود — و هر لغو هم.</li>
-        </ol>
+      <section class="ikiku__band ikiku__band--soft">
+        <div class="ikiku__wide">
+          <div class="ikiku__band-head">
+            <div>
+              <p class="ikiku__kicker">از پرونده تا تعهد</p>
+              <h2>چطور کار می‌کند</h2>
+            </div>
+          </div>
+          <ol class="ikiku__steps">
+            <li><strong>پرونده.</strong> نیرو مهارت‌هایش را به زبانِ خودش می‌نویسد؛ سامانه مهارتِ
+              استاندارد را پیشنهاد می‌دهد و خودِ او تأیید می‌کند.</li>
+            <li><strong>نیاز.</strong> کسب‌وکار جایگاهش را تعریف می‌کند و نیازِ هر دوره را از پیش
+              اعلام می‌کند: چند نفر، از کِی تا کِی، کجا.</li>
+            <li><strong>پیشنهاد.</strong> این دو پیش از موعد به هم می‌رسند، با رتبه‌ای که راهِ
+              رسیدن به هر عددش پیداست.</li>
+            <li><strong>تعهد.</strong> هر گمارش در دفترِ عمومی ثبت می‌شود — و هر لغو هم.</li>
+          </ol>
+        </div>
       </section>
 
-      <section class="ikiku__section">
-        <h2>آنچه به آن پایبندیم</h2>
-        <ul class="ikiku__tenets">
-          <li><strong>کار، حیثیت است.</strong> هیچ کاری «ساده» نیست؛ در ایکیکو آدم‌ها شماره نیستند.</li>
-          <li><strong>اعتماد، قابلِ حمل است.</strong> آبرویی که به دست می‌آورید به نامِ خودتان نوشته
-            می‌شود و با شما می‌رود؛ به شهرِ دیگر، به شغلِ دیگر.</li>
-          <li><strong>هر ادعا صاحبی دارد.</strong> داده‌ای که نتوان پرسید «این را که گفت؟» داده نیست.</li>
-          <li><strong>ایمنیِ آدم‌ها، پیش از شفافیت.</strong> حرفهٔ شما عمومی است؛ نشانی، شمارهٔ تماس،
-            کدِ ملی و برنامهٔ زمانیِ شما نه.</li>
-          <li><strong>واسطه‌ایم، نه دلال.</strong> هیچ‌کس نمی‌تواند با پول رتبه‌اش را بالا ببرد یا
-            نقدی را پاک کند.</li>
-        </ul>
-        <p><a class="ikiku__link" href="/ikiku/manifest">مرام‌نامه را کامل بخوانید</a></p>
+      <section class="ikiku__band">
+        <div class="ikiku__wide ikiku__trust">
+          <div class="ikiku__tenets-panel">
+            <p class="ikiku__kicker">مرام‌نامه</p>
+            <h2>آنچه به آن پایبندیم</h2>
+            <ul class="ikiku__tenets">
+              <li><strong>کار، حیثیت است.</strong> هیچ کاری «ساده» نیست؛ در ایکیکو آدم‌ها شماره نیستند.</li>
+              <li><strong>اعتماد، قابلِ حمل است.</strong> آبرویی که به دست می‌آورید به نامِ خودتان نوشته
+                می‌شود و با شما می‌رود؛ به شهرِ دیگر، به شغلِ دیگر.</li>
+              <li><strong>هر ادعا صاحبی دارد.</strong> داده‌ای که نتوان پرسید «این را که گفت؟» داده نیست.</li>
+              <li><strong>ایمنیِ آدم‌ها، پیش از شفافیت.</strong> حرفهٔ شما عمومی است؛ نشانی، شمارهٔ تماس،
+                کدِ ملی و برنامهٔ زمانیِ شما نه.</li>
+              <li><strong>واسطه‌ایم، نه دلال.</strong> هیچ‌کس نمی‌تواند با پول رتبه‌اش را بالا ببرد یا
+                نقدی را پاک کند.</li>
+            </ul>
+            <p><a class="ikiku__link" href="/ikiku/manifest">مرام‌نامه را کامل بخوانید</a></p>
+          </div>
+
+          <div class="ikiku__ledgers-panel">
+            <p class="ikiku__kicker">هر کسی می‌تواند ببیند</p>
+            <h2>در روشنایی</h2>
+            <ul class="ikiku__ledgers">
+              <li><a href="/ikiku/jobs"><strong>کارهای باز</strong>
+                <span>نیازهایی که کسب‌وکارها اعلام کرده‌اند.</span></a></li>
+              <li><a href="/ikiku/bookings"><strong>دفترِ عمومیِ تعهدها</strong>
+                <span>هر گمارش، و هر لغو.</span></a></li>
+              <li><a href="/ikiku/costs"><strong>هزینهٔ مشترک</strong>
+                <span>هزینهٔ واقعیِ اداره‌کردنِ ایکیکو و سهمِ هر روز-نفر.</span></a></li>
+            </ul>
+          </div>
+        </div>
       </section>
 
-      <section class="ikiku__section">
-        <h2>در روشنایی</h2>
-        <ul class="ikiku__ledgers">
-          <li><a href="/ikiku/jobs">کارهای باز</a> — نیازهایی که کسب‌وکارها اعلام کرده‌اند.</li>
-          <li><a href="/ikiku/bookings">دفترِ عمومیِ تعهدها</a> — هر گمارش، و هر لغو.</li>
-          <li><a href="/ikiku/costs">هزینهٔ مشترک</a> — هزینهٔ واقعیِ اداره‌کردنِ ایکیکو و سهمِ
-            هر روز-نفر.</li>
-        </ul>
-      </section>
+      <div class="ikiku__wide">
+        <p class="ikiku__muted">آغازِ کار: کافه‌ها و رستوران‌های ایران. مرام‌نامه هنوز پیش‌نویس است.</p>
+      </div>
+    </div>
+  </template>
 
-      <p class="ikiku__muted">آغازِ کار: کافه‌ها و رستوران‌های ایران. مرام‌نامه هنوز پیش‌نویس است.</p>
-    </div></div>
+  <!-- Open needs as cards. Fed only by ikiku.demand.ikiku_public_open(), which hands over
+       plain public values, never the record: nothing here can print the business. -->
+  <template id="job_cards" name="ایکیکو — کارتِ کارهای باز">
+    <div t-if="jobs" class="ikiku__jobs">
+      <t t-foreach="jobs" t-as="job">
+        <article class="ikiku__job">
+          <span class="ikiku__job-seats"><t t-out="job['seats']"/> نفر</span>
+          <h3 t-out="job['position']"/>
+          <p class="ikiku__job-where" t-out="job['province']"/>
+          <p class="ikiku__job-when">
+            از <span t-out="job['date_start_fa']"/> تا <span t-out="job['date_end_fa']"/></p>
+        </article>
+      </t>
+    </div>
+    <div t-else="" class="ikiku__empty">
+      هنوز نیازی اعلام نشده است. <a href="/ikiku/ku">نخستین کسب‌وکار باشید</a>.
+    </div>
   </template>
 
   <!-- Shared by both doors: signup and login, each carrying the redirect into the right flow. -->

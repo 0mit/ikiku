@@ -3,7 +3,7 @@
 
   <template id="public_profile" name="ایکیکو — پروندهٔ عمومی">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question" t-out="values.get('name')"/>
         <p class="ikiku__help" t-out="values.get('headline')"/>
         <div class="ikiku__card">
@@ -20,24 +20,26 @@
         </div>
 
         <h3>ادعاها و راست‌آزمایی‌ها</h3>
-        <table>
-          <thead><tr>
-            <th>ادعا</th><th>گویندهٔ ادعا</th><th>از چه راه</th>
-            <th>تأیید</th><th>اعتراض</th><th>وضعیت</th>
-          </tr></thead>
-          <tbody>
-            <t t-foreach="assertions" t-as="a">
-              <tr>
-                <td t-out="a.spec_node_id.name or a.value_text"/>
-                <td t-out="a.asserted_by_id.name"/>
-                <td t-out="dict(a._fields['method'].selection).get(a.method)"/>
-                <td t-out="a.confirm_count"/>
-                <td t-out="a.dispute_count"/>
-                <td t-out="dict(a._fields['state'].selection).get(a.state)"/>
-              </tr>
-            </t>
-          </tbody>
-        </table>
+        <div class="ikiku__table">
+          <table>
+            <thead><tr>
+              <th>ادعا</th><th>گویندهٔ ادعا</th><th>از چه راه</th>
+              <th>تأیید</th><th>اعتراض</th><th>وضعیت</th>
+            </tr></thead>
+            <tbody>
+              <t t-foreach="assertions" t-as="a">
+                <tr>
+                  <td t-out="a.spec_node_id.name or a.value_text"/>
+                  <td t-out="a.asserted_by_id.name"/>
+                  <td t-out="dict(a._fields['method'].selection).get(a.method)"/>
+                  <td t-out="a.confirm_count"/>
+                  <td t-out="a.dispute_count"/>
+                  <td t-out="dict(a._fields['state'].selection).get(a.state)"/>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
         <p class="ikiku__muted">
           هیچ ستاره‌ای بدونِ زنجیره‌اش نشان داده نمی‌شود. هر ادعا صاحبی دارد و
           هر رأیی قابلِ اعتراض است.
@@ -66,22 +68,24 @@
 
   <template id="public_jobs" name="ایکیکو — کارهای باز">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
+        <p class="ikiku__kicker">در روشنایی</p>
         <h1 class="ikiku__question">کارهای باز</h1>
-        <table>
-          <thead><tr><th>جایگاه</th><th>استان</th><th>از</th><th>تا</th><th>نفر</th></tr></thead>
-          <tbody>
-            <t t-foreach="demands" t-as="d">
-              <tr>
-                <td t-out="d.position_id.spec_node_id.name"/>
-                <td t-out="d.province_id.name"/>
-                <td t-out="d.date_start_fa"/>
-                <td t-out="d.date_end_fa"/>
-                <td t-out="d.seats"/>
-              </tr>
+        <p class="ikiku__help">
+          نیازهایی که کسب‌وکارها اعلام کرده‌اند. نامِ کسب‌وکار و محلِ کار اینجا نوشته نمی‌شود.
+        </p>
+        <form class="ikiku__filter" action="/ikiku/jobs" method="get">
+          <label for="province">استان</label>
+          <select class="ikiku__field" id="province" name="province">
+            <option value="">همهٔ استان‌ها</option>
+            <t t-foreach="provinces" t-as="p">
+              <option t-att-value="p.id" t-att-selected="'selected' if p.id == province_id else None"
+                      t-out="p.name"/>
             </t>
-          </tbody>
-        </table>
+          </select>
+          <button class="ikiku__go" type="submit">نمایش</button>
+        </form>
+        <t t-call="ikiku_portal.job_cards"/>
         <p class="ikiku__muted">
           نامِ جایگاه بر پایهٔ استانداردِ مشترک نوشته شده، نه عنوانِ داخلیِ هر مغازه —
           تا کسی که جای دیگری آموزش دیده بفهمد این کار چیست.
@@ -92,46 +96,48 @@
 
   <template id="public_bookings" name="ایکیکو — دفترِ عمومیِ تعهدها">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question">دفترِ عمومیِ تعهدها</h1>
         <div class="ikiku__note">
           هر گمارش همان لحظه اینجا ثبت می‌شود، و هر لغو هم. محلِ کار تا آغازِ کار
           نوشته نمی‌شود. تعهدی که عمومی اعلام شده، بی‌سروصدا پس گرفته نمی‌شود.
         </div>
-        <table>
-          <thead><tr>
-            <th>شناسه</th><th>نیرو</th><th>از</th><th>تا</th><th>استان</th>
-            <th>محلِ کار</th><th>وضعیت</th>
-          </tr></thead>
-          <tbody>
-            <t t-foreach="bookings" t-as="b">
-              <tr>
-                <td t-out="b['ref']"/>
-                <td><a t-att-href="'/ikiku/p/%s' % b['resource_slug']" t-out="b['resource']"/></td>
-                <td t-out="b['date_start_fa']"/>
-                <td t-out="b['date_end_fa']"/>
-                <td t-out="b['province']"/>
-                <td>
-                  <t t-if="b['business']"><span t-out="b['business']"/></t>
-                  <t t-else=""><span class="ikiku__withheld">تا آغازِ کار</span></t>
-                </td>
-                <td>
-                  <t t-if="b['cancelled']">
-                    <span class="ikiku__withheld">لغو — <t t-out="b['cancel_reason']"/></span>
-                  </t>
-                  <t t-else=""><span t-out="b['state']"/></t>
-                </td>
-              </tr>
-            </t>
-          </tbody>
-        </table>
+        <div class="ikiku__table">
+          <table>
+            <thead><tr>
+              <th>شناسه</th><th>نیرو</th><th>از</th><th>تا</th><th>استان</th>
+              <th>محلِ کار</th><th>وضعیت</th>
+            </tr></thead>
+            <tbody>
+              <t t-foreach="bookings" t-as="b">
+                <tr>
+                  <td t-out="b['ref']"/>
+                  <td><a t-att-href="'/ikiku/p/%s' % b['resource_slug']" t-out="b['resource']"/></td>
+                  <td t-out="b['date_start_fa']"/>
+                  <td t-out="b['date_end_fa']"/>
+                  <td t-out="b['province']"/>
+                  <td>
+                    <t t-if="b['business']"><span t-out="b['business']"/></t>
+                    <t t-else=""><span class="ikiku__withheld">تا آغازِ کار</span></t>
+                  </td>
+                  <td>
+                    <t t-if="b['cancelled']">
+                      <span class="ikiku__withheld">لغو — <t t-out="b['cancel_reason']"/></span>
+                    </t>
+                    <t t-else=""><span t-out="b['state']"/></t>
+                  </td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
       </div></div>
     </t>
   </template>
 
   <template id="public_costs" name="ایکیکو — هزینهٔ مشترک">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question">هزینهٔ مشترک</h1>
         <div class="ikiku__note">
           ایکیکو از فاصلهٔ میان کارگر و کارفرما نان نمی‌خورد. هزینهٔ واقعیِ اداره‌کردنِ
@@ -139,25 +145,27 @@
           تقسیم می‌شود. هرچه سامانه بزرگ‌تر شود، سهمِ هر روز-نفر کمتر — و آن عدد
           همین‌جا نوشته می‌شود تا بشود بررسی‌اش کرد.
         </div>
-        <table>
-          <thead><tr>
-            <th>دوره</th><th>از</th><th>تا</th><th>روز-نفر</th>
-            <th>کسب‌وکار</th><th>نرخِ هر روز-نفر</th><th>تغییر نسبت به دورهٔ پیش</th>
-          </tr></thead>
-          <tbody>
-            <t t-foreach="periods" t-as="p">
-              <tr>
-                <td t-out="p.name"/>
-                <td t-out="p.date_start_fa"/>
-                <td t-out="p.date_end_fa"/>
-                <td t-out="p.total_person_days"/>
-                <td t-out="p.business_count"/>
-                <td t-out="p.rate_per_person_day"/>
-                <td t-out="'%.1f%%' % p.rate_change_pct"/>
-              </tr>
-            </t>
-          </tbody>
-        </table>
+        <div class="ikiku__table">
+          <table>
+            <thead><tr>
+              <th>دوره</th><th>از</th><th>تا</th><th>روز-نفر</th>
+              <th>کسب‌وکار</th><th>نرخِ هر روز-نفر</th><th>تغییر نسبت به دورهٔ پیش</th>
+            </tr></thead>
+            <tbody>
+              <t t-foreach="periods" t-as="p">
+                <tr>
+                  <td t-out="p.name"/>
+                  <td t-out="p.date_start_fa"/>
+                  <td t-out="p.date_end_fa"/>
+                  <td t-out="p.total_person_days"/>
+                  <td t-out="p.business_count"/>
+                  <td t-out="p.rate_per_person_day"/>
+                  <td t-out="'%.1f%%' % p.rate_change_pct"/>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
       </div></div>
     </t>
   </template>

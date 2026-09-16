@@ -32,10 +32,13 @@ class IkikuPublic(http.Controller):
         })
 
     @http.route('/ikiku/jobs', type='http', auth='public', website=True)
-    def public_jobs(self, **kw):
-        demands = request.env['ikiku.demand'].sudo().search(
-            [('state', 'in', ('open', 'proposed'))], order='date_start')
-        return request.render('ikiku_portal.public_jobs', {'demands': demands})
+    def public_jobs(self, province=None, **kw):
+        province_id = int(province) if province and str(province).isdigit() else None
+        return request.render('ikiku_portal.public_jobs', {
+            'jobs': request.env['ikiku.demand'].ikiku_public_open(province_id=province_id),
+            'provinces': request.env['ikiku.province'].sudo().search([]),
+            'province_id': province_id,
+        })
 
     @http.route('/ikiku/bookings', type='http', auth='public', website=True)
     def public_bookings(self, **kw):
