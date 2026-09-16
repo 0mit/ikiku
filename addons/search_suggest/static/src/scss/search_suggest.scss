@@ -1,0 +1,50 @@
+// Part of search_suggest. Licensed under AGPL-3.0.
+// Logical properties only, so the same rules serve right-to-left and left-to-right pages.
+// Colours come from custom properties a site may set; the fallbacks are neutral.
+.search-suggest {
+  position: relative;
+}
+.search-suggest__list {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  z-index: 20;
+  margin: .25rem 0 0;
+  padding: .25rem;
+  list-style: none;
+  max-block-size: 22rem;
+  overflow-y: auto;
+  background: var(--search-suggest-bg, #fff);
+  border: 1px solid var(--search-suggest-border, #d9dce1);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(20, 24, 31, .12);
+}
+.search-suggest__option {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  min-block-size: 2.75rem;
+  justify-content: center;
+  padding-block: .45rem;
+  padding-inline: .75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.search-suggest__option[aria-selected="true"],
+.search-suggest__option:hover {
+  background: var(--search-suggest-active, #eef3fc);
+}
+.search-suggest__label {
+  font-weight: 700;
+}
+.search-suggest__detail {
+  color: var(--search-suggest-muted, #5b616b);
+}
+.search-suggest__status {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
