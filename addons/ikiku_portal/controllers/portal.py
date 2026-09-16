@@ -284,8 +284,7 @@ class IkikuPortal(http.Controller):
     def me(self, **kw):
         resource = self._resource()
         if not resource:
-            business = self._business()
-            return request.redirect('/business' if business else '/join')
+            return request.redirect('/business' if self._businesses() else '/join')
         remember_side('ki')
         partner = self._partner()
         availability = self._availability(resource)
@@ -312,9 +311,29 @@ class IkikuPortal(http.Controller):
         })
 
     # ------------------------------------------------------------- businesses
-    def _business(self):
+    def _businesses(self):
+        """Every business the signed-in person holds (operator, 2026-09-16: one person may hold several)."""
         partner = request.env.user.partner_id.commercial_partner_id
-        return request.env['ikiku.business'].sudo().search([('partner_id', '=', partner.id)], limit=1)
+        return request.env['ikiku.business'].sudo().search([('partner_id', '=', partner.id)], order='name, id')
+
+    def _business(self, business_id=None):
+        """One of the person's businesses: the one asked for, else the one the need being written
+        is for, else the only one. Empty when it cannot be told which."""
+        businesses = self._businesses()
+        wanted = business_id or self._draft().get('business_id')
+        if wanted:
+            return businesses.filtered(lambda business: business.id == to_int(wanted, 0))
+        return businesses if len(businesses) == 1 else businesses.browse()
+
+    def _need_business(self):
+        """(business, None) for the need being written, or (None, redirect) to name a business or
+        to choose which one."""
+        business = self._business()
+        if business:
+            return business, None
+        if self._businesses():
+            return None, request.redirect('/business/need/for')
+        return None, request.redirect('/business/name')
 
     def _draft(self):
         return dict(request.session.get('ikiku_need') or {})
@@ -323,14 +342,16 @@ class IkikuPortal(http.Controller):
         request.session['ikiku_need'] = draft
 
     def _business_page(self, template, step, values):
-        values.update({'step': step, 'total': BUSINESS_STEPS, 'changing_need': bool(self._draft().get('edit_id'))})
+        business = self._business()
+        values.update({'step': step, 'total': BUSINESS_STEPS, 'changing_need': bool(self._draft().get('edit_id')),
+                       # Said only to a person with several businesses, so the need lands where they mean.
+                       'for_business': business.name if business and len(self._businesses()) > 1 else False})
         return request.render(template, values)
 
     def _own_need(self, need_id):
-        """The business's own need, or None."""
-        business = self._business()
+        """A need of one of the person's businesses, or None."""
         demand = request.env['ikiku.demand'].sudo().browse(need_id).exists()
-        return demand if business and demand.business_id == business else None
+        return demand if demand and demand.business_id in self._businesses() else None
 
     def _need_missing(self, draft):
         for key, url in (('position_id', '/business/need/who'), ('work_type_id', '/business/need/type'),
@@ -341,19 +362,21 @@ class IkikuPortal(http.Controller):
 
     @http.route('/business', type='http', auth='user', website=True, sitemap=False)
     def business_home(self, **kw):
-        business = self._business()
-        if not business:
+        businesses = self._businesses()
+        if not businesses:
             return request.redirect('/business/name')
         remember_side('ku')
-        demands = request.env['ikiku.demand'].sudo().search([('business_id', '=', business.id)],
-                                                            order='create_date desc')
         today = tehran_today()
+        Demand = request.env['ikiku.demand'].sudo()
         return request.render('ikiku_portal.business_home', {
-            'business': business,
-            'needs': [{'demand': d, 'seats': to_fa_digits(d.seats),
-                       'dates': dates_text(d.date_start, d.date_end, today),
-                       'is_open': d.state in ('open', 'proposed'),
-                       'booked': bool(d.ikiku_live_bookings())} for d in demands],
+            'businesses': [{
+                'business': business,
+                'needs': [{'demand': d, 'seats': to_fa_digits(d.seats),
+                           'dates': dates_text(d.date_start, d.date_end, today),
+                           'is_open': d.state in ('open', 'proposed'),
+                           'booked': bool(d.ikiku_live_bookings())}
+                          for d in Demand.search([('business_id', '=', business.id)], order='create_date desc')],
+            } for business in businesses],
             'note': {'filled': "درخواست بسته شد: نیرو پیدا کردید.",
                      'cancelled': "درخواست لغو شد. دلیلی که نوشتید ثبت شد.",
                      'changed': "تغییرها ثبت شد."}.get(kw.get('done')),
@@ -363,13 +386,23 @@ class IkikuPortal(http.Controller):
 
     @http.route('/business/name', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
     def business_name(self, **post):
-        """The first question of کو؟, and the way to change the answer later."""
+        """The first question of کو؟, a further business (?new=1), and renaming one (?business=<id>)."""
         staff = self._staff_elsewhere()
         if staff:
             return staff
         if self._needs_name(self._partner()):
             return request.redirect('/join/name?for=ku')
-        business = self._business()
+        businesses = self._businesses()
+        if post.get('business'):
+            business = self._business(post['business'])
+            if not business:
+                return request.not_found()
+        elif businesses and not post.get('new'):
+            business = businesses[0] if len(businesses) == 1 else None
+            if not business:
+                return request.redirect('/business')
+        else:
+            business = None
         name = ' '.join((post.get('name') or '').split())
         error = None
         if request.httprequest.method == 'POST':
@@ -377,22 +410,23 @@ class IkikuPortal(http.Controller):
                 if business:
                     business.name = name
                     return request.redirect('/business')
-                self._partner()._ikiku_grant_role('ku', business_name=name)
+                made = self._partner()._ikiku_grant_role('ku', business_name=name, another=bool(businesses))
                 remember_side('ku')
+                self._keep_draft({'business_id': made.id})
                 return request.redirect('/business/need/who')
             error = "اسم رو ننوشتید. اینجا بنویسید."
         else:
             name = business.name if business else ''
         return request.render('ikiku_portal.business_name', {
-            'business': business, 'name': name, 'error': error,
+            'business': business, 'name': name, 'error': error, 'another': bool(businesses) and not business,
             'has_resource': 'ki' in ikiku_sides(request.env.user)})
 
     @http.route('/business/need/who', type='http', auth='user', methods=['GET', 'POST'], website=True,
                 sitemap=False)
     def need_who(self, **post):
-        business = self._business()
-        if not business:
-            return request.redirect('/business/name')
+        business, elsewhere = self._need_business()
+        if elsewhere:
+            return elsewhere
         draft = self._draft()
         raw = (post.get('raw') or '').strip()
         error = None
@@ -481,11 +515,13 @@ class IkikuPortal(http.Controller):
     @http.route('/business/need/where', type='http', auth='user', methods=['GET', 'POST'], website=True,
                 sitemap=False)
     def need_where(self, **post):
-        business = self._business()
+        business, elsewhere = self._need_business()
+        if elsewhere:
+            return elsewhere
         draft = self._draft()
         missing = self._need_missing(draft)
-        if not business or missing:
-            return request.redirect(missing or '/business/name')
+        if missing:
+            return request.redirect(missing)
         last = request.env['ikiku.demand'].sudo().search([('business_id', '=', business.id)],
                                                          order='create_date desc', limit=1)
         errors = {}
@@ -571,10 +607,29 @@ class IkikuPortal(http.Controller):
         })
 
     @http.route('/business/need/new', type='http', auth='user', website=True, sitemap=False)
-    def need_new(self, **kw):
-        """A fresh need: nothing left over from a change that was not finished."""
+    def need_new(self, business=None, **kw):
+        """A fresh need, for the business named or the only one: nothing left over from a
+        change that was not finished."""
         request.session.pop('ikiku_need', None)
+        chosen = self._business(business) if business else self._business()
+        if chosen:
+            self._keep_draft({'business_id': chosen.id})
         return request.redirect('/business/need/who')
+
+    @http.route('/business/need/for', type='http', auth='user', website=True, sitemap=False)
+    def need_for(self, business=None, **kw):
+        """«برای کدوم کافه؟» for a person with several businesses. The rest of the draft (a role
+        chosen on the home page) is kept."""
+        businesses = self._businesses()
+        if not businesses:
+            return request.redirect('/business/name')
+        chosen = self._business(business) if business else None
+        if chosen:
+            draft = self._draft()
+            draft['business_id'] = chosen.id
+            self._keep_draft(draft)
+            return request.redirect('/business/need/who')
+        return request.render('ikiku_portal.need_for', {'businesses': businesses})
 
     def _changeable(self, need_id):
         demand = self._own_need(need_id)
@@ -592,6 +647,7 @@ class IkikuPortal(http.Controller):
             return refusal
         self._keep_draft({
             'edit_id': demand.id,
+            'business_id': demand.business_id.id,
             'position_id': demand.position_id.id,
             'node_id': demand.position_id.spec_node_id.id,
             'work_type_id': demand.work_type_id.id,

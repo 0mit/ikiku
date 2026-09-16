@@ -289,9 +289,9 @@ class IkikuCustomerPortal(CustomerPortal):
         user = request.env.user
         sides = ikiku_sides(user)
         if len(sides) == 2 and request.session.get(SESSION_SIDE) not in sides:
-            business = request.env['ikiku.business'].sudo().search(
-                [('partner_id', '=', user.partner_id.commercial_partner_id.id)], limit=1)
-            return request.render('ikiku_portal.choose_side', {'business': business})
+            businesses = request.env['ikiku.business'].sudo().search(
+                [('partner_id', '=', user.partner_id.commercial_partner_id.id)], order='name, id')
+            return request.render('ikiku_portal.choose_side', {'businesses': businesses})
         target = ikiku_home_for(user)
         if target:
             return request.redirect(target)

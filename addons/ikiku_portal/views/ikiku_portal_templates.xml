@@ -251,8 +251,9 @@
   <template id="business_name" name="ایکیکو — اسمِ کافه">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
-        <p class="ikiku__step"><t t-if="business">عوض کردن</t><t t-else="">شروع</t></p>
-        <h1 class="ikiku__question">اسمِ کافه یا رستورانتون چیه؟</h1>
+        <p class="ikiku__step"><t t-if="business">عوض کردن</t><t t-elif="another">کافه‌ی دیگه</t><t t-else="">شروع</t></p>
+        <h1 t-if="another" class="ikiku__question">اسمِ کافه یا رستورانِ دیگه‌تون چیه؟</h1>
+        <h1 t-else="" class="ikiku__question">اسمِ کافه یا رستورانتون چیه؟</h1>
         <p class="ikiku__lead">همون اسمی که سرِ در نوشته.</p>
         <p t-if="has_resource and not business" class="ikiku__lead">صفحه‌ی کاری‌تون سرِ جاشه. این فقط برای کافه‌تونه.</p>
         <form method="post" class="ikiku__form" data-ikiku-form="">
@@ -437,30 +438,45 @@
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-if="len(sides) == 2" t-call="ikiku_portal.side_switch"><t t-set="side" t-value="'ku'"/></t>
-        <p class="ikiku__step" t-out="business.name"/>
+        <p t-if="len(businesses) == 1" class="ikiku__step" t-out="businesses[0]['business'].name"/>
+        <p t-else="" class="ikiku__step">کافه‌ها و رستوران‌هاتون</p>
         <h1 class="ikiku__question">درخواست‌های نیروی شما</h1>
         <p t-if="note" class="ikiku__status" role="status" t-out="note"/>
-        <a class="ikiku__go ikiku__go--block" href="/business/need/new">نیروی تازه می‌خوام</a>
-        <t t-if="needs">
-          <t t-foreach="needs" t-as="need">
-            <t t-set="d" t-value="need['demand']"/>
-            <article class="ikiku__card ikiku__need">
-              <strong><t t-out="need['seats']"/> نفر · <t t-out="d.position_id.spec_node_id.plain_label or d.position_id.spec_node_id.name"/></strong>
-              <p><t t-out="d.work_type_id.name"/> · <t t-out="need['dates']"/></p>
-              <p class="ikiku__muted"><t t-out="d.province_id.name"/><t t-if="d.city">، <t t-out="d.city"/></t>
-                · <t t-out="{'draft': 'پیش‌نویس', 'open': 'باز', 'proposed': 'باز', 'filled': 'نیرو پیدا شد', 'cancelled': 'لغو شد'}.get(d.state)"/></p>
-              <t t-call="ikiku_portal.need_actions">
-                <t t-set="need_rec" t-value="d"/>
-                <t t-set="is_open" t-value="need['is_open']"/><t t-set="booked" t-value="need['booked']"/>
+        <!-- One section per business (operator, 2026-09-16: one person may hold several). -->
+        <t t-foreach="businesses" t-as="row">
+          <t t-set="biz" t-value="row['business']"/>
+          <section class="ikiku__biz">
+            <div t-if="len(businesses) &gt; 1" class="ikiku__biz-head">
+              <h2 class="ikiku__subhead" t-out="biz.name"/>
+              <a t-att-href="'/business/name?business=%d' % biz.id">عوض کردنِ اسم</a>
+            </div>
+            <a class="ikiku__go ikiku__go--block" t-att-href="'/business/need/new?business=%d' % biz.id">
+              <t t-if="len(businesses) &gt; 1">نیروی تازه برای <t t-out="biz.name"/></t>
+              <t t-else="">نیروی تازه می‌خوام</t>
+            </a>
+            <div t-if="row['needs']" class="ikiku__needs">
+              <t t-foreach="row['needs']" t-as="need">
+                <t t-set="d" t-value="need['demand']"/>
+                <article class="ikiku__card ikiku__need">
+                  <strong><t t-out="need['seats']"/> نفر · <t t-out="d.position_id.spec_node_id.plain_label or d.position_id.spec_node_id.name"/></strong>
+                  <p><t t-out="d.work_type_id.name"/> · <t t-out="need['dates']"/></p>
+                  <p class="ikiku__muted"><t t-out="d.province_id.name"/><t t-if="d.city">، <t t-out="d.city"/></t>
+                    · <t t-out="{'draft': 'پیش‌نویس', 'open': 'باز', 'proposed': 'باز', 'filled': 'نیرو پیدا شد', 'cancelled': 'لغو شد'}.get(d.state)"/></p>
+                  <t t-call="ikiku_portal.need_actions">
+                    <t t-set="need_rec" t-value="d"/>
+                    <t t-set="is_open" t-value="need['is_open']"/><t t-set="booked" t-value="need['booked']"/>
+                  </t>
+                </article>
               </t>
-            </article>
-          </t>
+            </div>
+            <p t-else="" class="ikiku__lead">هنوز درخواستی ندارید.</p>
+          </section>
         </t>
-        <p t-else="" class="ikiku__lead">هنوز درخواستی ندارید.</p>
+        <p class="ikiku__lead ikiku__biz-add">یه کافه یا رستورانِ دیگه هم دارید؟ <a href="/business/name?new=1">اضافه‌ش کنید</a></p>
         <t t-call="ikiku_portal.my_number"/>
         <p t-if="'ki' not in sides" class="ikiku__lead">خودتون هم دنبالِ کار هستید؟ <a href="/ki">با همین شماره ثبت‌نام کنید</a></p>
         <p class="ikiku__links">
-          <a href="/business/name">عوض کردنِ اسمِ کافه</a>
+          <a t-if="len(businesses) == 1" href="/business/name">عوض کردنِ اسمِ کافه</a>
           <a href="/help/niroo">راهنما</a>
           <a href="/web/session/logout?redirect=/">خروج</a>
         </p>
@@ -478,7 +494,7 @@
         <h1 class="ikiku__question">امروز برای چی اومدید؟</h1>
         <div class="ikiku__tiles ikiku__tiles--one">
           <a class="ikiku__tile ikiku__tile--link" href="/me"><span>کار می‌خوام<small>صفحه‌ی کاریِ خودتون</small></span></a>
-          <a class="ikiku__tile ikiku__tile--link" href="/business"><span>نیرو می‌خوام<small>درخواست‌های <t t-out="business.name"/></small></span></a>
+          <a class="ikiku__tile ikiku__tile--link" href="/business"><span>نیرو می‌خوام<small t-if="len(businesses) == 1">درخواست‌های <t t-out="businesses.name"/></small><small t-else="">درخواست‌های کافه‌هاتون</small></span></a>
         </div>
         <p class="ikiku__lead">هر وقت خواستید، بالای صفحه عوضش کنید.</p>
         <p class="ikiku__links"><a href="/help/hardo">راهنما</a> <a href="/web/session/logout?redirect=/">خروج</a></p>
@@ -559,6 +575,22 @@
           <button class="ikiku__go ikiku__go--block" type="submit">لغو کن</button>
         </form>
         <p class="ikiku__links"><a t-att-href="'/business/need/%d/close' % demand.id">برگردم</a></p>
+      </div></div>
+    </t>
+  </template>
+
+  <!-- A person with several businesses says which one a new need is for. -->
+  <template id="need_for" name="ایکیکو — برای کدوم کافه">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step">نیروی تازه</p>
+        <h1 class="ikiku__question">برای کدوم کافه یا رستوران؟</h1>
+        <div class="ikiku__tiles ikiku__tiles--one">
+          <t t-foreach="businesses" t-as="biz">
+            <a class="ikiku__tile ikiku__tile--link" t-att-href="'/business/need/for?business=%d' % biz.id"><span t-out="biz.name"/></a>
+          </t>
+        </div>
+        <p class="ikiku__links"><a href="/business/name?new=1">کافه‌ی دیگه‌ای اضافه کنم</a> <a href="/business">برگردم</a></p>
       </div></div>
     </t>
   </template>

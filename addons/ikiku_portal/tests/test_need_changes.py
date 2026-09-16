@@ -143,3 +143,97 @@ class TestNeedChanges(HttpCase):
             self.assertEqual(self.url_open(url % need.id, allow_redirects=False).status_code, 404, url)
         self.assertEqual(self.post('/business/need/%d/cancel' % self.need.id, {'reason': ''}).status_code, 200)
         self.assertEqual(need.state, 'open')
+
+
+@tagged('post_install', '-at_install')
+class TestSeveralBusinesses(HttpCase):
+    """One person manages the needs of several businesses (operator, 2026-09-16)."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        env = cls.env
+        cls.tehran = env.ref('ikiku_base.province_te')
+        cls.node = env.ref('ikiku_base.spec_dishwashing')
+        cls.full = env.ref('ikiku_base.work_type_full_time')
+        cls.owner = env['res.users'].create({'name': "مریم", 'login': 'many-owner', 'password': 'many-owner-pass-1',
+                                             'group_ids': [(6, 0, [env.ref('base.group_portal').id])]})
+        cls.first = cls.owner.partner_id._ikiku_grant_role('ku', business_name="کافه نارنج")
+
+    def setUp(self):
+        super().setUp()
+        self.authenticate('many-owner', 'many-owner-pass-1')
+
+    def post(self, url, data):
+        token = TOKEN.search(self.url_open(url).text).group(1)
+        return self.url_open(url, data=dict(data, csrf_token=token), allow_redirects=False)
+
+    def location(self, response):
+        self.assertIn(response.status_code, (302, 303), response.text[:300])
+        return response.headers['Location']
+
+    def businesses(self):
+        return self.env['ikiku.business'].search([('partner_id', '=', self.owner.partner_id.id)], order='id')
+
+    def add_second(self):
+        page = self.url_open('/business/name?new=1').text
+        self.assertIn("اسمِ کافه یا رستورانِ دیگه‌تون چیه؟", page)
+        done = self.post('/business/name?new=1', {'name': "رستوران لیمو"})
+        self.assertTrue(self.location(done).endswith('/business/need/who'))
+        return self.businesses()[1]
+
+    def walk_need(self, city):
+        self.post('/business/need/who', {'node_id': str(self.node.id)})
+        self.post('/business/need/type', {'work_type_id': str(self.full.id)})
+        self.post('/business/need/count', {'seats': '1'})
+        self.post('/business/need/when', {'start': 'today', 'end': 'none'})
+        return self.post('/business/need/where', {'province_id': str(self.tehran.id), 'city': city})
+
+    def test_a_second_business_gets_its_own_needs(self):
+        self.assertIn("یه کافه یا رستورانِ دیگه هم دارید؟", self.url_open('/business').text)
+        second = self.add_second()
+        self.assertEqual(len(self.businesses()), 2)
+        self.assertIn("برای <strong>رستوران لیمو</strong>", self.url_open('/business/need/who').text)
+        self.walk_need("تهران")
+        need = self.env['ikiku.demand'].search([('business_id', 'in', self.businesses().ids)])
+        self.assertEqual(need.business_id, second)
+        home = self.url_open('/business').text
+        self.assertIn("کافه نارنج", home)
+        self.assertIn("نیروی تازه برای رستوران لیمو", home)
+        self.assertIn('/business/need/%d/edit' % need.id, home)
+        self.assertEqual(self.url_open('/business/need/%d/edit' % need.id, allow_redirects=False).status_code, 303)
+        self.assertIn("برای <strong>رستوران لیمو</strong>", self.url_open('/business/need/who').text)
+
+    def test_a_new_need_asks_which_business(self):
+        self.add_second()
+        self.url_open('/business/need/new')
+        self.assertTrue(self.location(self.url_open('/business/need/who', allow_redirects=False))
+                        .endswith('/business/need/for'))
+        chooser = self.url_open('/business/need/for').text
+        self.assertIn("برای کدوم کافه یا رستوران؟", chooser)
+        self.url_open('/ku?node=%d' % self.node.id)
+        self.url_open('/business/need/for?business=%d' % self.first.id)
+        who = self.url_open('/business/need/who').text
+        self.assertIn("برای <strong>کافه نارنج</strong>", who)
+        self.assertRegex(who, r'value="%d"\s+checked="checked"|checked="checked"[^>]*value="%d"' % (self.node.id, self.node.id),
+                         "the role chosen on the home page is kept")
+
+    def test_rename_one_and_nobody_else_s(self):
+        second = self.add_second()
+        self.post('/business/name?business=%d' % second.id, {'name': "رستوران پرتقال"})
+        self.assertEqual((self.first.name, second.name), ("کافه نارنج", "رستوران پرتقال"))
+        stranger = self.env['ikiku.business'].create({'name': "مالِ دیگری", 'partner_id': self.env['res.partner'].create({'name': "دیگری"}).id})
+        self.assertEqual(self.url_open('/business/name?business=%d' % stranger.id).status_code, 404)
+        self.url_open('/business/need/new')
+        self.url_open('/business/need/for?business=%d' % stranger.id)
+        self.assertTrue(self.location(self.url_open('/business/need/who', allow_redirects=False))
+                        .endswith('/business/need/for'))
+
+    def test_staff_add_another_business(self):
+        staff = self.env['res.users'].create({'name': "همکار", 'login': 'many-staff',
+                                              'group_ids': [(6, 0, [self.env.ref('base.group_user').id,
+                                                                    self.env.ref('ikiku_base.group_ikiku_staff').id])]})
+        self.owner.partner_id.sudo().write({'ikiku_mobile': '+989121234567'})
+        self.env['ikiku.staff.role'].with_user(staff).create(
+            {'partner_id': self.owner.partner_id.id, 'role': 'ku', 'business_name': "شعبه دو"}).action_apply()
+        self.assertEqual(self.businesses().mapped('name'), ["کافه نارنج", "شعبه دو"])

@@ -106,9 +106,10 @@ class IkikuStaffRole(models.TransientModel):
         else:
             has = self.env['ikiku.business'].sudo().search_count(
                 [('partner_id', '=', partner.commercial_partner_id.id)], limit=1)
-        if has:
+        if has and self.role == 'ki':
             raise UserError("این حساب این نقش را دارد.")
-        partner._ikiku_grant_role(self.role, business_name=self.business_name)
+        # A holder may hold several businesses: with a name, another one is added.
+        partner._ikiku_grant_role(self.role, business_name=self.business_name, another=bool(has))
         partner.message_post(body="نقشِ «%s» به دستِ %s به همین حساب اضافه شد."
                                   % (ROLE_LABEL[self.role], self.env.user.name))
         return {'type': 'ir.actions.act_window_close'}

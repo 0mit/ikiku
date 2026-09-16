@@ -18,7 +18,7 @@ class IkikuBusiness(models.Model):
 
     partner_id = fields.Many2one('res.partner', string="دارنده", required=True,
                                  ondelete='restrict', index=True, tracking=True,
-                                 help="کسی که حسابِ این کسب‌وکار را دارد.")
+                                 help="کسی که حسابِ این کسب‌وکار را دارد. یک نفر می‌تواند چند کسب‌وکار داشته باشد.")
     # The business's own name, not the holder's: a portal signup gives the
     # business the person's partner, so a related name put the holder's personal
     # name on every position, demand and booking of the business.
@@ -45,7 +45,7 @@ class IkikuBusiness(models.Model):
     position_ids = fields.One2many('ikiku.position', 'business_id', string="جایگاه‌ها")
     overlay_ids = fields.One2many('ikiku.spec.overlay', 'business_id', string="لایه‌های محلی")
 
-    _partner_uniq = models.Constraint('UNIQUE(partner_id)', "برای هر کسب‌وکار یک پرونده.")
+    # One person may hold several businesses (operator, 2026-09-16): no UNIQUE(partner_id).
 
     @api.model_create_multi
     def create(self, vals_list):

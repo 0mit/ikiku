@@ -64,10 +64,12 @@ class ResPartner(models.Model):
                 super(ResPartner, changed).write({'ikiku_mobile_set_by_id': False})
         return super().write(vals)
 
-    def _ikiku_grant_role(self, role, business_name=None):
+    def _ikiku_grant_role(self, role, business_name=None, another=False):
         """The one way a person gets a side (operator, 2026-09-16: one person may hold both):
-        the worker record or the business, and the group that goes with it. Returns the
-        record. A staff account never gets a side, and never a second, portal user."""
+        the worker record or a business, and the group that goes with it. Returns the record.
+        With `another`, a further business is made for a holder who has one already (one
+        person may hold several). A staff account never gets a side, and never a second,
+        portal user."""
         self.ensure_one()
         partner = self.sudo()
         if partner.with_context(active_test=False).user_ids.filtered(lambda user: not user.share):
@@ -81,8 +83,8 @@ class ResPartner(models.Model):
         elif role == 'ku':
             holder = partner.commercial_partner_id
             Business = self.env['ikiku.business'].sudo()
-            record = Business.search([('partner_id', '=', holder.id)], limit=1)
-            if not record:
+            record = Business.search([('partner_id', '=', holder.id)], limit=1, order='id')
+            if not record or another:
                 if not (business_name or '').strip():
                     raise UserError("نامِ کافه یا رستوران را بنویسید.")
                 record = Business.create({'partner_id': holder.id, 'name': business_name.strip()})
