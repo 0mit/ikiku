@@ -1,0 +1,133 @@
+# Part of iKiKu. Licensed under AGPL-3.0.
+"""Signing in with a mobile number and an SMS code (operator, 2026-09-16: D-1 B, D-2 B,
+D-3, D-7 A, D-8 C)."""
+import re
+from unittest.mock import patch
+
+from odoo import fields
+from odoo.exceptions import AccessDenied, UserError
+from odoo.tests import HttpCase, tagged
+
+from odoo.addons.ikiku_portal.tests.test_mobile_challenge import CODE, MOBILE, RANDBELOW, OtpSetup
+
+TOKEN = re.compile(r'name="csrf_token" value="([^"]+)"')
+
+
+@tagged('post_install', '-at_install')
+class TestSmsLogin(OtpSetup, HttpCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.enable_otp()
+
+    def enter(self, mobile='۰۹۱۲۱۲۳۴۵۶۷', code='۱۲۳۴۵۶', role='ki'):
+        page = self.url_open('/enter?as=%s' % role).text
+        with patch(RANDBELOW, return_value=CODE):
+            sent = self.url_open('/enter/send', allow_redirects=False, data={
+                'csrf_token': TOKEN.search(page).group(1), 'mobile': mobile, 'role': role})
+        self.assertTrue(sent.headers['Location'].endswith('/enter/code'), sent.text[:300])
+        self.send_queued()
+        page = self.url_open('/enter/code').text
+        return self.url_open('/enter/code/submit', allow_redirects=False, data={
+            'csrf_token': TOKEN.search(page).group(1), 'code': code})
+
+    def users_with_number(self):
+        return self.env['res.users'].with_context(active_test=False).search(
+            [('partner_id.ikiku_mobile', '=', MOBILE)])
+
+    def test_a_new_number_signs_up_and_is_signed_in(self):
+        response = self.enter()
+        self.assertTrue(response.headers['Location'].endswith('/join'))
+        user = self.users_with_number()
+        self.assertEqual(len(user), 1)
+        self.assertTrue(user.share)
+        self.assertTrue(user.login.startswith('m-'))
+        self.assertNotIn('912', user.login)
+        self.assertTrue(user.partner_id.ikiku_mobile_verified_on)
+        again = self.url_open('/enter', allow_redirects=False)
+        self.assertTrue(again.headers['Location'].endswith('/join'), "already signed in")
+
+    def test_the_same_number_opens_the_same_account(self):
+        self.enter()
+        first = self.users_with_number()
+        self.url_open('/web/session/logout')
+        self.enter(mobile='09121234567', code='123456')
+        self.assertEqual(self.users_with_number(), first)
+
+    def test_a_wrong_code_does_not_sign_in(self):
+        response = self.enter(code='000000')
+        self.assertIn('error=wrong', response.headers['Location'])
+        self.assertFalse(self.users_with_number())
+
+    def test_a_staff_number_is_refused(self):
+        staff = self.env['res.users'].create({'name': "همکار", 'login': 'staff-sms', 'password': 'staff-sms-pass-1',
+                                              'group_ids': [(6, 0, [self.env.ref('base.group_user').id])]})
+        staff.partner_id.write({'ikiku_mobile': MOBILE, 'ikiku_mobile_verified_on': fields.Datetime.now()})
+        response = self.enter()
+        self.assertIn('error=staff', response.headers['Location'])
+
+    def test_an_unproven_typed_number_gives_way(self):
+        other = self.env['res.partner'].create({'name': "تایپ‌کرده", 'ikiku_mobile': MOBILE})
+        self.enter()
+        self.assertFalse(other.ikiku_mobile)
+        self.assertNotEqual(self.users_with_number().partner_id, other)
+
+    def test_a_staff_created_account_is_opened_by_its_number(self):
+        staff = self.env['res.users'].create({'name': "همکار", 'login': 'staff-helper', 'password': 'staff-helper-1',
+                                              'group_ids': [(6, 0, [self.env.ref('base.group_user').id,
+                                                                    self.env.ref('ikiku_base.group_ikiku_staff').id])]})
+        wizard = self.env['ikiku.staff.account'].with_user(staff).create(
+            {'name': "رضا محمدی", 'mobile': '۰۹۱۲۱۲۳۴۵۶۷', 'role': 'ki'})
+        wizard.action_create()
+        made = self.users_with_number()
+        self.assertEqual(len(made), 1)
+        self.assertFalse(made.partner_id.ikiku_mobile_verified_on)
+        self.assertEqual(made.partner_id.ikiku_mobile_set_by_id, staff)
+        response = self.enter()
+        self.assertTrue(response.headers['Location'].endswith('/me'))
+        self.assertEqual(self.users_with_number(), made)
+        self.assertTrue(made.partner_id.ikiku_mobile_verified_on)
+
+    def test_the_login_token_is_single_use_and_portal_only(self):
+        Challenge = self.env['ikiku.mobile.challenge'].sudo()
+        challenge = Challenge.create({'mobile': MOBILE, 'purpose': 'enter', 'session_key': 'k',
+                                      'code_hash': Challenge._hash('1'), 'state': 'done'})
+        user, token, error = challenge._issue_login()
+        self.assertFalse(error)
+        credential = {'type': 'ikiku_sms', 'login': user.login, 'token': token}
+        self.assertEqual(user.with_user(user)._check_credentials(credential, {})['uid'], user.id)
+        with self.assertRaises(AccessDenied):
+            user.with_user(user)._check_credentials(credential, {})
+        self.assertEqual(challenge._issue_login()[2], 'expired', "a challenge issues one token")
+        internal = self.env.ref('base.user_admin')
+        with self.assertRaises(AccessDenied):
+            internal.with_user(internal)._check_credentials(
+                {'type': 'ikiku_sms', 'login': internal.login, 'token': token}, {})
+
+    def test_changing_a_number_needs_the_national_id(self):
+        self.env['ir.config_parameter'].sudo().set_param('ikiku.nid_salt', 'test-salt')
+        partner = self.env['res.partner'].create({'name': "مریم", 'ikiku_mobile': '+989351234567',
+                                                  'ikiku_mobile_verified_on': fields.Datetime.now()})
+        partner.ikiku_nid_hash = partner.hash_national_id('0012345678')
+        Change = self.env['ikiku.mobile.change']
+        with self.assertRaises(UserError):
+            Change.create({'partner_id': partner.id, 'new_mobile': MOBILE, 'national_id': '0099999999'}).action_apply()
+        change = Change.create({'partner_id': partner.id, 'new_mobile': MOBILE, 'national_id': '۰۰۱۲۳۴۵۶۷۸'})
+        self.assertFalse(change.national_id)
+        change.action_apply()
+        self.assertEqual((partner.ikiku_mobile, partner.ikiku_mobile_verified_on), (MOBILE, False))
+        self.assertEqual(partner.ikiku_mobile_set_by_id, self.env.user)
+
+    def test_email_signup_is_closed_and_sessions_last_thirty_days(self):
+        self.assertEqual(self.env['website'].search([], limit=1).auth_signup_uninvited, 'b2b')
+        self.assertEqual(self.env['ir.config_parameter'].sudo().get_param('sessions.max_inactivity_seconds'),
+                         str(30 * 24 * 3600))
+
+    def test_my_sends_an_ikiku_account_home(self):
+        user = self.env['res.users'].create({'name': "نیرو", 'login': 'my-walker', 'password': 'my-walker-pass-1',
+                                             'group_ids': [(6, 0, [self.env.ref('base.group_portal').id])]})
+        self.env['ikiku.resource'].create({'partner_id': user.partner_id.id})
+        self.authenticate('my-walker', 'my-walker-pass-1')
+        response = self.url_open('/my', allow_redirects=False)
+        self.assertTrue(response.headers['Location'].endswith('/me'))

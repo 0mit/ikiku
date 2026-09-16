@@ -1,20 +1,31 @@
 # Part of iKiKu. Licensed under AGPL-3.0.
-"""Proving a mobile number before it becomes the identity anchor.
+"""Proving a mobile number, to sign in with it or to anchor an account to it.
 
 Phone is the establishing anchor (docs/design.html) and ikiku_mobile is UNIQUE,
 so writing whatever number a visitor types would let anyone take somebody else's
-number first. With an SMS provider's verification template configured (Kavenegar
-or sms.ir, reached through sms_otp, which names neither), the number waits here
-until its owner types the code sent to it; only then is it written to the
-partner. Proving a number proves the SIM, not the person: ikiku_is_verified
-stays a staff decision.
+number first. A number becomes an account's anchor only once its owner types the
+code sent to it. Proving a number proves the SIM, not the person:
+ikiku_is_verified stays a staff decision.
+
+Two purposes share one mechanism:
+  verify  a signed-in account proves its number (the older email accounts).
+  enter   a visitor proves a number to sign in or to sign up (operator, 2026-09-16,
+          D-1 B). The challenge is bound to the browser session, not to a partner,
+          and a proven code issues a single-use login token that only a portal
+          user can spend (res_users._check_credentials).
+
+Which account a proven number opens, in order:
+  1. the account that already proved this number;
+  2. an account whose number staff wrote (a staff-created account, D-8, or a
+     staff number change, D-7): whoever proves the SIM is the person staff met;
+  3. otherwise a new account, with an opaque login (D-2 B). Unproven numbers that
+     other accounts merely typed give way, as they always have.
+A number proven for a staff (internal) account never opens anything here.
 
 The code is kept as an HMAC keyed by the database secret. The plain code exists
-only until the background job has handed it to the provider, because a job
-cannot send what it cannot read. An outside API can take seconds to answer (every
-lookup from the production host took 8 s until its resolver was fixed on
-2026-09-15), so sending never happens inside the visitor's request: the page
-waits at most WAIT_LIMIT for the result and shows it the moment it is known.
+only until the background job has handed it to the provider. Sending never
+happens inside the visitor's request: the page waits at most WAIT_LIMIT and shows
+the result the moment it is known.
 """
 import hashlib
 import hmac
@@ -23,7 +34,7 @@ from datetime import timedelta
 
 from odoo import api, fields, models
 
-from odoo.addons.ikiku_base.models.jalali import to_latin_digits
+from odoo.addons.ikiku_base.models.jalali import to_fa_digits, to_latin_digits
 from odoo.addons.sms_otp.tools.otp import SmsOtpError
 
 CODE_DIGITS = 6
@@ -33,22 +44,26 @@ RESEND_AFTER = timedelta(seconds=60)
 MAX_SENDS_PER_HOUR = 3
 WAIT_LIMIT = timedelta(minutes=2)
 KEEP = timedelta(days=1)
+LOGIN_TOKEN_TTL = timedelta(minutes=2)
 
-
-# What the visitor reads. Keys travel in URLs; sentences never do.
+# What the visitor reads, in spoken, polite Persian (operator, D-9). Keys travel in
+# URLs; sentences never do.
 MESSAGES = {
-    'queued': "کد در راه است…",
-    'sent': "کد فرستاده شد. تا پنج دقیقه معتبر است.",
-    'wrong': "کد درست نبود.",
-    'expired': "این کد دیگر معتبر نیست. کدِ تازه بخواهید.",
-    'tries': "کد چند بار اشتباه وارد شد. کدِ تازه بخواهید.",
-    'limit': "در یک ساعتِ گذشته برای این شماره به اندازهٔ کافی کد فرستاده‌ایم. کمی بعد دوباره امتحان کنید.",
-    'taken': "این شماره پیش‌تر برای حسابِ دیگری تأیید شده است. اگر شمارهٔ شماست، با ایکیکو تماس بگیرید.",
-    'held': "این شماره پیش‌تر ثبت شده است.",
-    'timeout': "پیامک در دو دقیقه فرستاده نشد. دوباره بخواهید.",
-    'failed': "پیامک فرستاده نشد. کمی بعد دوباره بخواهید.",
-    'number': "این شماره پیامک نمی‌پذیرد. شماره را دوباره بنویسید.",
-    'mobile': "شمارهٔ موبایلِ ایران معتبر نیست.",
+    'queued': "پیامک داره می‌ره…",
+    'sent': "پیامک رفت. معمولاً تا یه دقیقه می‌رسه. کد تا ۵ دقیقه کار می‌کنه.",
+    'wrong': "این کد درست نیست. دوباره نگاه کنید و بنویسید.",
+    'expired': "وقتِ این کد تموم شد. یه کدِ تازه بخواید.",
+    'tries': "چند بار اشتباه شد. یه کدِ تازه بخواید.",
+    'limit': "تو یه ساعت فقط ۳ بار کد می‌فرستیم. کمی بعد دوباره امتحان کنید.",
+    'limit_at': "تو یه ساعت فقط ۳ بار کد می‌فرستیم. ساعتِ %s دوباره امتحان کنید.",
+    'taken': "این شماره مالِ یه حسابِ دیگه‌ست.",
+    'held': "این شماره مالِ یه حسابِ دیگه‌ست.",
+    'timeout': "پیامک نرفت. دوباره بخواید.",
+    'failed': "پیامک نرفت. دوباره بخواید.",
+    'number': "این شماره پیامک نمی‌گیره. شماره رو دوباره نگاه کنید.",
+    'mobile': "این شماره درست نیست. باید ۱۱ رقم باشه و با ۰۹ شروع بشه. مثلِ ۰۹۱۲۱۲۳۴۵۶۷",
+    'staff': "این شماره مالِ حسابِ همکارانِ ایکیکوست. از «ورود با ایمیل» وارد بشید.",
+    'session': "این صفحه کهنه شده. شماره رو دوباره بنویسید.",
 }
 
 
@@ -57,7 +72,15 @@ class IkikuMobileChallenge(models.Model):
     _description = "تأییدِ شمارهٔ موبایل"
     _order = 'id desc'
 
-    partner_id = fields.Many2one('res.partner', string="شخص", required=True, ondelete='cascade', index=True)
+    partner_id = fields.Many2one('res.partner', string="شخص", ondelete='cascade', index=True,
+                                 help="خالی برای ورود یا ثبت‌نام با پیامک: هنوز معلوم نیست حسابِ کیست.")
+    purpose = fields.Selection([
+        ('verify', "تأییدِ شمارهٔ حساب"),
+        ('enter', "ورود یا ثبت‌نام"),
+    ], string="برای", default='verify', required=True)
+    session_key = fields.Char(index=True, groups='base.group_system',
+                              help="اثرِ نشستِ مرورگر؛ کدِ ورود فقط در همان مرورگر کار می‌کند.")
+    as_role = fields.Selection([('ki', "نیرو"), ('ku', "کسب‌وکار")], string="از درِ")
     mobile = fields.Char("شماره", required=True, index=True)
     state = fields.Selection([
         ('queued', "در صف"),
@@ -75,6 +98,10 @@ class IkikuMobileChallenge(models.Model):
     expires_at = fields.Datetime("انقضا")
     sms_provider = fields.Char("سامانهٔ پیامک")
     sms_messageid = fields.Char("شناسهٔ پیامک")
+    login_user_id = fields.Many2one('res.users', string="حسابِ واردشده", readonly=True, ondelete='cascade')
+    login_token_hash = fields.Char(groups='base.group_system', readonly=True)
+    login_token_expires = fields.Datetime(groups='base.group_system', readonly=True)
+    login_token_used = fields.Boolean(groups='base.group_system', readonly=True)
 
     @api.model
     def _enabled(self):
@@ -86,8 +113,19 @@ class IkikuMobileChallenge(models.Model):
         return hmac.new(secret.encode(), code.encode(), hashlib.sha256).hexdigest()
 
     @api.model
-    def _latest(self, partner):
-        return self.search([('partner_id', '=', partner.id), ('state', '!=', 'done')], limit=1)
+    def session_key_for(self, sid):
+        """What the challenge stores about the browser session: a hash, never the sid."""
+        return self._hash('session:' + (sid or ''))
+
+    @api.model
+    def _latest(self, partner=None, session_key=None):
+        if partner:
+            domain = [('partner_id', '=', partner.id)]
+        elif session_key:
+            domain = [('session_key', '=', session_key), ('purpose', '=', 'enter')]
+        else:
+            return self.browse()
+        return self.search(domain + [('state', '!=', 'done')], limit=1)
 
     @api.model
     def _verified_elsewhere(self, partner, mobile):
@@ -96,23 +134,49 @@ class IkikuMobileChallenge(models.Model):
             ('id', '!=', partner.id)], limit=1))
 
     @api.model
-    def start(self, partner, mobile):
-        """Ask for a code for `mobile`. Returns (challenge, error key or False)."""
+    def retry_at(self, mobile):
+        """When the hourly limit on `mobile` lets the next code out, as ۱۴:۲۰ in Tehran."""
+        oldest = self.search([('mobile', '=', mobile),
+                              ('queued_at', '>=', fields.Datetime.now() - timedelta(hours=1))],
+                             order='queued_at', limit=1)
+        if not oldest:
+            return False
+        moment = fields.Datetime.context_timestamp(
+            self.with_context(tz='Asia/Tehran'), oldest.queued_at + timedelta(hours=1, minutes=1))
+        return to_fa_digits(moment.strftime('%H:%M'))
+
+    @api.model
+    def start(self, partner, mobile, session_key=None, as_role=None):
+        """Ask for a code for `mobile`, for a signed-in `partner` or, with no partner, for
+        the browser session `session_key`. Returns (challenge, error key or False)."""
         now = fields.Datetime.now()
-        latest = self._latest(partner)
+        latest = self._latest(partner=partner, session_key=None if partner else session_key)
         if (latest and latest.mobile == mobile and latest.state in ('queued', 'sent')
                 and now - (latest.sent_at or latest.queued_at) < RESEND_AFTER):
             return latest, False
         if self.search_count([('mobile', '=', mobile), ('queued_at', '>=', now - timedelta(hours=1))]) \
                 >= MAX_SENDS_PER_HOUR:
             return latest, 'limit'
-        if self._verified_elsewhere(partner, mobile):
+        if partner and self._verified_elsewhere(partner, mobile):
             return latest, 'taken'
-        self.search([('partner_id', '=', partner.id), ('state', 'in', ('queued', 'sent', 'failed'))]).write(
-            {'state': 'expired', 'pending_code': False})
+        if partner:
+            self.search([('partner_id', '=', partner.id), ('state', 'in', ('queued', 'sent', 'failed'))]).write(
+                {'state': 'expired', 'pending_code': False})
+        elif session_key:
+            self.search([('session_key', '=', session_key), ('purpose', '=', 'enter'),
+                         ('state', 'in', ('queued', 'sent', 'failed'))]).write(
+                {'state': 'expired', 'pending_code': False})
+        else:
+            return latest, 'session'
         code = '%0*d' % (CODE_DIGITS, secrets.randbelow(10 ** CODE_DIGITS))
-        challenge = self.create({'partner_id': partner.id, 'mobile': mobile,
-                                 'code_hash': self._hash(code), 'pending_code': code})
+        challenge = self.create({
+            'partner_id': partner.id if partner else False,
+            'purpose': 'verify' if partner else 'enter',
+            'session_key': False if partner else session_key,
+            'as_role': as_role or False,
+            'mobile': mobile,
+            'code_hash': self._hash(code), 'pending_code': code,
+        })
         self.env.ref('ikiku_portal.ir_cron_ikiku_mobile_challenge_send')._trigger()
         return challenge, False
 
@@ -161,7 +225,8 @@ class IkikuMobileChallenge(models.Model):
         }
 
     def check(self, code):
-        """Returns an error key, or False once the number is the partner's anchor."""
+        """Returns an error key, or False once the code is proven: for `verify` the number
+        is then the partner's anchor; for `enter` the controller calls _issue_login."""
         self.ensure_one()
         self._payload()
         if self.state != 'sent':
@@ -176,6 +241,9 @@ class IkikuMobileChallenge(models.Model):
                 self.state = 'expired'
                 return 'tries'
             return 'wrong'
+        if self.purpose == 'enter':
+            self.state = 'done'
+            return False
         return self._claim()
 
     def _claim(self):
@@ -183,15 +251,100 @@ class IkikuMobileChallenge(models.Model):
         if self._verified_elsewhere(self.partner_id, self.mobile):
             self.state = 'expired'
             return 'taken'
-        holder = self.env['res.partner'].sudo().with_context(active_test=False).search(
-            [('ikiku_mobile', '=', self.mobile), ('id', '!=', self.partner_id.id)])
-        if holder:
-            # An unproven claim on the number gives way to its proven owner.
-            holder.ikiku_mobile = False
-            holder.flush_recordset(['ikiku_mobile'])
-            holder.message_post(body="شمارهٔ موبایلِ تأییدنشدهٔ این حساب برداشته شد: "
-                                     "صاحبِ شماره آن را با کدِ پیامک برای حسابِ دیگری تأیید کرد.")
+        self._release_unproven(except_partner=self.partner_id)
         self.partner_id.sudo().write({'ikiku_mobile': self.mobile,
                                       'ikiku_mobile_verified_on': fields.Datetime.now()})
         self.state = 'done'
         return False
+
+    def _release_unproven(self, except_partner=None):
+        """An unproven claim on the number gives way to its proven owner."""
+        domain = [('ikiku_mobile', '=', self.mobile)]
+        if except_partner:
+            domain.append(('id', '!=', except_partner.id))
+        holders = self.env['res.partner'].sudo().with_context(active_test=False).search(domain)
+        for holder in holders:
+            holder.ikiku_mobile = False
+            holder.flush_recordset(['ikiku_mobile'])
+            holder.message_post(body="شمارهٔ موبایلِ تأییدنشدهٔ این حساب برداشته شد: "
+                                     "صاحبِ شماره آن را با کدِ پیامک برای حسابِ دیگری تأیید کرد.")
+
+    # ------------------------------------------------------------ enter (SMS sign-in)
+    def _enter_account(self):
+        """The portal user a proven `enter` challenge opens, creating one if needed.
+        Returns (user, False) or (False, error key)."""
+        self.ensure_one()
+        Partner = self.env['res.partner'].sudo().with_context(active_test=False)
+        now = fields.Datetime.now()
+
+        proven = Partner.search([('ikiku_mobile', '=', self.mobile),
+                                 ('ikiku_mobile_verified_on', '!=', False)], limit=1)
+        if proven:
+            if proven.user_ids.filtered(lambda u: not u.share):
+                return False, 'staff'
+            return self._portal_user_for(proven), False
+
+        written_by_staff = Partner.search([('ikiku_mobile', '=', self.mobile),
+                                           ('ikiku_mobile_set_by_id', '!=', False)], limit=1)
+        if written_by_staff:
+            if written_by_staff.user_ids.filtered(lambda u: not u.share):
+                return False, 'staff'
+            self._release_unproven(except_partner=written_by_staff)
+            written_by_staff.write({'ikiku_mobile_verified_on': now})
+            written_by_staff.message_post(body="صاحبِ شماره با کدِ پیامک وارد شد و شماره تأیید شد.")
+            return self._portal_user_for(written_by_staff), False
+
+        self._release_unproven()
+        partner = Partner.create({'name': "کاربرِ تازه", 'ikiku_mobile': self.mobile,
+                                  'ikiku_mobile_verified_on': now})
+        return self._portal_user_for(partner), False
+
+    def _portal_user_for(self, partner):
+        user = partner.with_context(active_test=False).user_ids.filtered('share')[:1]
+        if user:
+            if not user.active:
+                user.active = True
+            return user
+        return self.env['res.users'].sudo().with_context(no_reset_password=True).create({
+            'name': partner.name,
+            'partner_id': partner.id,
+            # D-2 B: an opaque login. The number stays a restricted partner field instead
+            # of appearing in staff user lists, and a number change needs no login change.
+            'login': 'm-%s' % secrets.token_hex(8),
+            'password': secrets.token_urlsafe(32),
+            'group_ids': [(6, 0, [self.env.ref('base.group_portal').id])],
+        })
+
+    def _issue_login(self):
+        """For a proven `enter` challenge: the account and a single-use login token, or an
+        error key. Issued once per challenge."""
+        self.ensure_one()
+        if self.purpose != 'enter' or self.state != 'done' or self.login_user_id:
+            return False, False, 'expired'
+        user, error = self._enter_account()
+        if error:
+            return False, False, error
+        token = secrets.token_urlsafe(32)
+        self.write({
+            'login_user_id': user.id,
+            'login_token_hash': self._hash('login:' + token),
+            'login_token_expires': fields.Datetime.now() + LOGIN_TOKEN_TTL,
+            'login_token_used': False,
+        })
+        return user, token, False
+
+    @api.model
+    def _consume_login_token(self, user, token):
+        """True once, for an unexpired token issued to `user`."""
+        if not token:
+            return False
+        challenge = self.sudo().search([
+            ('login_user_id', '=', user.id),
+            ('login_token_used', '=', False),
+            ('login_token_expires', '>', fields.Datetime.now()),
+        ], order='id desc', limit=1)
+        if not challenge or not hmac.compare_digest(challenge.login_token_hash or '',
+                                                    self._hash('login:' + token)):
+            return False
+        challenge.login_token_used = True
+        return True

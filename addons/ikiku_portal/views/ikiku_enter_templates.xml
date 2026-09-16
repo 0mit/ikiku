@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- E1: the one question is the number. Errors re-render with what was typed. -->
+  <template id="enter_mobile" name="ایکیکو — ورود با شماره">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step"><t t-if="signed_in">تأییدِ شماره</t><t t-else="">ورود</t></p>
+        <h1 class="ikiku__question">شماره موبایلتون چیه؟</h1>
+        <p class="ikiku__lead">یه کد براتون پیامک می‌کنیم.<t t-if="not signed_in"> رمز و ایمیل لازم نیست.</t></p>
+        <p t-if="role == 'ku' and not signed_in" class="ikiku__lead">با شماره‌ی خودتون وارد بشید، نه شماره‌ی کافه.</p>
+
+        <div t-if="not otp_enabled" class="ikiku__note">
+          ورود با پیامک الان کار نمی‌کنه. <a href="/web/login">با ایمیل وارد بشید</a>.
+        </div>
+        <form t-else="" action="/enter/send" method="post" class="ikiku__form">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <input type="hidden" name="role" t-att-value="role"/>
+          <label for="mobile" class="ikiku__label">شماره موبایل</label>
+          <input class="ikiku__field ikiku__field--big" type="tel" id="mobile" name="mobile"
+                 inputmode="numeric" dir="ltr" autocomplete="tel-national" maxlength="20"
+                 t-att-value="mobile" placeholder="۰۹۱۲۱۲۳۴۵۶۷" required="required"
+                 t-att-aria-invalid="error and 'true'"
+                 t-att-aria-describedby="'mobile-error' if error else 'mobile-help'"/>
+          <p t-if="error" id="mobile-error" class="ikiku__error" role="alert" t-out="error"/>
+          <p id="mobile-help" class="ikiku__lead">شماره‌تون رو به هیچ‌کس نشون نمی‌دیم.</p>
+          <button class="ikiku__go ikiku__go--block" type="submit">کد رو بفرست</button>
+        </form>
+
+        <p class="ikiku__links">
+          <a t-if="not signed_in" href="/web/login">ورود با ایمیل</a>
+          <a href="/help/code">کد نمیاد؟ راهنما</a>
+        </p>
+      </div></div>
+    </t>
+  </template>
+
+  <!-- E2: the code. The status line is updated by ikiku_otp.js and reads right without it. -->
+  <template id="enter_code" name="ایکیکو — کدِ پیامک">
+    <t t-call="website.layout">
+      <t t-set="failed" t-value="status['state'] in ('failed', 'expired')"/>
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step">ورود</p>
+        <h1 class="ikiku__question">کدی که براتون پیامک شد رو بنویسید</h1>
+        <p class="ikiku__lead">به شماره‌ی <bdi dir="ltr" t-out="masked"/> فرستادیم.</p>
+
+        <p id="ikiku-otp" class="ikiku__status" role="status" aria-live="polite"
+           data-state-url="/enter/code/state" t-att-data-state="status['state']"
+           t-att-data-resend="status['resend_in']" t-out="status['text']"/>
+
+        <form id="ikiku-otp-code" action="/enter/code/submit" method="post" class="ikiku__form"
+              t-att-hidden="failed and 'hidden'">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <label for="code" class="ikiku__label">کد ۶ رقمی</label>
+          <input class="ikiku__field ikiku__field--code" id="code" name="code" dir="ltr"
+                 inputmode="numeric" autocomplete="one-time-code" maxlength="12" required="required"
+                 t-att-aria-invalid="error and 'true'" t-att-aria-describedby="error and 'code-error'"/>
+          <p t-if="error" id="code-error" class="ikiku__error" role="alert" t-out="error"/>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
+        </form>
+
+        <form id="ikiku-otp-resend" action="/enter/code/resend" method="post"
+              t-att-hidden="not failed and status['resend_in'] and 'hidden'">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <button class="ikiku__secondary ikiku__go--block" type="submit">دوباره بفرست</button>
+        </form>
+
+        <p class="ikiku__links">
+          <a t-att-href="'/enter?as=%s' % role">شماره رو اشتباه زدم</a>
+          <a href="/help/code">کد نیومد؟</a>
+        </p>
+        <noscript><p class="ikiku__lead">اگه چیزی عوض نشد، صفحه رو دوباره باز کنید.</p></noscript>
+      </div></div>
+    </t>
+  </template>
+
+</odoo>

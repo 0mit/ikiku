@@ -22,6 +22,7 @@ IKIKU_MENUS = [
 # Odoo's contact form mails the company address, and there is none yet.
 RETIRED_MENU_URLS = ('/contactus',)
 PLACEHOLDER_COMPANY_NAMES = ('My Company', 'YourCompany')
+SESSION_DAYS = 30
 
 
 class Website(models.Model):
@@ -32,13 +33,19 @@ class Website(models.Model):
         company = self.env.ref('base.main_company')
         if company.name in PLACEHOLDER_COMPANY_NAMES:
             company.name = 'ایکیکو'
+        # Every sign-in by SMS costs a message, so a session lasts 30 days of inactivity
+        # (operator, D-3). The parameter is global: staff sessions last as long.
+        params = self.env['ir.config_parameter'].sudo()
+        if not params.get_param('sessions.max_inactivity_seconds'):
+            params.set_param('sessions.max_inactivity_seconds', SESSION_DAYS * 24 * 3600)
         langs = ['en_US'] + (['fa_IR'] if self.env['res.lang'].search_count(
             [('code', '=', 'fa_IR'), ('active', '=', True)]) else [])
         Menu = self.env['website.menu']
         for website in self.search([]):
-            # Signup is open to anyone; the website setting overrides the global
-            # one, and Odoo defaults it to invitation-only (b2b).
-            website.auth_signup_uninvited = 'b2c'
+            # Public email signup is closed (operator, 2026-09-16, D-1 B): people come in
+            # with a mobile number and an SMS code at /enter. /web/login stays for staff
+            # and for accounts that already use email.
+            website.auth_signup_uninvited = 'b2b'
             top = website.menu_id
             if not top:
                 continue

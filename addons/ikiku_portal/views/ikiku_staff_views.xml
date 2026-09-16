@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="ikiku_staff_account_form" model="ir.ui.view">
+    <field name="name">ikiku.staff.account.form</field>
+    <field name="model">ikiku.staff.account</field>
+    <field name="arch" type="xml">
+      <form string="ساختِ حساب برای کسی که خودش نمی‌تواند">
+        <p class="text-muted">
+          حساب بدونِ کدِ پیامک ساخته می‌شود. شماره تأییدنشده می‌ماند تا صاحبِ همان سیم‌کارت
+          یک بار با کد وارد شود؛ آن وقت به همین حساب می‌رسد. نامِ شما در تاریخچهٔ حساب می‌ماند.
+        </p>
+        <group>
+          <field name="name"/>
+          <field name="mobile" placeholder="۰۹۱۲۱۲۳۴۵۶۷"/>
+          <field name="role" widget="radio"/>
+          <field name="business_name" invisible="role != 'ku'" required="role == 'ku'"/>
+        </group>
+        <footer>
+          <button name="action_create" type="object" string="ساختِ حساب" class="btn-primary"/>
+          <button special="cancel" string="انصراف"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="ikiku_mobile_change_form" model="ir.ui.view">
+    <field name="name">ikiku.mobile.change.form</field>
+    <field name="model">ikiku.mobile.change</field>
+    <field name="arch" type="xml">
+      <form string="تغییرِ شمارهٔ موبایل">
+        <p class="text-muted">
+          فقط وقتی کارتِ ملیِ خودِ شخص را دیده‌اید. کدِ ملی با اثرِ ثبت‌شده مقایسه می‌شود و رقم‌هایش
+          نگه داشته نمی‌شود. همهٔ ورودهای قبلیِ این حساب بسته می‌شود.
+        </p>
+        <group>
+          <field name="partner_id" options="{'no_create': True}"/>
+          <field name="new_mobile" placeholder="۰۹۱۲۱۲۳۴۵۶۷"/>
+          <field name="national_id" password="True"/>
+        </group>
+        <footer>
+          <button name="action_apply" type="object" string="عوض کن" class="btn-primary"/>
+          <button special="cancel" string="انصراف"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_ikiku_staff_account" model="ir.actions.act_window">
+    <field name="name">ساختِ حساب برای کسی</field>
+    <field name="res_model">ikiku.staff.account</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <record id="action_ikiku_mobile_change" model="ir.actions.act_window">
+    <field name="name">تغییرِ شمارهٔ موبایل</field>
+    <field name="res_model">ikiku.mobile.change</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <menuitem id="menu_ikiku_people_help" name="کمک به آدم‌ها" parent="ikiku_base.menu_ikiku_root"
+            sequence="40" groups="ikiku_base.group_ikiku_staff"/>
+  <menuitem id="menu_ikiku_staff_account" parent="menu_ikiku_people_help" sequence="10"
+            action="action_ikiku_staff_account" groups="ikiku_base.group_ikiku_staff"/>
+  <menuitem id="menu_ikiku_mobile_change" parent="menu_ikiku_people_help" sequence="20"
+            action="action_ikiku_mobile_change" groups="ikiku_base.group_ikiku_staff"/>
+
+</odoo>
