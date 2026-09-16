@@ -160,5 +160,7 @@
       <field name="parent_id" ref="spec_shift"/>
       <field name="hint_terms">شب شبانه وایسه شب‌کار</field>
     </record>
+    <!-- Inside noupdate, so it runs on install only: a label a master changes survives -u. -->
+    <function model="ikiku.spec.node" name="_ikiku_apply_labels"/>
   </data>
 </odoo>

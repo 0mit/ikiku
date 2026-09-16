@@ -22,3 +22,7 @@ access_verification_portal,verification portal,model_ikiku_verification,base.gro
 access_verification_staff,verification staff,model_ikiku_verification,group_ikiku_staff,1,1,1,0
 access_dispute_portal,dispute portal,model_ikiku_dispute,base.group_portal,1,1,1,0
 access_dispute_staff,dispute staff,model_ikiku_dispute,group_ikiku_staff,1,1,1,0
+access_work_type_public,work type public,model_ikiku_work_type,base.group_public,1,0,0,0
+access_work_type_portal,work type portal,model_ikiku_work_type,base.group_portal,1,0,0,0
+access_work_type_user,work type user,model_ikiku_work_type,base.group_user,1,0,0,0
+access_work_type_master,work type master,model_ikiku_work_type,group_ikiku_master,1,1,1,1

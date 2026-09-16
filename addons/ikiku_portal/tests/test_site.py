@@ -4,7 +4,7 @@ from datetime import timedelta
 from odoo import fields
 from odoo.tests import HttpCase, tagged
 
-PUBLIC_KEYS = {'position', 'province', 'date_start_fa', 'date_end_fa', 'seats'}
+PUBLIC_KEYS = {'position', 'seats', 'work_type', 'province', 'city', 'date_start_fa', 'date_end_fa'}
 
 
 @tagged('post_install', '-at_install')
@@ -50,7 +50,7 @@ class TestSite(HttpCase):
 
     def test_jobs_filter_by_province(self):
         page = self.url_open('/ikiku/jobs?province=%d' % self.tehran.id).text
-        self.assertIn('۲ نفر', page)
+        self.assertIn('۲ نفر لازمه', page)
         self.assertNotIn('۳ نفر', page)
         self.assertNotIn('۹ نفر', page)
         self.assertNotIn(self.business.name, page)

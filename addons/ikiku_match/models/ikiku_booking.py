@@ -74,7 +74,7 @@ class IkikuBooking(models.Model):
     def _compute_fa(self):
         for rec in self:
             rec.date_start_fa = format_jalali(rec.date_start)
-            rec.date_end_fa = format_jalali(rec.date_end)
+            rec.date_end_fa = format_jalali(rec.date_end) if rec.date_end else "بدون پایان"
 
     @api.depends('venue_public', 'date_start', 'state')
     def _compute_venue_disclosed(self):

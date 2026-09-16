@@ -105,6 +105,14 @@ class IkikuProposal(models.Model):
             "فصل: %s از %s — ضریبِ تقاضا %s."
             % (to_fa_digits(round(season, 2)), to_fa_digits(W_SEASON),
                to_fa_digits(round(demand.season_factor or 1.0, 2))),
+            "نوعِ همکاری: %s — %s."
+            % (demand.work_type_id.name or "گفته نشده",
+               "می‌پذیرد" if availability and demand.work_type_id in availability.work_type_ids
+               else "نوعِ همکاری را نگفته، پس کنار گذاشته نشد"),
+            "زمان: آزاد از %s تا %s%s."
+            % (availability.date_start_fa if availability else "—",
+               availability.date_end_fa if availability else "—",
+               "؛ این نیاز پایان ندارد" if not demand.date_end else ""),
             "جمع: %s" % to_fa_digits(round(total, 2)),
         ]
         return {
@@ -116,14 +124,22 @@ class IkikuProposal(models.Model):
 
     @api.model
     def build_for_demand(self, demand, limit=20):
-        """Find resources free for the whole window and rank them."""
+        """Find resources free for the need and rank them.
+
+        A need with an end date needs someone free for the whole window. A need with
+        no end date (operator, 2026-09-16) goes to anyone free from its start; the
+        explanation then says how long they are free. Either way the kind of work must
+        be one the worker accepts, or one they have not ruled out by naming none.
+        None of this changes a weight: it decides who is ranked, not how."""
         if demand.state not in ('open', 'proposed'):
             raise UserError("فقط برای نیازِ باز می‌توان پیشنهاد ساخت.")
         Availability = self.env['ikiku.availability']
+        until = demand.date_end or demand.date_start
         candidates = Availability.search([
             ('state', '=', 'open'),
             ('date_start', '<=', demand.date_start),
-            ('date_end', '>=', demand.date_end),
+            '|', ('date_end', '=', False), ('date_end', '>=', until),
+            '|', ('work_type_ids', '=', False), ('work_type_ids', 'in', demand.work_type_id.ids),
             ('resource_id.state', '=', 'active'),
             '|', ('province_id', '=', demand.province_id.id), ('can_relocate', '=', True),
         ])

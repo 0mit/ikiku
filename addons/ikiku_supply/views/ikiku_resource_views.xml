@@ -82,6 +82,7 @@
                   <field name="date_end_fa" string="تا (شمسی)"/>
                   <field name="province_id"/>
                   <field name="city"/>
+                  <field name="work_type_ids" widget="many2many_tags"/>
                   <field name="hours_per_week"/>
                   <field name="state"/>
                 </list>

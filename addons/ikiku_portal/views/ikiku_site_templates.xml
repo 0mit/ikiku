@@ -127,11 +127,17 @@
     <div t-if="jobs" class="ikiku__jobs">
       <t t-foreach="jobs" t-as="job">
         <article class="ikiku__job">
-          <span class="ikiku__job-seats"><t t-out="job['seats']"/> نفر</span>
+          <div class="ikiku__job-tags">
+            <span t-if="job.get('seats')" class="ikiku__job-seats"><t t-out="job['seats']"/> نفر لازمه</span>
+            <span t-if="job.get('work_type')" class="ikiku__job-type" t-out="job['work_type']"/>
+          </div>
           <h3 t-out="job['position']"/>
-          <p class="ikiku__job-where" t-out="job['province']"/>
-          <p class="ikiku__job-when">
-            از <span t-out="job['date_start_fa']"/> تا <span t-out="job['date_end_fa']"/></p>
+          <p class="ikiku__job-where">
+            <t t-out="job.get('province')"/><t t-if="job.get('city')">، <t t-out="job['city']"/></t></p>
+          <p t-if="job.get('date_start_fa')" class="ikiku__job-when">
+            از <span t-out="job['date_start_fa']"/>
+            <t t-if="job.get('date_end_fa') == 'بدون پایان'"> · بدون پایان</t>
+            <t t-else=""> تا <span t-out="job.get('date_end_fa')"/></t></p>
         </article>
       </t>
     </div>

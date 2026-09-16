@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- The four kinds the operator set on 2026-09-16. noupdate: staff may reword the
+       plain description; code is what the matching and the pages rely on. -->
+  <data noupdate="1">
+    <record id="work_type_full_time" model="ikiku.work.type">
+      <field name="name">تمام‌وقت</field>
+      <field name="code">full_time</field>
+      <field name="description">هر روزِ کاری، یه روزِ کامل.</field>
+      <field name="sequence">10</field>
+    </record>
+    <record id="work_type_part_time" model="ikiku.work.type">
+      <field name="name">پاره‌وقت</field>
+      <field name="code">part_time</field>
+      <field name="description">چند ساعت در روز، یا چند روز در هفته.</field>
+      <field name="sequence">20</field>
+    </record>
+    <record id="work_type_temporary" model="ikiku.work.type">
+      <field name="name">موقت</field>
+      <field name="code">temporary</field>
+      <field name="description">یه مدتِ مشخص، مثلاً فصلِ عید یا تابستون.</field>
+      <field name="sequence">30</field>
+    </record>
+    <record id="work_type_per_shift" model="ikiku.work.type">
+      <field name="name">موردی</field>
+      <field name="code">per_shift</field>
+      <field name="description">چند شیفت، هر وقت لازم شد.</field>
+      <field name="sequence">40</field>
+    </record>
+  </data>
+</odoo>

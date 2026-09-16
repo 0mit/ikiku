@@ -13,6 +13,26 @@ The three states, and why each exists:
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+# The order and everyday names of the skills a person taps when signing up, keyed by
+# the stable code. A published order (بند ۸), never popularity. New skills come from
+# action_promote by a master, not from editing this list.
+SPEC_LABELS = {
+    'kitchen': (10, "آشپزخونه"),
+    'dishwashing': (10, "ظرف‌شستن"),
+    'prep': (20, "آماده‌کردن مواد"),
+    'line-cook': (30, "آشپزی"),
+    'chef': (40, "سرآشپزی"),
+    'bar': (20, "قهوه و بار"),
+    'barista': (10, "باریستا"),
+    'espresso': (20, "اسپرسو گرفتن"),
+    'latte-art': (30, "طرح روی قهوه"),
+    'brewbar': (40, "دم‌آوری قهوه"),
+    'floor': (30, "سالن"),
+    'waiter': (10, "گارسونی"),
+    'host': (20, "خوشامدگویی به مهمان"),
+    'cashier': (30, "صندوق‌داری"),
+}
+
 
 class IkikuSpecNode(models.Model):
     _name = 'ikiku.spec.node'
@@ -22,6 +42,11 @@ class IkikuSpecNode(models.Model):
 
     name = fields.Char("نام", required=True, translate=True)
     name_en = fields.Char("English name")
+    plain_label = fields.Char(
+        "نامِ ساده", help="همان کار به زبانِ روزمره، برای دکمه‌های ثبت‌نام. خالی یعنی همان نام.")
+    sequence = fields.Integer(
+        "ترتیبِ نمایش", default=100,
+        help="ترتیبی که دکمه‌ها نشان داده می‌شوند؛ ثابت و منتشرشده، هرگز بر پایهٔ پرطرفداری.")
     code = fields.Char("کد", required=True, help="kebab-case، پایدار و بدون تغییر.")
     complete_code = fields.Char(compute='_compute_complete_code', store=True, recursive=True)
     kind = fields.Selection([
@@ -46,6 +71,17 @@ class IkikuSpecNode(models.Model):
                                        readonly=True)
 
     _code_uniq = models.Constraint('UNIQUE(code)', "کد گره باید یکتا باشد.")
+
+    @api.model
+    def _ikiku_apply_labels(self):
+        """Write SPEC_LABELS. Run on install from the noupdate spec data and once by the
+        19.0.0.1.2 migration, never on every update, so a label a master changes stays."""
+        Node = self.with_context(active_test=False)
+        for code, (sequence, label) in SPEC_LABELS.items():
+            node = Node.search([('code', '=', code)], limit=1)
+            if node:
+                node.write({'sequence': sequence, 'plain_label': label})
+        return True
 
     @api.depends('code', 'parent_id.complete_code')
     def _compute_complete_code(self):

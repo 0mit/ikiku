@@ -87,10 +87,11 @@ class IkikuCostPeriod(models.Model):
                 rec.rate_change_pct = 0.0
 
     def _person_days(self, booking):
-        """Days of this booking that fall inside this period."""
+        """Days of this booking that fall inside this period. A booking with no end
+        date runs to the end of every period it reaches."""
         self.ensure_one()
         start = max(booking.date_start, self.date_start)
-        end = min(booking.date_end, self.date_end)
+        end = min(booking.date_end or self.date_end, self.date_end)
         return (end - start).days + 1 if end >= start else 0
 
     def action_allocate(self):
@@ -104,7 +105,7 @@ class IkikuCostPeriod(models.Model):
         bookings = self.env['ikiku.booking'].search([
             ('state', 'in', ('confirmed', 'in_progress', 'done')),
             ('date_start', '<=', self.date_end),
-            ('date_end', '>=', self.date_start),
+            '|', ('date_end', '=', False), ('date_end', '>=', self.date_start),
         ])
         per_business = {}
         for booking in bookings:

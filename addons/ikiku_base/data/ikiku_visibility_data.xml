@@ -97,5 +97,59 @@
       <field name="visibility">restricted</field>
       <field name="reason">تاریخِ بررسی هم داده‌ای دربارهٔ فرد است.</field>
     </record>
+    <record id="vis_ikiku_demand_position_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">position_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">عنوانِ داخلیِ هر مغازه است؛ عموم نامِ استانداردِ همان کار را می‌بیند.</field>
+    </record>
+    <record id="vis_ikiku_demand_business_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">business_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">بند ۷: محلِ کار تا آغازِ کار عمومی نیست.</field>
+    </record>
+    <record id="vis_ikiku_demand_note" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">note</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">یادداشتِ کسب‌وکار؛ ممکن است ساعت یا نشانی داشته باشد.</field>
+    </record>
+    <record id="vis_ikiku_demand_seats" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">seats</field>
+      <field name="visibility">public</field>
+      <field name="reason">چند نفر لازم است؛ دربارهٔ کار است، نه دربارهٔ کسی.</field>
+    </record>
+    <record id="vis_ikiku_demand_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">province_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">استانِ کار، نه نشانیِ آن.</field>
+    </record>
+    <record id="vis_ikiku_demand_city" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">city</field>
+      <field name="visibility">public</field>
+      <field name="reason">شهرِ کار، نه نشانیِ آن. تصمیمِ اپراتور، ۲۵ شهریور ۱۴۰۵.</field>
+    </record>
+    <record id="vis_ikiku_demand_date_start" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">date_start</field>
+      <field name="visibility">public</field>
+      <field name="reason">از کِی؛ دربارهٔ کار است، نه برنامهٔ کسی.</field>
+    </record>
+    <record id="vis_ikiku_demand_date_end" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">date_end</field>
+      <field name="visibility">public</field>
+      <field name="reason">تا کِی، یا بدون پایان؛ دربارهٔ کار است.</field>
+    </record>
+    <record id="vis_ikiku_demand_work_type_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">work_type_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">نوعِ همکاری؛ دربارهٔ کار است.</field>
+    </record>
   </data>
 </odoo>

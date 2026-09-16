@@ -8,6 +8,7 @@ fails at the worst possible moment. See the build map, "Jalali".
 The ledger stores Gregorian/UTC always. These functions run at the boundary:
 portal rendering and portal input. A Jalali string in a database column is a bug.
 """
+from datetime import date
 
 JALALI_MONTHS_FA = [
     "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
@@ -76,6 +77,29 @@ def jalali_to_gregorian(jy, jm, jd):
 
 def is_jalali_leap(jy):
     return ((jy + 12) % 33) % 4 == 1
+
+
+def jalali_month_days(jy, jm):
+    """Farvardin to Shahrivar have 31 days, Mehr to Bahman 30, Esfand 29 or 30."""
+    if jm <= 6:
+        return 31
+    if jm <= 11:
+        return 30
+    return 30 if is_jalali_leap(jy) else 29
+
+
+def jalali_date(jy, jm, jd):
+    """A checked Jalali date -> datetime.date, or ValueError('year' | 'month' | 'day').
+
+    jalali_to_gregorian is arithmetic and accepts anything: 31 Mehr quietly
+    becomes 1 Aban. A date a person typed or picked goes through this instead."""
+    if not 1300 <= jy <= 1500:
+        raise ValueError('year')
+    if not 1 <= jm <= 12:
+        raise ValueError('month')
+    if not 1 <= jd <= jalali_month_days(jy, jm):
+        raise ValueError('day')
+    return date(*jalali_to_gregorian(jy, jm, jd))
 
 
 def to_fa_digits(text):
