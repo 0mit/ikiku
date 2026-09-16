@@ -44,16 +44,16 @@ class TestSite(HttpCase):
         self.assertIn('آیکی؟ کو؟', page)
         self.assertIn('id="ikiku-doors"', page)
         self.assertIn(self.node.name, page)
-        self.assertIn('همهٔ کارهای باز (۲)', page)
+        self.assertIn('همه‌ی کارهای باز (۲)', page)
         self.assertNotIn(self.business.name, page)
         self.assertNotIn('عنوانِ داخلیِ ظرف‌شویِ شبِ ما', page)
 
     def test_jobs_filter_by_province(self):
-        page = self.url_open('/ikiku/jobs?province=%d' % self.tehran.id).text
+        page = self.url_open('/jobs?province=%d' % self.tehran.id).text
         self.assertIn('۲ نفر لازمه', page)
         self.assertNotIn('۳ نفر', page)
         self.assertNotIn('۹ نفر', page)
         self.assertNotIn(self.business.name, page)
-        everywhere = self.url_open('/ikiku/jobs?province=nonsense')
+        everywhere = self.url_open('/jobs?province=nonsense')
         self.assertEqual(everywhere.status_code, 200)
         self.assertIn('۳ نفر', everywhere.text)

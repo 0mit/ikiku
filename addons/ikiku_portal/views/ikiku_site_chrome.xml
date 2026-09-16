@@ -10,23 +10,25 @@
           <div class="ikiku__wide ikiku__footer-grid">
             <div>
               <h5>ایکیکو</h5>
-              <p>آیکی؟ کو؟ — نیروی حرفه‌ایِ کافه و رستوران و کسب‌وکارها، پیش از موعد و با
-                تعهدِ آشکار، به هم می‌رسند.</p>
+              <p>آیکی؟ کو؟ — کارگرِ کافه و رستوران و کسی که نیرو لازم داره، زودتر و جلوی چشمِ همه
+                به هم می‌رسن.</p>
             </div>
             <div>
-              <h5>ورود</h5>
+              <h5>برای شما</h5>
               <ul class="list-unstyled">
-                <li><a href="/ikiku/ki">کی؟ — برای نیروی کار</a></li>
-                <li><a href="/ikiku/ku">کو؟ — برای کسب‌وکار</a></li>
+                <li><a href="/ki">کار می‌خوام</a></li>
+                <li><a href="/ku">نیرو می‌خوام</a></li>
+                <li><a href="/help">راهنما</a></li>
+                <li><a href="/help/tamas?from=footer">می‌خوام یکی کمکم کنه</a></li>
               </ul>
             </div>
             <div>
-              <h5>در روشنایی</h5>
+              <h5>جلوی چشمِ همه</h5>
               <ul class="list-unstyled">
-                <li><a href="/ikiku/manifest">مرام‌نامه</a></li>
-                <li><a href="/ikiku/jobs">کارهای باز</a></li>
-                <li><a href="/ikiku/bookings">دفترِ عمومیِ تعهدها</a></li>
-                <li><a href="/ikiku/costs">هزینهٔ مشترک</a></li>
+                <li><a href="/jobs">کارهای باز</a></li>
+                <li><a href="/bookings">دفترِ قرارهای کار</a></li>
+                <li><a href="/costs">هزینه‌ی مشترک</a></li>
+                <li><a href="/manifest">مرام‌نامه</a></li>
               </ul>
             </div>
           </div>
@@ -50,11 +52,16 @@
   </template>
 
   <!-- The header button led to /contactus, whose form mails a company address that does
-       not exist. It leads to the two doors instead. The classes stay: the primary views
-       header_call_to_action_large and _sidebar address the link by oe_unremovable. -->
-  <template id="header_call_to_action" inherit_id="website.header_call_to_action" name="ایکیکو — دکمهٔ پیوستن">
+       not exist. A visitor gets «ثبت‌نام» (the two doors), a signed-in person «صفحه‌ی من».
+       Inside a flow it is hidden, so nobody leaves a half-filled step by mistake. The
+       classes stay: header_call_to_action_large and _sidebar address the link by
+       oe_unremovable. -->
+  <template id="header_call_to_action" inherit_id="website.header_call_to_action" name="ایکیکو — دکمهٔ سرصفحه">
     <xpath expr="//a[hasclass('btn_cta')]" position="replace">
-      <a href="/#ikiku-doors" class="oe_unremovable btn btn-primary btn_cta">پیوستن</a>
+      <t t-set="ikiku_in_flow" t-value="request.httprequest.path.startswith(('/join', '/enter', '/business/need'))"/>
+      <a t-if="not ikiku_in_flow and request.env.user._is_public()" href="/#ikiku-doors"
+         class="oe_unremovable btn btn-primary btn_cta">ثبت‌نام</a>
+      <a t-elif="not ikiku_in_flow" href="/me" class="oe_unremovable btn btn-primary btn_cta">صفحه‌ی من</a>
     </xpath>
   </template>
 

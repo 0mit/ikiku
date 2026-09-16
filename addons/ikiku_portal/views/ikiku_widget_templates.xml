@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- «قدم ۲ از ۵ · راهنما», and a bar that fills as the steps go by. -->
+  <template id="step_head" name="ایکیکو — سرِ قدم">
+    <div class="ikiku__stephead">
+      <span class="ikiku__step">
+        <t t-if="edit">عوض کردن</t>
+        <t t-else="">قدم <t t-out="request.env['ikiku.demand'].ikiku_fa_digits(step)"/> از <t t-out="request.env['ikiku.demand'].ikiku_fa_digits(total)"/></t>
+      </span>
+      <a class="ikiku__helplink" href="/help">راهنما</a>
+    </div>
+    <div t-if="not edit" class="ikiku__progress" role="presentation">
+      <span t-att-style="'inline-size: ' + str(100 * step // total) + '%'"/>
+    </div>
+  </template>
+
+  <!-- Skill tiles from the standard, grouped by family, in the published order. -->
+  <template id="skill_tiles" name="ایکیکو — دکمه‌های کار">
+    <t t-foreach="groups" t-as="group">
+      <fieldset class="ikiku__group">
+        <legend t-out="group[0].plain_label or group[0].name"/>
+        <div class="ikiku__tiles">
+          <t t-foreach="group[1]" t-as="node">
+            <label class="ikiku__tile">
+              <input t-att-type="input_type" name="node_id" t-att-value="node.id"
+                     t-att-checked="node.id in on_ids and 'checked'"
+                     t-att-disabled="node.id in locked_ids and 'disabled'"/>
+              <span><t t-out="node.plain_label or node.name"/>
+                <small t-if="node.id in locked_ids">ثبت شده</small></span>
+            </label>
+          </t>
+        </div>
+      </fieldset>
+    </t>
+  </template>
+
+  <!-- «از کِی؟» and «تا کِی؟» as buttons, with three selects for another day. -->
+  <template id="date_choices" name="ایکیکو — انتخابِ تاریخ">
+    <fieldset class="ikiku__group">
+      <legend>از کِی؟</legend>
+      <div class="ikiku__chips">
+        <t t-foreach="dates['starts']" t-as="choice">
+          <label class="ikiku__chip">
+            <input type="radio" name="start" t-att-value="choice[0]"
+                   t-att-checked="dates['start'] == choice[0] and 'checked'"/>
+            <span t-out="choice[1]"/>
+          </label>
+        </t>
+        <label class="ikiku__chip">
+          <input type="radio" name="start" value="custom" t-att-checked="dates['start'] == 'custom' and 'checked'"/>
+          <span>یه روزِ دیگه…</span>
+        </label>
+      </div>
+      <t t-call="ikiku_portal.date_selects"><t t-set="prefix" t-value="'start'"/></t>
+    </fieldset>
+    <fieldset class="ikiku__group">
+      <legend>تا کِی؟</legend>
+      <div class="ikiku__chips">
+        <t t-foreach="dates['ends']" t-as="choice">
+          <label class="ikiku__chip">
+            <input type="radio" name="end" t-att-value="choice[0]"
+                   t-att-checked="dates['end'] == choice[0] and 'checked'"/>
+            <span t-out="choice[1]"/>
+          </label>
+        </t>
+        <label class="ikiku__chip">
+          <input type="radio" name="end" value="custom" t-att-checked="dates['end'] == 'custom' and 'checked'"/>
+          <span>یه روزِ دیگه…</span>
+        </label>
+      </div>
+      <t t-call="ikiku_portal.date_selects"><t t-set="prefix" t-value="'end'"/></t>
+    </fieldset>
+  </template>
+
+  <template id="date_selects" name="ایکیکو — روز، ماه، سال">
+    <details class="ikiku__custom" t-att-open="dates['custom'].get(prefix) == 'custom' and 'open'">
+      <summary>روزِ دیگه رو اینجا انتخاب کنید</summary>
+      <div class="ikiku__selects">
+        <label>روز
+          <select class="ikiku__field" t-att-name="'%s_day' % prefix">
+            <option value="">روز</option>
+            <t t-foreach="dates['days']" t-as="d">
+              <option t-att-value="d[0]" t-att-selected="dates['custom'].get('%s_day' % prefix) == str(d[0]) and 'selected'" t-out="d[1]"/>
+            </t>
+          </select>
+        </label>
+        <label>ماه
+          <select class="ikiku__field" t-att-name="'%s_month' % prefix">
+            <option value="">ماه</option>
+            <t t-foreach="dates['months']" t-as="m">
+              <option t-att-value="m[0]" t-att-selected="dates['custom'].get('%s_month' % prefix) == str(m[0]) and 'selected'" t-out="m[1]"/>
+            </t>
+          </select>
+        </label>
+        <label>سال
+          <select class="ikiku__field" t-att-name="'%s_year' % prefix">
+            <t t-foreach="dates['years']" t-as="y">
+              <option t-att-value="y[0]" t-att-selected="dates['custom'].get('%s_year' % prefix) == str(y[0]) and 'selected'" t-out="y[1]"/>
+            </t>
+          </select>
+        </label>
+      </div>
+    </details>
+  </template>
+
+  <!-- Province first, nothing chosen for the person; the city is typed. -->
+  <template id="place_fields" name="ایکیکو — استان و شهر">
+    <label for="province_id" class="ikiku__label">استان</label>
+    <select class="ikiku__field ikiku__field--big" id="province_id" name="province_id" required="required"
+            t-att-aria-invalid="errors.get('province') and 'true'">
+      <option value="">استان رو انتخاب کنید</option>
+      <t t-foreach="provinces" t-as="p">
+        <option t-att-value="p.id" t-att-selected="p.id == province_id and 'selected'" t-out="p.name"/>
+      </t>
+    </select>
+    <p t-if="errors.get('province')" class="ikiku__error" role="alert" t-out="errors['province']"/>
+    <label for="city" class="ikiku__label">شهر</label>
+    <input class="ikiku__field ikiku__field--big" id="city" name="city" t-att-value="city" required="required"
+           placeholder="مثلاً: کرج" autocomplete="address-level2" t-att-aria-invalid="errors.get('city') and 'true'"/>
+    <p t-if="errors.get('city')" class="ikiku__error" role="alert" t-out="errors['city']"/>
+  </template>
+
+</odoo>

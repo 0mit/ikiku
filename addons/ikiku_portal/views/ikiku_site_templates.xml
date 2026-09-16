@@ -18,31 +18,31 @@
       <section class="ikiku__band ikiku__band--hero">
         <div class="ikiku__wide ikiku__hero">
           <div class="ikiku__hero-copy">
-            <p class="ikiku__kicker">ایکیکو · نیروی حرفه‌ای و کسب‌وکارِ کافه و رستوران</p>
+            <p class="ikiku__kicker">ایکیکو · کافه و رستوران</p>
             <h1 class="ikiku__ask">آیکی؟ کو؟</h1>
-            <p class="ikiku__lede">
-              این نام دو پرسش است: <strong>کی؟</strong> و <strong>کو؟</strong> — چه کسی، و کجا.
-              کارِ ایکیکو این است که آیکی، حتی آن کس که هنوز نمی‌شناسی‌اش، بدل شود به کسی
-              که می‌شناسی‌اش، و می‌دانی کجاست.
-            </p>
+            <p class="ikiku__plain">کار تو کافه و رستوران می‌خواید؟ یا نیرو لازم دارید؟</p>
           </div>
 
           <div id="ikiku-doors" class="ikiku__doors">
-            <a class="ikiku__door" href="/ikiku/ki">
+            <a class="ikiku__door" href="/ki">
               <span class="ikiku__door-ask">کی؟</span>
-              <strong class="ikiku__door-who">نیروی کار هستم</strong>
-              <span>ظرفشور، باریستا، آشپز، گارسون. پرونده‌ای روشن از مهارت و سابقه‌تان به نامِ خودتان
-                بسازید، و بگویید از کِی تا کِی و در کجا می‌توانید کار کنید.</span>
-              <span class="ikiku__door-go">ساختِ پرونده</span>
+              <strong class="ikiku__door-who">دنبالِ کار هستم</strong>
+              <span>ظرف‌شستن، قهوه، آشپزی، گارسونی. با شماره موبایل، حدودِ ۳ دقیقه.</span>
+              <span class="ikiku__door-go">ثبت‌نام برای کار</span>
             </a>
-            <a class="ikiku__door" href="/ikiku/ku">
+            <a class="ikiku__door" href="/ku">
               <span class="ikiku__door-ask">کو؟</span>
-              <strong class="ikiku__door-who">کسب‌وکار دارم</strong>
-              <span>کافه یا رستوران. جایگاه‌های کاری‌تان را تعریف کنید و نیازِ سه ماهِ بعد را
-                همین حالا اعلام کنید؛ هرچه زودتر، انتخابِ بیشتر.</span>
-              <span class="ikiku__door-go">تعریفِ جایگاه</span>
+              <strong class="ikiku__door-who">نیرو لازم دارم</strong>
+              <span>کافه یا رستوران دارید؟ بگید چه نیرویی، چند نفر و از کِی.</span>
+              <span class="ikiku__door-go">نیرو می‌خوام</span>
             </a>
+            <p class="ikiku__doors-note">ایمیل و رمز لازم نیست. فقط شماره موبایل.</p>
           </div>
+
+          <p class="ikiku__lede">
+            این اسم دو تا سؤاله: <strong>کی؟</strong> و <strong>کو؟</strong> — چه کسی، و کجا.
+            کارِ ایکیکو اینه که آیکی، حتی کسی که هنوز نمی‌شناسیدش، بشه کسی که می‌شناسیدش و می‌دونید کجاست.
+          </p>
         </div>
       </section>
 
@@ -50,15 +50,15 @@
         <div class="ikiku__wide">
           <div class="ikiku__band-head">
             <div>
-              <p class="ikiku__kicker">در روشنایی</p>
+              <p class="ikiku__kicker">همه می‌بینن</p>
               <h2>کارهای باز</h2>
-              <p class="ikiku__muted">نیازهایی که کسب‌وکارها اعلام کرده‌اند. نامِ کسب‌وکار و محلِ کار
-                اینجا نوشته نمی‌شود.</p>
+              <p class="ikiku__lead">نیرویی که کافه‌ها و رستوران‌ها لازم دارن. اسمِ کافه یا رستوران اینجا نوشته نمیشه.</p>
             </div>
-            <a t-if="jobs_count" class="ikiku__secondary" href="/ikiku/jobs">
-              همهٔ کارهای باز (<t t-out="Demand.ikiku_fa_digits(jobs_count)"/>)</a>
+            <a t-if="jobs_count" class="ikiku__secondary" href="/jobs">
+              همه‌ی کارهای باز (<t t-out="Demand.ikiku_fa_digits(jobs_count)"/>)</a>
           </div>
           <t t-call="ikiku_portal.job_cards"/>
+          <p t-if="jobs" class="ikiku__lead">کار می‌خواید؟ <a href="/ki">ثبت‌نام کنید</a>؛ ایکیکو خودش شما رو معرفی می‌کنه.</p>
         </div>
       </section>
 
@@ -66,18 +66,15 @@
         <div class="ikiku__wide">
           <div class="ikiku__band-head">
             <div>
-              <p class="ikiku__kicker">از پرونده تا تعهد</p>
-              <h2>چطور کار می‌کند</h2>
+              <p class="ikiku__kicker">از ثبت‌نام تا سرِ کار</p>
+              <h2>چطوری کار می‌کنه؟</h2>
             </div>
           </div>
           <ol class="ikiku__steps">
-            <li><strong>پرونده.</strong> نیرو مهارت‌هایش را به زبانِ خودش می‌نویسد؛ سامانه مهارتِ
-              استاندارد را پیشنهاد می‌دهد و خودِ او تأیید می‌کند.</li>
-            <li><strong>نیاز.</strong> کسب‌وکار جایگاهش را تعریف می‌کند و نیازِ هر دوره را از پیش
-              اعلام می‌کند: چند نفر، از کِی تا کِی، کجا.</li>
-            <li><strong>پیشنهاد.</strong> این دو پیش از موعد به هم می‌رسند، با رتبه‌ای که راهِ
-              رسیدن به هر عددش پیداست.</li>
-            <li><strong>تعهد.</strong> هر گمارش در دفترِ عمومی ثبت می‌شود — و هر لغو هم.</li>
+            <li><strong>کارگر</strong> میگه چه کاری بلده و کِی آزاده.</li>
+            <li><strong>کافه یا رستوران</strong> میگه چه نیرویی، چند نفر، از کِی.</li>
+            <li><strong>ایکیکو</strong> کسانی رو که به هم می‌خورن معرفی می‌کنه، و میگه هر عدد از کجا اومده.</li>
+            <li><strong>قرارِ کار</strong> که گذاشته شد، همه می‌بینن. اگه به هم بخوره هم همه می‌بینن.</li>
           </ol>
         </div>
       </section>
@@ -85,38 +82,36 @@
       <section class="ikiku__band">
         <div class="ikiku__wide ikiku__trust">
           <div class="ikiku__tenets-panel">
-            <p class="ikiku__kicker">مرام‌نامه</p>
-            <h2>آنچه به آن پایبندیم</h2>
+            <p class="ikiku__kicker">مرام‌نامه، ساده</p>
+            <h2>قول‌هایی که دادیم</h2>
             <ul class="ikiku__tenets">
-              <li><strong>کار، حیثیت است.</strong> هیچ کاری «ساده» نیست؛ در ایکیکو آدم‌ها شماره نیستند.</li>
-              <li><strong>اعتماد، قابلِ حمل است.</strong> آبرویی که به دست می‌آورید به نامِ خودتان نوشته
-                می‌شود و با شما می‌رود؛ به شهرِ دیگر، به شغلِ دیگر.</li>
-              <li><strong>هر ادعا صاحبی دارد.</strong> داده‌ای که نتوان پرسید «این را که گفت؟» داده نیست.</li>
-              <li><strong>ایمنیِ آدم‌ها، پیش از شفافیت.</strong> حرفهٔ شما عمومی است؛ نشانی، شمارهٔ تماس،
-                کدِ ملی و برنامهٔ زمانیِ شما نه.</li>
-              <li><strong>واسطه‌ایم، نه دلال.</strong> هیچ‌کس نمی‌تواند با پول رتبه‌اش را بالا ببرد یا
-                نقدی را پاک کند.</li>
+              <li><strong>هر کاری آبرو داره.</strong> هیچ کاری «ساده» نیست؛ ظرف‌شستن هم فنه. تو ایکیکو آدم‌ها شماره نیستن. <small>بند ۱</small></li>
+              <li><strong>آبروی کاری مالِ خودتونه.</strong> هر چی تو کار به دست میارید به اسمِ خودتون نوشته میشه و با شما میاد؛ به شهرِ دیگه، به کارِ دیگه. <small>بند ۲</small></li>
+              <li><strong>هر حرفی صاحب داره.</strong> معلومه کی گفته و از کجا می‌دونه. حرفی که نشه پرسید «کی گفته؟» حساب نیست. <small>بند ۳</small></li>
+              <li><strong>امنیتِ آدم‌ها اول.</strong> کارتون رو همه می‌بینن؛ آدرس، شماره، کدِ ملی و برنامه‌ی روزتون رو نه. <small>بند ۷</small></li>
+              <li><strong>واسطه‌ایم، نه دلال.</strong> هیچ‌کس با پول رتبه‌ش بالا نمیره، و هیچ‌کس با پول نقدی رو پاک نمی‌کنه. <small>بند ۸</small></li>
             </ul>
-            <p><a class="ikiku__link" href="/ikiku/manifest">مرام‌نامه را کامل بخوانید</a></p>
+            <p class="ikiku__links"><a class="ikiku__link" href="/help/maram">خلاصه‌ی ساده‌ی همه‌ی بندها</a>
+              <a class="ikiku__link" href="/manifest">متنِ کاملِ مرام‌نامه</a></p>
           </div>
 
           <div class="ikiku__ledgers-panel">
-            <p class="ikiku__kicker">هر کسی می‌تواند ببیند</p>
-            <h2>در روشنایی</h2>
+            <p class="ikiku__kicker">همه می‌بینن</p>
+            <h2>جلوی چشمِ همه</h2>
             <ul class="ikiku__ledgers">
-              <li><a href="/ikiku/jobs"><strong>کارهای باز</strong>
-                <span>نیازهایی که کسب‌وکارها اعلام کرده‌اند.</span></a></li>
-              <li><a href="/ikiku/bookings"><strong>دفترِ عمومیِ تعهدها</strong>
-                <span>هر گمارش، و هر لغو.</span></a></li>
-              <li><a href="/ikiku/costs"><strong>هزینهٔ مشترک</strong>
-                <span>هزینهٔ واقعیِ اداره‌کردنِ ایکیکو و سهمِ هر روز-نفر.</span></a></li>
+              <li><a href="/jobs"><strong>کارهای باز</strong>
+                <span>نیرویی که کافه‌ها و رستوران‌ها لازم دارن.</span></a></li>
+              <li><a href="/bookings"><strong>دفترِ قرارهای کار</strong>
+                <span>هر قرارِ کاری که گذاشته شد، و هر قراری که به هم خورد.</span></a></li>
+              <li><a href="/costs"><strong>هزینه‌ی مشترک</strong>
+                <span>خرجِ واقعیِ ایکیکو، و سهمِ هر کافه و رستوران.</span></a></li>
             </ul>
           </div>
         </div>
       </section>
 
       <div class="ikiku__wide">
-        <p class="ikiku__muted">آغازِ کار: کافه‌ها و رستوران‌های ایران. مرام‌نامه هنوز پیش‌نویس است.</p>
+        <p class="ikiku__lead">شروعِ کار: کافه‌ها و رستوران‌های ایران. مرام‌نامه هنوز پیش‌نویسه.</p>
       </div>
     </div>
   </template>
@@ -142,85 +137,65 @@
       </t>
     </div>
     <div t-else="" class="ikiku__empty">
-      هنوز نیازی اعلام نشده است. <a href="/ikiku/ku">نخستین کسب‌وکار باشید</a>.
+      هنوز کارِ بازی نیست. نیرو لازم دارید؟ <a href="/ku">اینجا بگید</a>.
     </div>
-  </template>
-
-  <!-- Shared by both doors: signup and login, each carrying the redirect into the right flow. -->
-  <template id="door_actions" name="ایکیکو — ورود از در">
-    <div class="ikiku__actions">
-      <a t-if="signup_enabled" class="ikiku__go" t-att-href="signup_url">ساختِ حساب</a>
-      <a class="ikiku__secondary" t-att-href="login_url">حساب دارم — ورود</a>
-    </div>
-    <p t-if="signup_enabled" class="ikiku__muted">
-      ثبت‌نام با ایمیل و گذرواژه است. پس از ساختِ حساب مستقیم به گامِ نخست می‌روید.
-    </p>
-    <p t-else="" class="ikiku__muted">ثبت‌نامِ تازه موقتاً بسته است.</p>
   </template>
 
   <template id="door_ki" name="ایکیکو — کی؟">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <p class="ikiku__kicker">برای نیروی کار</p>
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__kicker">برای کسی که دنبالِ کاره</p>
         <h1 class="ikiku__ask">کی؟</h1>
-        <p class="ikiku__lede">
-          ایکیکو پرونده‌ای حرفه‌ای به نامِ خودِ شما می‌سازد — مهارت، سابقه، و تأییدهایی که
-          دیگران داده‌اند — تا از این کار با شما به کارِ بعد برود.
-        </p>
-        <ol class="ikiku__steps">
-          <li><strong>شما.</strong> شمارهٔ موبایل، یک خط دربارهٔ خودتان، استان و شهر.</li>
-          <li><strong>مهارت‌ها.</strong> به زبانِ خودتان بنویسید؛ ما مهارتِ استاندارد را پیشنهاد
-            می‌دهیم و شما تأیید می‌کنید.</li>
-          <li><strong>زمان و مکان.</strong> از کِی تا کِی، و در کدام استان و شهر می‌توانید کار کنید.</li>
-        </ol>
-        <div class="ikiku__note">
-          نشانیِ خانه، شمارهٔ تماس، کدِ ملی و برنامهٔ زمانیِ شما عمومی نمی‌شود — بندِ ۷
-          مرام‌نامه. آنچه عمومی است حرفهٔ شماست.
-        </div>
-        <div t-if="otp_enabled" class="ikiku__note">
-          شمارهٔ موبایلتان را با کدی که پیامک می‌شود تأیید می‌کنید. هویتِ شما را کارکنانِ
-          ایکیکو جداگانه تأیید می‌کنند؛ تا آن روز «هنوز تأیید نشده» نمایش داده می‌شود.
-        </div>
-        <div t-else="" class="ikiku__note">
-          تأییدِ شمارهٔ موبایل با پیامک هنوز راه نیفتاده است. تا آن روز هویتِ شما
-          «هنوز تأیید نشده» نمایش داده می‌شود و کارکنانِ ایکیکو آن را دستی تأیید می‌کنند.
-        </div>
-        <t t-call="ikiku_portal.door_actions"/>
+        <p class="ikiku__plain">دنبالِ کار هستید؟</p>
+        <ul class="ikiku__plainlist">
+          <li>ظرف‌شستن، قهوه، آشپزی، گارسونی.</li>
+          <li>حدودِ ۳ دقیقه طول می‌کشه.</li>
+          <li>شماره و آدرس‌تون رو به هیچ‌کس نشون نمی‌دیم. <a href="/help/dide">چرا؟</a></li>
+        </ul>
+        <t t-if="otp_enabled">
+          <a class="ikiku__go ikiku__go--block" t-att-href="start_url">شروع کنیم</a>
+          <p class="ikiku__links"><a t-att-href="start_url">قبلاً ثبت‌نام کردم، وارد می‌شم</a>
+            <a href="/help/kar">راهنما</a></p>
+        </t>
+        <t t-else="">
+          <div class="ikiku__note">ثبت‌نام با پیامک الان کار نمی‌کنه. کمی بعد دوباره بیاید، یا
+            <a href="/help/tamas?from=ki">بگید باهاتون تماس بگیریم</a>.</div>
+          <p class="ikiku__links"><a href="/web/login">ورود با ایمیل</a></p>
+        </t>
       </div></div>
     </t>
   </template>
 
   <template id="door_ku" name="ایکیکو — کو؟">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <p class="ikiku__kicker">برای کسب‌وکار</p>
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__kicker">برای کافه و رستوران</p>
         <h1 class="ikiku__ask">کو؟</h1>
-        <p class="ikiku__lede">
-          بگویید کجا، و چه کسی را لازم دارید. ایکیکو نیرویی پیشنهاد می‌دهد که مهارتش
-          راست‌آزمایی شده و تعهدش عمومی است.
-        </p>
-        <ol class="ikiku__steps">
-          <li><strong>نام.</strong> نامِ کافه یا رستورانتان، همان که روی سردر است.</li>
-          <li><strong>جایگاه.</strong> همان‌طور که با کارکنانتان حرف می‌زنید بنویسید — مثلاً «یکی که
-            ظرف بشوره و شیفت شب وایسه» — و از میانِ پیشنهادها مهارتِ استاندارد را بردارید.</li>
-          <li><strong>نیاز.</strong> چند نفر، از کِی تا کِی، در کدام استان و شهر. نیازِ سه ماهِ بعد را
-            همین حالا اعلام کنید.</li>
-          <li><strong>پیشنهادها.</strong> ببینید چه کسانی پیشنهاد شده‌اند؛ هر عدد راهِ رسیدن به آن
-            هم پیداست.</li>
-        </ol>
-        <div class="ikiku__note">
-          ایکیکو از فاصلهٔ میان کارگر و کارفرما نان نمی‌خورد. هزینهٔ واقعیِ اداره‌کردنِ سامانه
-          به نسبتِ روز-نفر میانِ کسب‌وکارها تقسیم و در
-          <a href="/ikiku/costs">هزینهٔ مشترک</a> منتشر می‌شود.
-        </div>
-        <t t-call="ikiku_portal.door_actions"/>
+        <p class="ikiku__plain">برای کافه یا رستورانتون نیرو می‌خواید؟</p>
+        <ul class="ikiku__plainlist">
+          <li>بگید چه نیرویی، چند نفر، از کِی، کجا.</li>
+          <li>ایکیکو از مزدِ کارگر چیزی برنمی‌داره. <a href="/help/hazine">هزینه‌ش چطوریه؟</a></li>
+        </ul>
+        <t t-if="otp_enabled">
+          <a class="ikiku__go ikiku__go--block" t-att-href="start_url">شروع کنیم</a>
+          <p class="ikiku__links"><a t-att-href="start_url">قبلاً ثبت‌نام کردم، وارد می‌شم</a>
+            <a href="/help/niroo">راهنما</a></p>
+        </t>
+        <t t-else="">
+          <div class="ikiku__note">ثبت‌نام با پیامک الان کار نمی‌کنه. کمی بعد دوباره بیاید، یا
+            <a href="/help/tamas?from=ku">بگید باهاتون تماس بگیریم</a>.</div>
+          <p class="ikiku__links"><a href="/web/login">ورود با ایمیل</a></p>
+        </t>
       </div></div>
     </t>
   </template>
 
   <template id="manifest_page" name="ایکیکو — مرام‌نامه">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell ikiku__manifest" t-out="body"/></div>
+      <div class="ikiku"><div class="ikiku__shell ikiku__manifest">
+        <p class="ikiku__note">متنِ کامل و رسمیِ قانونِ ایکیکو. <a href="/help/maram">خلاصه‌ی ساده‌اش اینجاست.</a></p>
+        <t t-out="body"/>
+      </div></div>
     </t>
   </template>
 

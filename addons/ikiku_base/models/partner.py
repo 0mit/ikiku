@@ -17,6 +17,11 @@ from .jalali import to_latin_digits
 
 IR_MOBILE = re.compile(r'^(?:\+98|0098|0)?9\d{9}$')
 
+# Standing, the whole rule (بند ۸). Pages and help render these, never a copy of them.
+STANDING_VERIFIED = 1.0        # identity checked by staff
+STANDING_PER_SUPPORTED = 0.25  # each claim someone else confirmed
+STANDING_MAX = 5.0
+
 
 class ResPartner(models.Model):
     _inherit = ['res.partner', 'ikiku.publishable']
@@ -55,8 +60,9 @@ class ResPartner(models.Model):
         """Bounded and readable. No hidden formula -- بند ۸ and the 'never' list."""
         for partner in self:
             supported = partner.ikiku_assertion_ids.filtered(lambda a: a.state == 'supported')
-            standing = (1.0 if partner.ikiku_is_verified else 0.0) + 0.25 * len(supported)
-            partner.ikiku_standing = min(standing, 5.0)
+            standing = (STANDING_VERIFIED if partner.ikiku_is_verified else 0.0) \
+                + STANDING_PER_SUPPORTED * len(supported)
+            partner.ikiku_standing = min(standing, STANDING_MAX)
 
     @api.model
     def normalise_mobile(self, raw):

@@ -8,19 +8,21 @@ Odoo's placeholder company name — and leaves anything a person has set alone.
 """
 from odoo import api, models
 
-# The two questions of the name are the two doors: کی؟ is who (a worker),
-# کو؟ is where (a business). The rest are the public ledgers and the law.
+# The two doors in plain words (کی؟ is the worker, کو؟ the business), the open jobs,
+# and help. The ledgers and the law moved to the footer on 2026-09-16; the home page
+# still shows them. Each entry lists the addresses it had before, so the menu record
+# is updated in place rather than duplicated.
 IKIKU_MENUS = [
-    ('/', 'خانه', 10),
-    ('/ikiku/ki', 'کی؟', 20),
-    ('/ikiku/ku', 'کو؟', 30),
-    ('/ikiku/jobs', 'کارهای باز', 40),
-    ('/ikiku/bookings', 'دفترِ تعهدها', 50),
-    ('/ikiku/costs', 'هزینهٔ مشترک', 60),
-    ('/ikiku/manifest', 'مرام‌نامه', 70),
+    ('/', 'خانه', 10, ()),
+    ('/ki', 'کار می‌خوام', 20, ('/ikiku/ki',)),
+    ('/ku', 'نیرو می‌خوام', 30, ('/ikiku/ku',)),
+    ('/jobs', 'کارهای باز', 40, ('/ikiku/jobs',)),
+    ('/help', 'راهنما', 50, ()),
 ]
-# Odoo's contact form mails the company address, and there is none yet.
-RETIRED_MENU_URLS = ('/contactus',)
+# Odoo's contact form mails the company address, and there is none yet. The ledger and
+# manifesto entries are in the footer now.
+RETIRED_MENU_URLS = ('/contactus', '/ikiku/bookings', '/ikiku/costs', '/ikiku/manifest',
+                     '/bookings', '/costs', '/manifest')
 PLACEHOLDER_COMPANY_NAMES = ('My Company', 'YourCompany')
 SESSION_DAYS = 30
 
@@ -50,12 +52,12 @@ class Website(models.Model):
             if not top:
                 continue
             children = top.child_id
-            for url, name, sequence in IKIKU_MENUS:
-                menu = children.filtered(lambda m: m.url == url)[:1]
+            for url, name, sequence, old_urls in IKIKU_MENUS:
+                menu = children.filtered(lambda m: m.url == url or m.url in old_urls)[:1]
                 if not menu:
                     menu = Menu.create({'name': name, 'url': url, 'parent_id': top.id,
                                         'website_id': website.id, 'sequence': sequence})
-                menu.sequence = sequence
+                menu.write({'url': url, 'sequence': sequence})
                 for lang in langs:
                     menu.with_context(lang=lang).name = name
             children.filtered(lambda m: m.url in RETIRED_MENU_URLS).unlink()

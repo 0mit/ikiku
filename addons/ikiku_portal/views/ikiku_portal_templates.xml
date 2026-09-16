@@ -1,319 +1,448 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-  <template id="resource_intake" name="ایکیکو — ثبت‌نام نیرو">
+  <!-- ============================================================ workers (کی؟) -->
+
+  <template id="join_name" name="ایکیکو — اسم">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <div class="ikiku__step">گامِ ۱ از ۳</div>
-        <h1 class="ikiku__question">شما را چه بنامیم، و کجا هستید؟</h1>
-        <p class="ikiku__help">
-          نشانیِ خانه‌تان را نمی‌پرسیم و ثبت نمی‌کنیم. فقط استان و شهر،
-          چون کار در جایی است.
-        </p>
-        <div t-if="error" class="ikiku__note" t-out="error"/>
-        <form action="/ikiku/join/submit" method="post">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <t t-if="not for_business" t-call="ikiku_portal.step_head"/>
+        <h1 class="ikiku__question">اسمتون چیه؟</h1>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-          <p><label for="mobile">شمارهٔ موبایل</label>
-             <input class="ikiku__field" type="text" id="mobile" name="mobile"
-                    t-att-value="partner.ikiku_mobile or ''"
-                    placeholder="۰۹۱۲۳۴۵۶۷۸۹" required="required"/></p>
-          <p class="ikiku__muted">شماره لنگرِ هویتِ شماست تا کسی نتواند دو بار ثبت‌نام کند.
-             روی پروندهٔ عمومی نمایش داده نمی‌شود.
-             <t t-if="mobile_verified">این شماره با پیامک تأیید شده است.</t>
-             <t t-elif="otp_enabled">پس از «ادامه» کدی به همین شماره پیامک می‌شود.</t></p>
-
-          <p><label for="headline">یک خط دربارهٔ خودتان</label>
-             <input class="ikiku__field" type="text" id="headline" name="headline"
-                    t-att-value="resource and resource.headline or ''"
-                    placeholder="مثلاً: باریستا، شش سال، شیراز"/></p>
-
-          <p><label for="province_id">استان</label>
-             <select class="ikiku__field" id="province_id" name="province_id" required="required">
-               <t t-foreach="provinces" t-as="p">
-                 <option t-att-value="p.id" t-out="p.name"/>
-               </t>
-             </select></p>
-          <p><label for="city">شهر</label>
-             <input class="ikiku__field" type="text" id="city" name="city"
-                    t-att-value="partner.ikiku_city or ''"/></p>
-          <button class="ikiku__go" type="submit">ادامه</button>
+          <input t-if="for_business" type="hidden" name="for" value="ku"/>
+          <input t-if="edit" type="hidden" name="edit" value="1"/>
+          <label for="name" class="ikiku__label">اسم و فامیل</label>
+          <input class="ikiku__field ikiku__field--big" id="name" name="name" t-att-value="name"
+                 placeholder="مثلاً: رضا محمدی" autocomplete="name" maxlength="120" required="required"
+                 t-att-aria-invalid="error and 'true'" t-att-aria-describedby="'name-error' if error else 'name-help'"/>
+          <p t-if="error" id="name-error" class="ikiku__error" role="alert" t-out="error"/>
+          <p id="name-help" class="ikiku__lead">
+            <t t-if="for_business">این اسمِ خودتونه، نه اسمِ کافه. اسمِ کافه رو بعدش می‌پرسیم.</t>
+            <t t-else="">این اسم روی صفحه‌ی کاری‌تون دیده میشه. شماره و آدرس‌تون دیده نمیشه.</t>
+          </p>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
       </div></div>
     </t>
   </template>
 
-  <template id="resource_verify" name="ایکیکو — تأییدِ شماره">
+  <template id="join_where" name="ایکیکو — کجا">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <div class="ikiku__step">گامِ ۱ از ۳ · تأییدِ شماره</div>
-        <h1 class="ikiku__question">کدی را که پیامک شد بنویسید</h1>
-        <p class="ikiku__help">
-          یک کدِ شش‌رقمی به <bdi dir="ltr" t-out="masked"/> فرستاده می‌شود. تا دو دقیقه صبر
-          می‌کنیم و نتیجه را همین‌جا می‌بینید.
-        </p>
-        <div t-if="error" class="ikiku__note" t-out="error"/>
-        <p id="ikiku-otp" class="ikiku__note" data-state-url="/ikiku/join/verify/state"
-           t-att-data-state="status['state']" t-att-data-wait="status['wait_left']"
-           t-att-data-resend="status['resend_in']" t-out="status['text']"/>
-        <form action="/ikiku/join/verify/submit" method="post">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <t t-call="ikiku_portal.step_head"/>
+        <h1 class="ikiku__question">کدوم استان و کدوم شهر؟</h1>
+        <p class="ikiku__lead">آدرسِ خونه رو نمی‌خوایم. فقط شهر.</p>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-          <input class="ikiku__field" name="code" dir="ltr" inputmode="numeric"
-                 autocomplete="one-time-code" maxlength="6" required="required"
-                 placeholder="------"/>
-          <button class="ikiku__go" type="submit">تأیید</button>
+          <input t-if="edit" type="hidden" name="edit" value="1"/>
+          <t t-call="ikiku_portal.place_fields"/>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
-        <form action="/ikiku/join/verify/resend" method="post">
-          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-          <button class="ikiku__secondary" type="submit" data-otp-resend=""
-                  t-att-disabled="status['resend_in'] and 'disabled'">فرستادنِ دوباره</button>
-        </form>
-        <p><a href="/ikiku/join">شماره را اشتباه نوشتم</a></p>
-        <noscript><p class="ikiku__muted">اگر وضعیت عوض نشد، صفحه را تازه کنید.</p></noscript>
       </div></div>
     </t>
   </template>
 
-  <template id="resource_skills" name="ایکیکو — مهارت‌ها">
+  <template id="join_skills" name="ایکیکو — چه کاری بلدید">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
-        <div class="ikiku__step">گامِ ۲ از ۳</div>
-        <h1 class="ikiku__question">چه کاری بلدید؟</h1>
-        <p class="ikiku__help">
-          به زبانِ خودتان بنویسید. ما حدس می‌زنیم منظورتان کدام مهارتِ استاندارد است،
-          و شما تأیید می‌کنید. اگر حدسمان درست نبود، همان که نوشتید نگه داشته می‌شود.
-        </p>
-        <form action="/ikiku/join/skills" method="get">
-          <input class="ikiku__field" type="text" name="raw" t-att-value="raw"
-                 placeholder="مثلاً: قهوه درست می‌کنم و شیفت شب هم می‌مانم"/>
-          <button class="ikiku__go" type="submit">ببین چه می‌فهمی</button>
+        <t t-call="ikiku_portal.step_head"/>
+        <h1 class="ikiku__question">چه کارهایی بلدید؟</h1>
+        <p class="ikiku__lead">هر چند تا که بلدید بزنید.</p>
+        <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <input t-if="edit" type="hidden" name="edit" value="1"/>
+          <t t-call="ikiku_portal.skill_tiles">
+            <t t-set="input_type" t-value="'checkbox'"/>
+            <t t-set="on_ids" t-value="claimed.ids"/>
+            <t t-set="locked_ids" t-value="claimed.ids"/>
+          </t>
+          <p class="ikiku__lead">این رو خودتون می‌گید. بعداً کسانی که باهاتون کار کردن می‌تونن تأییدش کنن.</p>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
 
-        <t t-if="raw">
-          <t t-if="proposals">
-            <p class="ikiku__help">این‌ها را فهمیدیم. کدام درست است؟</p>
-            <ul class="ikiku__proposals">
-              <t t-foreach="proposals" t-as="node">
-                <li class="ikiku__proposal">
-                  <span><strong t-out="node.name"/>
-                    <span class="ikiku__muted" t-out="node.complete_code"/></span>
-                  <form action="/ikiku/join/skills/confirm" method="post">
-                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                    <input type="hidden" name="raw" t-att-value="raw"/>
-                    <input type="hidden" name="node_id" t-att-value="node.id"/>
-                    <button type="submit">همین است</button>
-                  </form>
-                </li>
-              </t>
-            </ul>
-          </t>
-          <t t-else="">
-            <div class="ikiku__note">
-              چیزی که نوشتید در استانداردِ ما نیست. حذفش نمی‌کنیم — عیناً ثبت می‌شود و
-              اگر چند نفرِ دیگر هم همین را بگویند، به استاندارد اضافه می‌شود.
-            </div>
-          </t>
-          <p class="ikiku__help">یا از فهرست انتخاب کنید:</p>
-          <form action="/ikiku/join/skills/confirm" method="post">
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            <input type="hidden" name="raw" t-att-value="raw"/>
-            <select class="ikiku__field" name="node_id">
-              <t t-foreach="families" t-as="f">
-                <option t-att-value="f.id" t-out="f.name"/>
-              </t>
-            </select>
-            <button class="ikiku__go" type="submit">ثبت کن</button>
+        <details class="ikiku__more" t-att-open="raw and 'open'">
+          <summary>کارتون اینجا نیست؟ خودتون بنویسید</summary>
+          <form method="get" class="ikiku__form">
+            <input t-if="edit" type="hidden" name="edit" value="1"/>
+            <label for="raw" class="ikiku__label">چه کاری بلدید؟</label>
+            <input class="ikiku__field ikiku__field--big" id="raw" name="raw" t-att-value="raw"
+                   placeholder="مثلاً: سبزی پاک می‌کنم و سالاد درست می‌کنم"/>
+            <button class="ikiku__secondary" type="submit">بگرد</button>
           </form>
-        </t>
+          <t t-if="proposals is not None">
+            <t t-if="proposals">
+              <p class="ikiku__lead">منظورتون یکی از این‌هاست؟</p>
+              <ul class="ikiku__proposals">
+                <t t-foreach="proposals" t-as="node">
+                  <li class="ikiku__proposal">
+                    <span t-out="node.plain_label or node.name"/>
+                    <form method="post">
+                      <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                      <input type="hidden" name="raw" t-att-value="raw"/>
+                      <input type="hidden" name="node_id" t-att-value="node.id"/>
+                      <input t-if="edit" type="hidden" name="edit" value="1"/>
+                      <button type="submit">آره، همینه</button>
+                    </form>
+                  </li>
+                </t>
+              </ul>
+            </t>
+            <form method="post" class="ikiku__form">
+              <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+              <input type="hidden" name="raw" t-att-value="raw"/>
+              <input t-if="edit" type="hidden" name="edit" value="1"/>
+              <p class="ikiku__lead">نوشته‌تون رو نگه می‌داریم. اگه چند نفرِ دیگه هم همین رو بنویسن،
+                همکارای ایکیکو نگاه می‌کنن که به فهرست اضافه بشه.</p>
+              <button class="ikiku__secondary" type="submit">
+                <t t-if="proposals">هیچ‌کدوم؛ همین نوشته رو نگه دارید</t><t t-else="">همین نوشته رو نگه دارید</t></button>
+            </form>
+          </t>
+        </details>
       </div></div>
     </t>
   </template>
 
-  <template id="resource_availability" name="ایکیکو — در دسترس بودن">
+  <template id="join_when" name="ایکیکو — از کِی تا کِی">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
-        <div class="ikiku__step">گامِ ۳ از ۳</div>
-        <h1 class="ikiku__question">از کِی تا کِی می‌توانید کار کنید؟</h1>
-        <p class="ikiku__help">تاریخ‌ها شمسی است. مثال: ۱۴۰۵/۰۹/۰۱</p>
-        <div class="ikiku__note">
-          این بازه فقط به کسب‌وکارهای تأییدشده نشان داده می‌شود، نه به همه.
-          برنامهٔ زمانیِ شما روی صفحهٔ عمومی نمی‌رود — بندِ ۷ مرام‌نامه.
-        </div>
-        <form action="/ikiku/join/availability/save" method="post">
+        <t t-call="ikiku_portal.step_head"/>
+        <h1 class="ikiku__question">از کِی تا کِی می‌تونید کار کنید؟</h1>
+        <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-          <p><label for="date_start">از تاریخ</label>
-             <input class="ikiku__field" id="date_start" name="date_start"
-                    placeholder="۱۴۰۵/۰۹/۰۱" required="required"/></p>
-          <p><label for="date_end">تا تاریخ</label>
-             <input class="ikiku__field" id="date_end" name="date_end"
-                    placeholder="۱۴۰۵/۱۲/۲۹" required="required"/></p>
-          <p><label for="province_id">استان</label>
-             <select class="ikiku__field" id="province_id" name="province_id" required="required">
-               <t t-foreach="provinces" t-as="p">
-                 <option t-att-value="p.id" t-out="p.name"/>
-               </t>
-             </select></p>
-          <p><label for="city">شهر</label>
-             <input class="ikiku__field" id="city" name="city"/></p>
-          <p><label for="hours_per_week">ساعت در هفته</label>
-             <input class="ikiku__field" id="hours_per_week" name="hours_per_week"
-                    type="number" value="40"/></p>
-          <p><label><input type="checkbox" name="can_relocate"/> می‌توانم شهر عوض کنم</label></p>
-          <button class="ikiku__go" type="submit">تمام</button>
+          <input t-if="edit" type="hidden" name="edit" value="1"/>
+          <t t-call="ikiku_portal.date_choices"/>
+          <p class="ikiku__lead">این تاریخ‌ها روی صفحه‌ای که همه می‌بینن نمیاد.
+            <a href="/help/dide">چرا؟</a></p>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
       </div></div>
     </t>
   </template>
 
-  <template id="resource_home" name="ایکیکو — پروندهٔ من">
+  <template id="join_how" name="ایکیکو — چه جوری">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
-        <t t-if="resource">
-          <h1 class="ikiku__question" t-out="resource.name"/>
-          <p class="ikiku__help" t-out="resource.headline"/>
-          <div class="ikiku__card">
-            <div>وضعیت: <strong t-out="dict(resource._fields['state'].selection).get(resource.state)"/></div>
-            <div>اعتبار: <strong t-out="resource.standing"/> از ۵</div>
-            <div>نشانیِ عمومی:
-              <a t-att-href="'/ikiku/p/%s' % resource.slug" t-out="'/ikiku/p/%s' % resource.slug"/></div>
-          </div>
-          <h3>گمارش‌های من</h3>
+        <t t-call="ikiku_portal.step_head"/>
+        <h1 class="ikiku__question">چه جوری می‌خواید کار کنید؟</h1>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <input t-if="edit" type="hidden" name="edit" value="1"/>
+
+          <fieldset class="ikiku__group">
+            <legend>هر کدوم که قبول دارید بزنید</legend>
+            <div class="ikiku__tiles">
+              <t t-foreach="work_types" t-as="wt">
+                <label class="ikiku__tile">
+                  <input type="checkbox" name="work_type_id" t-att-value="wt.id"
+                         t-att-checked="wt in selected_types and 'checked'"/>
+                  <span><t t-out="wt.name"/><small t-out="wt.description"/></span>
+                </label>
+              </t>
+            </div>
+            <p t-if="errors.get('types')" class="ikiku__error" role="alert" t-out="errors['types']"/>
+          </fieldset>
+
+          <fieldset class="ikiku__group">
+            <legend>چه ساعتی؟ (لازم نیست)</legend>
+            <div class="ikiku__chips">
+              <t t-foreach="shifts" t-as="shift">
+                <label class="ikiku__chip">
+                  <input type="checkbox" name="shift_id" t-att-value="shift.id"
+                         t-att-checked="shift in selected_shifts and 'checked'"/>
+                  <span t-out="shift.name.replace('شیفت ', '')"/>
+                </label>
+              </t>
+            </div>
+          </fieldset>
+
+          <fieldset class="ikiku__group">
+            <legend>اگه کار تو یه شهرِ دیگه باشه، می‌رید؟</legend>
+            <div class="ikiku__chips">
+              <label class="ikiku__chip"><input type="radio" name="relocate" value="yes"
+                     t-att-checked="relocate == 'yes' and 'checked'"/><span>آره</span></label>
+              <label class="ikiku__chip"><input type="radio" name="relocate" value="no"
+                     t-att-checked="relocate == 'no' and 'checked'"/><span>نه</span></label>
+            </div>
+            <p t-if="errors.get('relocate')" class="ikiku__error" role="alert" t-out="errors['relocate']"/>
+          </fieldset>
+
+          <button class="ikiku__go ikiku__go--block" type="submit">ثبت کن</button>
+        </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="resource_home" name="ایکیکو — صفحه‌ی من">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <p class="ikiku__step">صفحه‌ی من</p>
+        <h1 class="ikiku__question" t-out="partner.name"/>
+
+        <div t-if="next_step" class="ikiku__status ikiku__status--todo">
+          <p>هنوز تموم نشده. یه قدم مونده.</p>
+          <a class="ikiku__go" t-att-href="next_step">ادامه</a>
+        </div>
+        <div t-elif="resource.state == 'submitted'" class="ikiku__status">
+          ثبت شد. همکارای ایکیکو نگاهش می‌کنن. لازم نیست کاری بکنید.
+        </div>
+        <div t-elif="resource.state == 'active'" class="ikiku__status">
+          صفحه‌ی کاری‌تون بازه و همه می‌بینن.
+          <a t-att-href="'/p/%s' % resource.slug">صفحه‌ای که همه می‌بینن</a>
+        </div>
+        <div t-elif="resource.state == 'paused'" class="ikiku__status">
+          صفحه‌تون فعلاً خاموشه.
+          <a t-att-href="'/p/%s' % resource.slug">صفحه‌ای که همه می‌بینن</a>
+        </div>
+
+        <dl class="ikiku__summary">
+          <div><dt>اسم</dt><dd t-out="partner.name"/><a href="/join/name?edit=1">عوض کنید</a></div>
+          <div><dt>استان و شهر</dt>
+            <dd><t t-out="partner.ikiku_province_id.name"/><t t-if="partner.ikiku_city">، <t t-out="partner.ikiku_city"/></t></dd>
+            <a href="/join/where?edit=1">عوض کنید</a></div>
+          <div><dt>کارهایی که بلدید</dt>
+            <dd t-out="skills_text or 'هنوز نگفتید'"/>
+            <a href="/join/skills?edit=1">اضافه کنید</a></div>
+          <div><dt>از کِی تا کِی</dt><dd t-out="dates_text or 'هنوز نگفتید'"/>
+            <a href="/join/when?edit=1">عوض کنید</a></div>
+          <div><dt>چه جوری</dt>
+            <dd t-if="availability and availability.details_confirmed">
+              <t t-out="'، '.join(availability.work_type_ids.mapped('name'))"/>
+              <t t-if="availability.can_relocate"> · شهرِ دیگه هم می‌رید</t></dd>
+            <dd t-else="">هنوز نگفتید</dd>
+            <a href="/join/how?edit=1">عوض کنید</a></div>
+        </dl>
+
+        <section class="ikiku__card">
+          <h2 class="ikiku__subhead">اعتبار: <t t-out="standing"/> از <t t-out="standing_max"/></h2>
+          <p t-if="standing_verified">هویتِ تأییدشده: <t t-out="standing_verified"/></p>
+          <p><t t-out="supported_count"/> چیز که گفتید و یکی دیگه تأییدش کرد، هر کدوم <t t-out="per_supported"/></p>
+          <p><a href="/help/etebar">این عدد از کجا میاد؟</a></p>
+        </section>
+
+        <section>
+          <h2 class="ikiku__subhead">قرارهای کارِ من</h2>
           <t t-if="bookings">
             <t t-foreach="bookings" t-as="b">
               <div class="ikiku__card">
-                <strong t-out="b.public_ref"/> —
-                <span t-out="b.date_start_fa"/> تا <span t-out="b.date_end_fa"/>
+                <strong t-out="b.public_ref"/> · از <span t-out="b.date_start_fa"/> تا <span t-out="b.date_end_fa"/>
                 <div class="ikiku__muted" t-out="b.employer_business_id.name"/>
               </div>
             </t>
           </t>
-          <t t-else=""><p class="ikiku__muted">هنوز گمارشی ندارید.</p></t>
-        </t>
-        <t t-else=""><p><a href="/ikiku/join">پروندهٔ خود را بسازید</a></p></t>
+          <p t-else="" class="ikiku__lead">هنوز قرارِ کاری ندارید.</p>
+        </section>
+
+        <p class="ikiku__links"><a href="/help">راهنما</a> <a href="/web/session/logout?redirect=/">خروج</a></p>
       </div></div>
     </t>
   </template>
 
-  <template id="business_position" name="ایکیکو — تعریف جایگاه">
-    <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <h1 class="ikiku__question">چه کسی را می‌خواهید؟</h1>
-        <p class="ikiku__help">
-          همان‌طور که با کارکنانتان حرف می‌زنید بنویسید. ما پیشنهاد می‌دهیم کدام
-          مهارتِ استاندارد است؛ انتخاب با شماست.
-        </p>
-        <form action="/ikiku/business/position/new" method="get">
-          <input class="ikiku__field" name="raw" t-att-value="raw"
-                 placeholder="مثلاً: یکی که ظرف بشوره و شیفت شب وایسه"/>
-          <button class="ikiku__go" type="submit">ببین چه می‌فهمی</button>
-        </form>
-        <t t-if="raw">
-          <ul class="ikiku__proposals">
-            <t t-foreach="proposals" t-as="node">
-              <li class="ikiku__proposal">
-                <span><strong t-out="node.name"/>
-                  <span class="ikiku__muted" t-out="node.complete_code"/></span>
-                <form action="/ikiku/business/position/save" method="post">
-                  <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                  <input type="hidden" name="raw" t-att-value="raw"/>
-                  <input type="hidden" name="node_id" t-att-value="node.id"/>
-                  <button type="submit">همین است</button>
-                </form>
-              </li>
-            </t>
-          </ul>
-          <t t-if="not proposals">
-            <div class="ikiku__note">
-              این را نفهمیدیم، اما حرفتان ثبت شد. از فهرست نزدیک‌ترین را بردارید؛
-              متنِ خودتان هم نگه داشته می‌شود.
-            </div>
-          </t>
-          <form action="/ikiku/business/position/save" method="post">
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            <input type="hidden" name="raw" t-att-value="raw"/>
-            <select class="ikiku__field" name="node_id">
-              <t t-foreach="all_nodes" t-as="n">
-                <option t-att-value="n.id" t-out="n.name"/>
-              </t>
-            </select>
-            <button class="ikiku__go" type="submit">ثبت جایگاه</button>
-          </form>
-        </t>
-      </div></div>
-    </t>
-  </template>
+  <!-- ============================================================ businesses (کو؟) -->
 
-  <template id="business_home" name="ایکیکو — کسب‌وکار من">
+  <template id="business_name" name="ایکیکو — اسمِ کافه">
     <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <t t-if="business">
-          <h1 class="ikiku__question" t-out="business.name"/>
-          <p><a href="/ikiku/business/position/new">تعریف جایگاهِ تازه</a> ·
-             <a href="/ikiku/business/name">تغییرِ نام</a></p>
-          <h3>اعلام نیاز</h3>
-          <div class="ikiku__note">
-            نیازِ سه ماه بعد را همین حالا اعلام کنید. هرچه زودتر، انتخابِ بیشتر.
-          </div>
-          <form action="/ikiku/business/demand/save" method="post">
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-            <p><label for="position_id">جایگاه</label>
-               <select class="ikiku__field" id="position_id" name="position_id" required="required">
-                 <t t-foreach="business.position_ids" t-as="pos">
-                   <option t-att-value="pos.id" t-out="pos.name"/>
-                 </t>
-               </select></p>
-            <p><label for="seats">چند نفر</label>
-               <input class="ikiku__field" id="seats" name="seats" type="number" value="1"/></p>
-            <p><label for="date_start">از تاریخ (شمسی)</label>
-               <input class="ikiku__field" id="date_start" name="date_start"
-                      placeholder="۱۴۰۵/۰۹/۰۱" required="required"/></p>
-            <p><label for="date_end">تا تاریخ (شمسی)</label>
-               <input class="ikiku__field" id="date_end" name="date_end"
-                      placeholder="۱۴۰۵/۱۲/۲۹" required="required"/></p>
-            <p><label for="province_id">استان</label>
-               <select class="ikiku__field" id="province_id" name="province_id" required="required">
-                 <t t-foreach="provinces" t-as="p">
-                   <option t-att-value="p.id" t-out="p.name"/>
-                 </t>
-               </select></p>
-            <p><label for="city">شهر</label>
-               <input class="ikiku__field" id="city" name="city"/></p>
-            <button class="ikiku__go" type="submit">اعلام نیاز و دیدنِ پیشنهادها</button>
-          </form>
-
-          <h3>نیازهای ثبت‌شده</h3>
-          <t t-foreach="demands" t-as="d">
-            <div class="ikiku__card">
-              <strong t-out="d.position_id.name"/> — <span t-out="d.seats"/> نفر
-              <div class="ikiku__muted">
-                <span t-out="d.date_start_fa"/> تا <span t-out="d.date_end_fa"/> ·
-                <span t-out="d.province_id.name"/>
-              </div>
-            </div>
-          </t>
-        </t>
-        <t t-else="">
-          <p><a href="/ikiku/business/name">نخست نامِ کسب‌وکارتان را بنویسید</a></p>
-        </t>
-      </div></div>
-    </t>
-  </template>
-
-  <template id="business_name" name="ایکیکو — نام کسب‌وکار">
-    <t t-call="website.layout">
-      <div class="ikiku"><div class="ikiku__shell">
-        <h1 class="ikiku__question">نامِ کسب‌وکارتان چیست؟</h1>
-        <p class="ikiku__help">
-          همان نامی که روی سردرِ کافه یا رستورانتان است. جایگاه‌ها و نیازهایتان با این نام
-          شناخته می‌شوند، نه با نامِ خودتان.
-        </p>
-        <div t-if="error" class="ikiku__note">نام را خالی نگذارید.</div>
-        <form action="/ikiku/business/name/save" method="post">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step"><t t-if="business">عوض کردن</t><t t-else="">شروع</t></p>
+        <h1 class="ikiku__question">اسمِ کافه یا رستورانتون چیه؟</h1>
+        <p class="ikiku__lead">همون اسمی که سرِ در نوشته.</p>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-          <input class="ikiku__field" name="name" required="required" maxlength="120"
-                 t-att-value="business.name if business else ''"
-                 placeholder="مثلاً: کافه نارنج"/>
-          <button class="ikiku__go" type="submit" t-out="'ذخیرهٔ نام' if business else 'ادامه'"/>
+          <label for="name" class="ikiku__label">اسمِ کافه یا رستوران</label>
+          <input class="ikiku__field ikiku__field--big" id="name" name="name" t-att-value="name" maxlength="120"
+                 placeholder="مثلاً: کافه نارنج" autocomplete="organization" required="required"
+                 t-att-aria-invalid="error and 'true'"/>
+          <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+          <p class="ikiku__lead">اسمِ کافه‌تون تو فهرستِ «کارهای باز» نمیاد.</p>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="need_who" name="ایکیکو — چه نیرویی">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
+        <h1 class="ikiku__question">چه نیرویی لازم دارید؟</h1>
+        <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <t t-call="ikiku_portal.skill_tiles">
+            <t t-set="input_type" t-value="'radio'"/>
+            <t t-set="on_ids" t-value="[selected] if selected else []"/>
+            <t t-set="locked_ids" t-value="[]"/>
+          </t>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
+        </form>
+        <details class="ikiku__more" t-att-open="raw and 'open'">
+          <summary>اینجا نیست؟ همون‌جوری که به همکارتون می‌گید بنویسید</summary>
+          <form method="get" class="ikiku__form">
+            <label for="raw" class="ikiku__label">چه کسی رو لازم دارید؟</label>
+            <input class="ikiku__field ikiku__field--big" id="raw" name="raw" t-att-value="raw"
+                   placeholder="مثلاً: یکی که ظرف بشوره و شیفتِ شب وایسه"/>
+            <button class="ikiku__secondary" type="submit">بگرد</button>
+          </form>
+          <t t-if="proposals is not None">
+            <t t-if="proposals">
+              <p class="ikiku__lead">منظورتون اینه؟</p>
+              <ul class="ikiku__proposals">
+                <t t-foreach="proposals" t-as="node">
+                  <li class="ikiku__proposal">
+                    <span t-out="node.plain_label or node.name"/>
+                    <form method="post">
+                      <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                      <input type="hidden" name="raw" t-att-value="raw"/>
+                      <input type="hidden" name="node_id" t-att-value="node.id"/>
+                      <button type="submit">آره، همینه</button>
+                    </form>
+                  </li>
+                </t>
+              </ul>
+            </t>
+            <p t-else="" class="ikiku__lead">این رو نفهمیدیم. از دکمه‌های بالا نزدیک‌ترین رو بزنید؛
+              نوشته‌تون هم نگه داشته میشه.</p>
+          </t>
+        </details>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="need_type" name="ایکیکو — چه جور همکاری">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
+        <h1 class="ikiku__question">چه جور همکاری؟</h1>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <fieldset class="ikiku__group">
+            <legend class="ikiku__sr">نوعِ همکاری</legend>
+            <div class="ikiku__tiles ikiku__tiles--one">
+              <t t-foreach="work_types" t-as="wt">
+                <label class="ikiku__tile">
+                  <input type="radio" name="work_type_id" t-att-value="wt.id"
+                         t-att-checked="wt.id == selected and 'checked'"/>
+                  <span><t t-out="wt.name"/><small t-out="wt.description"/></span>
+                </label>
+              </t>
+            </div>
+          </fieldset>
+          <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
+        </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="need_count" name="ایکیکو — چند نفر">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
+        <h1 class="ikiku__question">چند نفر لازم دارید؟</h1>
+        <form method="post" class="ikiku__form ikiku__form--stepper">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <!-- First in the form so the Enter key means «ادامه», not «−»; CSS shows it last. -->
+          <button class="ikiku__go ikiku__go--block ikiku__last" type="submit" name="next" value="1">ادامه</button>
+          <div class="ikiku__stepper">
+            <button type="submit" name="adjust" value="-1" class="ikiku__stepper-btn" aria-label="یکی کمتر">−</button>
+            <label for="seats" class="ikiku__sr">تعداد نفر</label>
+            <input class="ikiku__field ikiku__stepper-value" id="seats" name="seats" t-att-value="seats_fa"
+                   inputmode="numeric" dir="ltr" maxlength="3"/>
+            <button type="submit" name="adjust" value="1" class="ikiku__stepper-btn" aria-label="یکی بیشتر">+</button>
+          </div>
+          <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+        </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="need_when" name="ایکیکو — از کِی تا کِی لازمشون دارید">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
+        <h1 class="ikiku__question">از کِی تا کِی لازمشون دارید؟</h1>
+        <p class="ikiku__lead">زودتر بگید، آدم‌های بیشتری پیدا میشن.</p>
+        <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <t t-call="ikiku_portal.date_choices"/>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
+        </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="need_where" name="ایکیکو — کجا و بررسی">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
+        <h1 class="ikiku__question">کجا؟ همه درسته؟</h1>
+        <dl class="ikiku__summary">
+          <div><dt>چه نیرویی</dt><dd t-out="summary['who']"/><a href="/business/need/who">عوض کنید</a></div>
+          <div><dt>چه جور</dt><dd t-out="summary['type']"/><a href="/business/need/type">عوض کنید</a></div>
+          <div><dt>چند نفر</dt><dd><t t-out="summary['seats']"/> نفر</dd><a href="/business/need/count">عوض کنید</a></div>
+          <div><dt>کِی</dt><dd t-out="summary['dates']"/><a href="/business/need/when">عوض کنید</a></div>
+        </dl>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <t t-call="ikiku_portal.place_fields"/>
+          <p class="ikiku__notice">این درخواست تو «کارهای باز» دیده میشه: چه کاری، چه جور، چند نفر، کدوم
+            استان و شهر، از کِی تا کِی. اسمِ کافه‌تون دیده نمیشه.</p>
+          <button class="ikiku__go ikiku__go--block" type="submit">ثبت کن</button>
+        </form>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="need_saved" name="ایکیکو — درخواست ثبت شد">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step">ثبت شد</p>
+        <h1 class="ikiku__question">درخواستتون ثبت شد.</h1>
+        <dl class="ikiku__summary">
+          <div><dt>چه نیرویی</dt><dd t-out="demand.position_id.spec_node_id.plain_label or demand.position_id.spec_node_id.name"/></div>
+          <div><dt>چه جور</dt><dd t-out="demand.work_type_id.name"/></div>
+          <div><dt>چند نفر</dt><dd><t t-out="seats"/> نفر</dd></div>
+          <div><dt>کِی</dt><dd t-out="dates"/></div>
+          <div><dt>کجا</dt><dd><t t-out="demand.province_id.name"/><t t-if="demand.city">، <t t-out="demand.city"/></t></dd></div>
+        </dl>
+        <p class="ikiku__lead">تو «کارهای باز» اومد، بدونِ اسمِ کافه‌تون.</p>
+        <p class="ikiku__lead">ایکیکو کسانی رو که تو این تاریخ‌ها و این استان آزادن نگاه می‌کنه.</p>
+        <p class="ikiku__links">
+          <a class="ikiku__go" href="/business">درخواست‌های من</a>
+          <a href="/help/hazine">هزینه‌ش چطوریه؟</a>
+          <a href="/help/tamas?from=need">می‌خوام یکی باهام تماس بگیره</a>
+        </p>
+      </div></div>
+    </t>
+  </template>
+
+  <template id="business_home" name="ایکیکو — درخواست‌های من">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <p class="ikiku__step" t-out="business.name"/>
+        <h1 class="ikiku__question">درخواست‌های نیروی شما</h1>
+        <a class="ikiku__go ikiku__go--block" href="/business/need/who">نیروی تازه می‌خوام</a>
+        <t t-if="needs">
+          <t t-foreach="needs" t-as="need">
+            <t t-set="d" t-value="need['demand']"/>
+            <article class="ikiku__card ikiku__need">
+              <strong><t t-out="need['seats']"/> نفر · <t t-out="d.position_id.spec_node_id.plain_label or d.position_id.spec_node_id.name"/></strong>
+              <p><t t-out="d.work_type_id.name"/> · <t t-out="need['dates']"/></p>
+              <p class="ikiku__muted"><t t-out="d.province_id.name"/><t t-if="d.city">، <t t-out="d.city"/></t>
+                · <t t-out="{'draft': 'پیش‌نویس', 'open': 'باز', 'proposed': 'باز', 'filled': 'پر شد', 'cancelled': 'لغو شد'}.get(d.state)"/></p>
+            </article>
+          </t>
+        </t>
+        <p t-else="" class="ikiku__lead">هنوز درخواستی ندارید.</p>
+        <p class="ikiku__links">
+          <a href="/business/name">عوض کردنِ اسمِ کافه</a>
+          <a href="/help/niroo">راهنما</a>
+          <a href="/web/session/logout?redirect=/">خروج</a>
+        </p>
       </div></div>
     </t>
   </template>

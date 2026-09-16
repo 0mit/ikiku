@@ -155,6 +155,8 @@ class TestSmsProviders(TransactionCase):
 
 @tagged('post_install', '-at_install')
 class TestJoinWithOtp(OtpSetup, HttpCase):
+    """An email account without a proven number proves it on the same two screens as SMS
+    sign-in, and only then goes on to the questions."""
 
     @classmethod
     def setUpClass(cls):
@@ -163,51 +165,34 @@ class TestJoinWithOtp(OtpSetup, HttpCase):
             'name': "نیروی آزمایشی", 'login': 'otp-walker', 'password': 'otp-walker-pass-1',
             'group_ids': [(6, 0, [cls.env.ref('base.group_portal').id])],
         })
-        cls.province = cls.env.ref('ikiku_base.province_te')
-
-    def submit_intake(self, mobile='09121234567'):
-        page = self.url_open('/ikiku/join').text
-        token = re.search(r'name="csrf_token" value="([^"]+)"', page).group(1)
-        return self.url_open('/ikiku/join/submit', allow_redirects=False, data={
-            'csrf_token': token, 'mobile': mobile, 'headline': "باریستا",
-            'province_id': self.province.id, 'city': "تهران"})
-
-    def test_mobile_typed_in_persian_digits(self):
-        self.enable_otp()
-        self.authenticate('otp-walker', 'otp-walker-pass-1')
-        response = self.submit_intake('۰۹۱۲۱۲۳۴۵۶۷')
-        self.assertTrue(response.headers['Location'].endswith('/ikiku/join/verify'))
-        challenge = self.env['ikiku.mobile.challenge'].search([('partner_id', '=', self.user.partner_id.id)], limit=1)
-        self.assertEqual(challenge.mobile, MOBILE)
 
     def test_join_waits_for_the_code(self):
         self.enable_otp()
         self.authenticate('otp-walker', 'otp-walker-pass-1')
-        with patch(RANDBELOW, return_value=CODE):
-            response = self.submit_intake()
-        self.assertTrue(response.headers['Location'].endswith('/ikiku/join/verify'))
-        self.env.invalidate_all()
-        self.assertFalse(self.user.partner_id.ikiku_mobile)
-        self.assertEqual(self.url_open('/ikiku/join/verify/state').json()['state'], 'queued')
-        page = self.url_open('/ikiku/join/verify').text
-        self.assertIn('id="ikiku-otp"', page)
-        self.send_queued()
-        self.assertEqual(self.url_open('/ikiku/join/verify/state').json()['state'], 'sent')
+        self.assertTrue(self.url_open('/join', allow_redirects=False).headers['Location'].endswith('/enter'))
+        page = self.url_open('/enter').text
         token = re.search(r'name="csrf_token" value="([^"]+)"', page).group(1)
-        wrong = self.url_open('/ikiku/join/verify/submit', allow_redirects=False,
-                              data={'csrf_token': token, 'code': '111111'})
+        with patch(RANDBELOW, return_value=CODE):
+            sent = self.url_open('/enter/send', allow_redirects=False,
+                                 data={'csrf_token': token, 'mobile': '۰۹۱۲۱۲۳۴۵۶۷'})
+        self.assertTrue(sent.headers['Location'].endswith('/enter/code'))
+        self.env.invalidate_all()
+        self.assertFalse(self.user.partner_id.ikiku_mobile, "the number waits for its proof")
+        self.assertEqual(self.url_open('/enter/code/state').json()['state'], 'queued')
+        self.send_queued()
+        self.assertEqual(self.url_open('/enter/code/state').json()['state'], 'sent')
+        page = self.url_open('/enter/code').text
+        token = re.search(r'name="csrf_token" value="([^"]+)"', page).group(1)
+        wrong = self.url_open('/enter/code/submit', allow_redirects=False, data={'csrf_token': token, 'code': '111111'})
         self.assertIn('error=wrong', wrong.headers['Location'])
-        right = self.url_open('/ikiku/join/verify/submit', allow_redirects=False,
-                              data={'csrf_token': token, 'code': '123456'})
-        self.assertTrue(right.headers['Location'].endswith('/ikiku/join/skills'))
+        right = self.url_open('/enter/code/submit', allow_redirects=False, data={'csrf_token': token, 'code': '123456'})
+        self.assertTrue(right.headers['Location'].endswith('/me'))
         self.env.invalidate_all()
         self.assertEqual(self.user.partner_id.ikiku_mobile, MOBILE)
         self.assertTrue(self.user.partner_id.ikiku_mobile_verified_on)
+        self.assertTrue(self.url_open('/join', allow_redirects=False).headers['Location'].endswith('/join/where'))
 
-    def test_without_sms_the_number_is_written_unproven(self):
+    def test_without_sms_the_questions_start_at_once(self):
         self.authenticate('otp-walker', 'otp-walker-pass-1')
-        response = self.submit_intake()
-        self.assertTrue(response.headers['Location'].endswith('/ikiku/join/skills'))
-        self.env.invalidate_all()
-        self.assertEqual(self.user.partner_id.ikiku_mobile, MOBILE)
-        self.assertFalse(self.user.partner_id.ikiku_mobile_verified_on)
+        response = self.url_open('/join', allow_redirects=False)
+        self.assertTrue(response.headers['Location'].endswith('/join/where'))

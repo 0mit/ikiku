@@ -15,16 +15,16 @@
           </div>
         </div>
         <div class="ikiku__note">
-          آنچه اینجا می‌بینید حرفهٔ این شخص است. نشانی، شمارهٔ تماس و ساعتِ کارِ
-          آیندهٔ او عمومی نیست و نخواهد شد — بندِ ۷ مرام‌نامه.
+          اینجا کارِ این آدم رو می‌بینید. آدرس، شماره و ساعتِ کارش نوشته نمیشه و نمی‌شه.
+          <a href="/help/dide">چرا؟</a>
         </div>
 
-        <h3>ادعاها و راست‌آزمایی‌ها</h3>
+        <h3>چیزهایی که گفته شده، و تأییدها</h3>
         <div class="ikiku__table">
           <table>
             <thead><tr>
-              <th>ادعا</th><th>گویندهٔ ادعا</th><th>از چه راه</th>
-              <th>تأیید</th><th>اعتراض</th><th>وضعیت</th>
+              <th>چی گفته شده</th><th>کی گفته</th><th>از کجا می‌دونه</th>
+              <th>تأیید</th><th>قبول ندارم</th><th>وضعیت</th>
             </tr></thead>
             <tbody>
               <t t-foreach="assertions" t-as="a">
@@ -40,12 +40,12 @@
             </tbody>
           </table>
         </div>
-        <p class="ikiku__muted">
-          هیچ ستاره‌ای بدونِ زنجیره‌اش نشان داده نمی‌شود. هر ادعا صاحبی دارد و
-          هر رأیی قابلِ اعتراض است.
+        <p class="ikiku__lead">
+          هیچ عددی بدونِ اینکه معلوم باشه از کجا اومده نشون داده نمیشه. هر حرفی صاحب داره،
+          و هر کسی می‌تونه بگه قبول ندارم. <a href="/help/etebar">اعتبار از کجا میاد؟</a>
         </p>
 
-        <h3>تعهدهای عمومی</h3>
+        <h3>قرارهای کار</h3>
         <t t-foreach="bookings" t-as="b">
           <div class="ikiku__card">
             <strong t-out="b['ref']"/> —
@@ -55,10 +55,10 @@
               <div>محلِ کار: <strong t-out="b['business']"/></div>
             </t>
             <t t-else="">
-              <div class="ikiku__withheld">محلِ کار تا آغازِ کار عمومی نمی‌شود.</div>
+              <div class="ikiku__withheld">اسمِ جای کار تا روزِ شروع نوشته نمیشه.</div>
             </t>
             <t t-if="b['cancelled']">
-              <div class="ikiku__withheld">لغو شد — <span t-out="b['cancel_reason']"/></div>
+              <div class="ikiku__withheld">به هم خورد — <span t-out="b['cancel_reason']"/></div>
             </t>
           </div>
         </t>
@@ -69,12 +69,13 @@
   <template id="public_jobs" name="ایکیکو — کارهای باز">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
-        <p class="ikiku__kicker">در روشنایی</p>
+        <p class="ikiku__kicker">همه می‌بینن</p>
         <h1 class="ikiku__question">کارهای باز</h1>
-        <p class="ikiku__help">
-          نیازهایی که کسب‌وکارها اعلام کرده‌اند. نامِ کسب‌وکار و محلِ کار اینجا نوشته نمی‌شود.
+        <p class="ikiku__lead">
+          نیرویی که کافه‌ها و رستوران‌ها لازم دارن. اسمِ کافه یا رستوران اینجا نوشته نمیشه.
+          کار می‌خواید؟ <a href="/ki">ثبت‌نام کنید</a>.
         </p>
-        <form class="ikiku__filter" action="/ikiku/jobs" method="get">
+        <form class="ikiku__filter" action="/jobs" method="get">
           <label for="province">استان</label>
           <select class="ikiku__field" id="province" name="province">
             <option value="">همهٔ استان‌ها</option>
@@ -86,9 +87,9 @@
           <button class="ikiku__go" type="submit">نمایش</button>
         </form>
         <t t-call="ikiku_portal.job_cards"/>
-        <p class="ikiku__muted">
-          نامِ جایگاه بر پایهٔ استانداردِ مشترک نوشته شده، نه عنوانِ داخلیِ هر مغازه —
-          تا کسی که جای دیگری آموزش دیده بفهمد این کار چیست.
+        <p class="ikiku__lead">
+          اسمِ هر کار همون اسمِ رایجه، نه اسمی که هر مغازه خودش گذاشته؛ تا کسی که جای دیگه
+          کار کرده بفهمه این چه کاریه.
         </p>
       </div></div>
     </t>
@@ -97,34 +98,35 @@
   <template id="public_bookings" name="ایکیکو — دفترِ عمومیِ تعهدها">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
-        <h1 class="ikiku__question">دفترِ عمومیِ تعهدها</h1>
+        <h1 class="ikiku__question">دفترِ قرارهای کار</h1>
         <div class="ikiku__note">
-          هر گمارش همان لحظه اینجا ثبت می‌شود، و هر لغو هم. محلِ کار تا آغازِ کار
-          نوشته نمی‌شود. تعهدی که عمومی اعلام شده، بی‌سروصدا پس گرفته نمی‌شود.
+          هر قرارِ کاری همون لحظه اینجا نوشته میشه، و هر قراری که به هم بخوره هم. اسمِ جای کار
+          تا روزِ شروع نوشته نمیشه. قولی که جلوی همه داده شده، بی‌سروصدا پس گرفته نمیشه.
+          <a href="/help/daftar">این دفتر رو چطوری بخونم؟</a>
         </div>
         <div class="ikiku__table">
           <table>
             <thead><tr>
-              <th>شناسه</th><th>نیرو</th><th>از</th><th>تا</th><th>استان</th>
-              <th>محلِ کار</th><th>وضعیت</th>
+              <th>شماره‌ی قرار</th><th>کارگر</th><th>از</th><th>تا</th><th>استان</th>
+              <th>جای کار</th><th>وضعیت</th>
             </tr></thead>
             <tbody>
               <t t-foreach="bookings" t-as="b">
                 <tr>
                   <td t-out="b['ref']"/>
-                  <td><a t-att-href="'/ikiku/p/%s' % b['resource_slug']" t-out="b['resource']"/></td>
+                  <td><a t-att-href="'/p/%s' % b['resource_slug']" t-out="b['resource']"/></td>
                   <td t-out="b['date_start_fa']"/>
                   <td t-out="b['date_end_fa']"/>
                   <td t-out="b['province']"/>
                   <td>
                     <t t-if="b['business']"><span t-out="b['business']"/></t>
-                    <t t-else=""><span class="ikiku__withheld">تا آغازِ کار</span></t>
+                    <t t-else=""><span class="ikiku__withheld">تا روزِ شروع</span></t>
                   </td>
                   <td>
                     <t t-if="b['cancelled']">
-                      <span class="ikiku__withheld">لغو — <t t-out="b['cancel_reason']"/></span>
+                      <span class="ikiku__withheld">به هم خورد — <t t-out="b['cancel_reason']"/></span>
                     </t>
-                    <t t-else=""><span t-out="b['state']"/></t>
+                    <t t-else=""><span t-out="{'confirmed': 'قطعی', 'at_risk': 'در خطر', 'replaced': 'نفر عوض شد', 'in_progress': 'سرِ کار', 'done': 'تموم شد'}.get(b['state'], b['state'])"/></t>
                   </td>
                 </tr>
               </t>
@@ -138,12 +140,12 @@
   <template id="public_costs" name="ایکیکو — هزینهٔ مشترک">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
-        <h1 class="ikiku__question">هزینهٔ مشترک</h1>
+        <h1 class="ikiku__question">هزینه‌ی مشترک</h1>
         <div class="ikiku__note">
-          ایکیکو از فاصلهٔ میان کارگر و کارفرما نان نمی‌خورد. هزینهٔ واقعیِ اداره‌کردنِ
-          پلتفرم در هر دوره میانِ کسب‌وکارهایی که استفاده کرده‌اند، به نسبتِ روز-نفر
-          تقسیم می‌شود. هرچه سامانه بزرگ‌تر شود، سهمِ هر روز-نفر کمتر — و آن عدد
-          همین‌جا نوشته می‌شود تا بشود بررسی‌اش کرد.
+          ایکیکو از مزدِ کارگر چیزی برنمی‌داره. خرجِ واقعیِ اداره‌کردنِ ایکیکو تو هر دوره بینِ
+          کافه‌ها و رستوران‌هایی که ازش استفاده کردن تقسیم میشه، به اندازه‌ی «روز-نفر»: یه نفر،
+          یه روز کار. ایکیکو بزرگ‌تر بشه، سهمِ هر روز-نفر کمتر میشه، و عددش همین‌جا نوشته میشه.
+          <a href="/help/hazine">مثال ببینید</a>
         </div>
         <div class="ikiku__table">
           <table>

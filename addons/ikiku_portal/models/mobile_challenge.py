@@ -45,6 +45,8 @@ MAX_SENDS_PER_HOUR = 3
 WAIT_LIMIT = timedelta(minutes=2)
 KEEP = timedelta(days=1)
 LOGIN_TOKEN_TTL = timedelta(minutes=2)
+# A new SMS account's name until its owner writes their own on the first screen.
+NEW_PARTNER_NAME = "کاربرِ تازه"
 
 # What the visitor reads, in spoken, polite Persian (operator, D-9). Keys travel in
 # URLs; sentences never do.
@@ -295,7 +297,7 @@ class IkikuMobileChallenge(models.Model):
             return self._portal_user_for(written_by_staff), False
 
         self._release_unproven()
-        partner = Partner.create({'name': "کاربرِ تازه", 'ikiku_mobile': self.mobile,
+        partner = Partner.create({'name': NEW_PARTNER_NAME, 'ikiku_mobile': self.mobile,
                                   'ikiku_mobile_verified_on': now})
         return self._portal_user_for(partner), False
 

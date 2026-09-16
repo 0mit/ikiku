@@ -333,3 +333,165 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   .ikiku * { transition: none !important; }
   .ikiku__door:hover { transform: none; }
 }
+
+// ---------------------------------------------------------------------------------------
+// The plain-words redesign (2026-09-16): one question per screen, choices as tiles and
+// chips, errors beside their fields, help pages. Logical properties only (see above).
+// ---------------------------------------------------------------------------------------
+.ikiku {
+  --ik-ink-2: #4B5361;          // darker than before: help text is read, not skimmed
+  --ik-error: #B3261E;
+  --ik-ok: #1E7A55;
+  font-size: 1.05rem;
+
+  &__shell--narrow { max-width: 36rem; }
+  &__plain { font-size: 1.2rem; color: var(--ik-ink); margin-block: .25rem 1rem; }
+  &__lead { color: var(--ik-ink-2); font-size: 1rem; margin-block: .5rem; }
+  &__plainlist { padding-inline-start: 1.1rem; margin-block: 0 1.25rem;
+    li { margin-block: .35rem; } }
+  &__subhead { font-size: 1.2rem; margin-block: 1.5rem .5rem; }
+  &__sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  &__trap { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; opacity: 0; }
+
+  // ---- hero: name, one plain line, doors; the name's meaning below the doors on phones --
+  &__hero { grid-template-rows: auto 1fr; }
+  &__hero-copy { grid-column: 1; grid-row: 1; }
+  &__doors { grid-column: 2; grid-row: 1 / span 2; }
+  &__lede { grid-column: 1; grid-row: 2; align-self: start; font-size: 1rem; color: var(--ik-ink-2); }
+  &__doors-note { margin: 0; text-align: center; color: var(--ik-ink-2); font-size: .95rem; }
+  &__job-tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+  &__job-type {
+    display: inline-block; padding-block: .1rem; padding-inline: .75rem; border-radius: 999px;
+    background: var(--ik-ground); color: var(--ik-ink); font-size: .8rem; font-weight: 700;
+  }
+  &__tenets small, &__helplist small, &__plain small { color: #B8D3FF; font-size: .78rem; margin-inline-start: .35rem; }
+  &__helplist small, &__plain small { color: var(--ik-ink-2); }
+
+  // ---- step header ---------------------------------------------------------------------
+  &__stephead { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  &__helplink { font-weight: 700; font-size: .95rem; min-block-size: 2.75rem; display: inline-flex; align-items: center; }
+  &__progress {
+    block-size: .35rem; border-radius: 999px; background: var(--ik-ground); overflow: hidden; margin-block: .25rem 1.25rem;
+    span { display: block; block-size: 100%; background: var(--ik-blue); border-radius: 999px; }
+  }
+
+  // ---- forms -----------------------------------------------------------------------------
+  &__form { display: flex; flex-direction: column; gap: .5rem; margin-block: 1rem; }
+  &__form--stepper { .ikiku__last { order: 3; } .ikiku__stepper { order: 1; } .ikiku__error { order: 2; } }
+  &__label { font-weight: 700; margin-block-start: .5rem; }
+  &__field--big { font-size: 1.2rem; min-block-size: 3.25rem; }
+  &__field--code { font-size: 1.6rem; letter-spacing: .4em; text-align: center; min-block-size: 3.5rem; }
+  &__field[aria-invalid='true'] { border-color: var(--ik-error); }
+  &__go--block { display: flex; inline-size: 100%; justify-content: center; min-block-size: 3.25rem; font-size: 1.1rem; }
+  &__go[disabled], &__go[aria-busy='true'] { opacity: .7; cursor: progress; }
+  &__error {
+    margin: 0; padding-block: .5rem; padding-inline: .85rem; border-radius: 10px;
+    background: rgba(179, 38, 30, .08); color: var(--ik-error); font-weight: 700;
+    border-inline-start: 3px solid var(--ik-error);
+  }
+  &__status {
+    padding-block: .85rem; padding-inline: 1rem; border-radius: 14px; margin-block: 1rem;
+    background: var(--ik-blue-soft); color: var(--ik-ink); font-weight: 700;
+    display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between;
+    p { margin: 0; }
+    .ikiku__go { margin-top: 0; }
+  }
+  &__status--todo { background: rgba(168, 99, 42, .1); }
+  &__notice {
+    padding-block: .75rem; padding-inline: 1rem; border-radius: 12px; background: var(--ik-blue-soft);
+    color: var(--ik-ink); font-size: .98rem;
+  }
+  &__links { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: center; margin-block: 1.25rem;
+    a { min-block-size: 2.75rem; display: inline-flex; align-items: center; font-weight: 700; }
+    .ikiku__go { margin-top: 0; }
+  }
+
+  // ---- choice groups, tiles and chips ------------------------------------------------------
+  &__group { border: 0; padding: 0; margin: 0 0 1rem; min-inline-size: 0;
+    legend { font-weight: 700; font-size: 1.05rem; margin-block-end: .5rem; float: none; inline-size: auto; }
+  }
+  &__tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+  &__tiles--one { grid-template-columns: 1fr; }
+  &__tiles--two { margin-block: 1rem; }
+  &__tile, &__chip {
+    position: relative; display: block; cursor: pointer; margin: 0;
+    input { position: absolute; opacity: 0; inline-size: 1px; block-size: 1px; }
+  }
+  &__tile span, &__tile--link span {
+    display: flex; flex-direction: column; justify-content: center; gap: .15rem;
+    min-block-size: 3.5rem; padding-block: .7rem; padding-inline: 1rem 2.4rem; border-radius: 14px;
+    border: 2px solid var(--ik-rule); background: var(--ik-paper); color: var(--ik-ink); font-weight: 700;
+    line-height: 1.5; position: relative;
+    small { font-weight: 400; color: var(--ik-ink-2); font-size: .88rem; }
+  }
+  &__tile--link { text-decoration: none; }
+  &__tile--link span { padding-inline-end: 1rem; }
+  &__tile span::after {
+    content: ""; position: absolute; inset-inline-end: .8rem; inset-block-start: 50%; translate: 0 -50%;
+    inline-size: 1.15rem; block-size: 1.15rem; border-radius: 6px; border: 2px solid var(--ik-rule); background: #fff;
+  }
+  &__tile--link span::after { display: none; }
+  &__tile input[type='radio'] + span::after { border-radius: 50%; }
+  &__tile input:checked + span { border-color: var(--ik-blue); background: var(--ik-blue-soft); }
+  &__tile input:checked + span::after {
+    border-color: var(--ik-blue); background: var(--ik-blue);
+    box-shadow: inset 0 0 0 3px #fff;
+  }
+  &__tile input:disabled + span { cursor: default; }
+  &__tile input:focus-visible + span, &__chip input:focus-visible + span { outline: 3px solid var(--ik-blue); outline-offset: 2px; }
+  &__chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+  &__chip span {
+    display: inline-flex; align-items: center; min-block-size: 3rem; padding-block: .45rem; padding-inline: 1rem;
+    border-radius: 999px; border: 2px solid var(--ik-rule); background: var(--ik-paper); font-weight: 700;
+  }
+  &__chip input:checked + span { border-color: var(--ik-blue); background: var(--ik-blue); color: #fff; }
+
+  &__custom, &__more {
+    margin-block: .6rem 0;
+    summary { cursor: pointer; color: var(--ik-blue); font-weight: 700; min-block-size: 2.75rem;
+              display: flex; align-items: center; }
+  }
+  &__more { margin-block: 1.5rem 0; padding-block-start: 1rem; border-block-start: 1px solid var(--ik-rule); }
+  &__selects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin-block-start: .5rem;
+    label { font-weight: 700; font-size: .9rem; display: flex; flex-direction: column; gap: .25rem; }
+  }
+
+  // ---- the +/− stepper ---------------------------------------------------------------------
+  &__stepper { display: flex; align-items: stretch; gap: .75rem; justify-content: center; margin-block: 1rem; }
+  &__stepper-btn {
+    inline-size: 4rem; min-block-size: 4rem; border-radius: 16px; border: 2px solid var(--ik-rule);
+    background: var(--ik-paper); font-size: 2rem; font-weight: 700; color: var(--ik-blue); cursor: pointer;
+  }
+  &__stepper-value { inline-size: 6rem; text-align: center; font-size: 2rem; font-weight: 700; }
+
+  // ---- summaries on /me and the check screen --------------------------------------------------
+  &__summary { margin-block: 1rem; display: grid; gap: .5rem;
+    > div {
+      display: grid; grid-template-columns: minmax(6rem, auto) 1fr auto; gap: .25rem 1rem; align-items: baseline;
+      padding-block: .7rem; padding-inline: 1rem; border-radius: 12px; background: var(--ik-ground);
+    }
+    dt { font-weight: 700; color: var(--ik-ink-2); font-size: .92rem; }
+    dd { margin: 0; font-weight: 700; }
+    a { font-size: .92rem; font-weight: 700; }
+  }
+  &__need strong { display: block; }
+  &__need p { margin-block: .15rem; }
+
+  // ---- help pages ---------------------------------------------------------------------------
+  &__help-page { max-width: 42rem; line-height: 2; }
+  &__helplist { padding-inline-start: 1.1rem; li { margin-block: .4rem; } }
+  &__helpsteps { padding-inline-start: 1.4rem; li { margin-block: .6rem; } }
+  &__glossary {
+    dt { font-weight: 700; margin-block-start: 1rem; }
+    dd { margin: 0; color: var(--ik-ink-2); }
+  }
+}
+
+@media (max-width: 900px) {
+  .ikiku__hero > * { grid-column: 1; grid-row: auto; }
+}
+@media (max-width: 520px) {
+  .ikiku__summary > div { grid-template-columns: 1fr auto; }
+  .ikiku__summary dd { grid-column: 1 / -1; grid-row: 2; }
+  .ikiku__tiles { grid-template-columns: 1fr; }
+}

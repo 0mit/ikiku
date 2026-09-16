@@ -14,7 +14,7 @@ from odoo.addons.ikiku_base.models.jalali import to_latin_digits
 
 class IkikuPublic(http.Controller):
 
-    @http.route('/ikiku/p/<string:slug>', type='http', auth='public', website=True)
+    @http.route('/p/<string:slug>', type='http', auth='public', website=True)
     def public_profile(self, slug, **kw):
         resource = request.env['ikiku.resource'].sudo().search(
             [('slug', '=', slug), ('state', 'in', ('active', 'paused'))], limit=1)
@@ -33,7 +33,7 @@ class IkikuPublic(http.Controller):
             'bookings': [b.public_payload() for b in bookings],
         })
 
-    @http.route('/ikiku/jobs', type='http', auth='public', website=True)
+    @http.route('/jobs', type='http', auth='public', website=True)
     def public_jobs(self, province=None, **kw):
         province = to_latin_digits(province or '').strip()
         province_id = int(province) if province.isascii() and province.isdigit() else None
@@ -43,7 +43,7 @@ class IkikuPublic(http.Controller):
             'province_id': province_id,
         })
 
-    @http.route('/ikiku/bookings', type='http', auth='public', website=True)
+    @http.route('/bookings', type='http', auth='public', website=True)
     def public_bookings(self, **kw):
         """The public register of commitments.
 
@@ -56,7 +56,7 @@ class IkikuPublic(http.Controller):
         return request.render('ikiku_portal.public_bookings', {
             'bookings': [b.public_payload() for b in bookings]})
 
-    @http.route('/ikiku/costs', type='http', auth='public', website=True)
+    @http.route('/costs', type='http', auth='public', website=True)
     def public_costs(self, **kw):
         periods = request.env['ikiku.cost.period'].sudo().search(
             [('is_public', '=', True), ('state', '!=', 'draft')], order='date_start desc')

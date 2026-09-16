@@ -14,6 +14,9 @@
         'views/ikiku_enter_templates.xml',
         'views/ikiku_portal_templates.xml',
         'views/ikiku_staff_views.xml',
+        'views/ikiku_help_request_views.xml',
+        'views/ikiku_widget_templates.xml',
+        'views/ikiku_help_templates.xml',
         'views/ikiku_public_templates.xml',
         'views/ikiku_site_templates.xml',
         'views/ikiku_site_chrome.xml',
@@ -23,6 +26,7 @@
         'web.assets_frontend': [
             'ikiku_portal/static/src/scss/ikiku.scss',
             'ikiku_portal/static/src/js/ikiku_otp.js',
+            'ikiku_portal/static/src/js/ikiku_form.js',
         ],
     },
     'installable': True,

@@ -29,6 +29,9 @@ class IkikuAvailability(models.Model):
     city = fields.Char("شهر")
     can_relocate = fields.Boolean("امکانِ جابه‌جایی", default=False)
     hours_per_week = fields.Integer("ساعت در هفته", default=40)
+    details_confirmed = fields.Boolean(
+        "نوعِ همکاری پرسیده شد", default=False,
+        help="نیرو نوعِ همکاری، شیفت و جابه‌جایی را خودش جواب داده است؛ تا آن وقت صفحه‌ی ثبت‌نام همین را می‌پرسد.")
     shift_node_ids = fields.Many2many('ikiku.spec.node', string="شیفت‌های ممکن",
                                       domain="[('kind', '=', 'attribute')]")
     state = fields.Selection([
