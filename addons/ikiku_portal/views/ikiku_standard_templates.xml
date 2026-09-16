@@ -5,7 +5,7 @@
        the fields of knowledge under the skills. Spoken Persian (D-9), plain words (D-10). -->
 
   <!-- A search box that suggests as the person types; without JavaScript it is a GET form. -->
-  <template id="standard_search" name="ایکیکو — جست‌وجو در کارها">
+  <template id="standard_search" name="جست‌وجو در کارها">
     <form t-att-action="action" method="get" class="ikiku__form ikiku__search" role="search">
       <label t-att-for="field_id" class="ikiku__label" t-out="label"/>
       <div data-suggest="" t-att-data-suggest-url="'/standard/suggest?kind=%s' % kind"
@@ -17,14 +17,14 @@
     </form>
   </template>
 
-  <template id="standard_trail" name="ایکیکو — مسیرِ کار یا مهارت">
+  <template id="standard_trail" name="مسیرِ کار یا مهارت">
     <p class="ikiku__kicker">
       <a t-att-href="home_url" t-out="home_label"/>
       <t t-foreach="trail" t-as="family"> · <t t-out="family.plain_label or family.name"/></t>
     </p>
   </template>
 
-  <template id="standard_roles" name="ایکیکو — کارها">
+  <template id="standard_roles" name="کارها">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <p class="ikiku__kicker"><a href="/knowledge">درختِ دانش</a></p>
@@ -67,7 +67,8 @@
     </t>
   </template>
 
-  <template id="standard_role" name="ایکیکو — یک کار">
+  <template id="standard_role" name="یک کار">
+    <t t-set="additional_title" t-value="label"/>
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.standard_trail">
@@ -109,7 +110,8 @@
     </t>
   </template>
 
-  <template id="standard_skill" name="ایکیکو — یک مهارت">
+  <template id="standard_skill" name="یک مهارت">
+    <t t-set="additional_title" t-value="label"/>
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.standard_trail">
@@ -145,7 +147,7 @@
     </t>
   </template>
 
-  <template id="standard_knowledge" name="ایکیکو — درختِ دانش">
+  <template id="standard_knowledge" name="درختِ دانش">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <p class="ikiku__kicker"><a href="/roles">کارها</a></p>
@@ -181,7 +183,8 @@
     </t>
   </template>
 
-  <template id="standard_knowledge_class" name="ایکیکو — یک شاخه‌ی دانش">
+  <template id="standard_knowledge_class" name="یک شاخه‌ی دانش">
+    <t t-set="additional_title" t-value="klass.name"/>
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <p class="ikiku__kicker">

@@ -57,3 +57,19 @@ class TestSite(HttpCase):
         everywhere = self.url_open('/jobs?province=nonsense')
         self.assertEqual(everywhere.status_code, 200)
         self.assertIn('۳ نفر', everywhere.text)
+
+    def test_the_brand_is_the_logo_and_titles_say_the_name_once(self):
+        website = self.env['website'].search([], limit=1)
+        company = self.env.ref('base.main_company')
+        self.assertFalse(company.uses_default_logo)
+        self.assertNotEqual(website.favicon, website._default_favicon())
+        self.assertTrue(website.social_default_image)
+        self.assertNotIn(website.name, ('My Website', 'Website'))
+        home = self.url_open('/').text
+        self.assertIn('ikiku-horizontal.svg', home)
+        self.assertIn('rel="apple-touch-icon" href="/ikiku_portal/static/src/img/ikiku-icon-180.png"', home)
+        self.assertIn('<title>آیکی؟ کو؟ | %s</title>' % website.name, home)
+        for url, title in (('/ki', "کی؟"), ('/help', "راهنما"), ('/roles/waiter', "پذیرایی از مهمان")):
+            page = self.url_open(url).text
+            self.assertIn('<title>%s | %s</title>' % (title, website.name), page, url)
+            self.assertNotIn('<title>ایکیکو —', page, url)

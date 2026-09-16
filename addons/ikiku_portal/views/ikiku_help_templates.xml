@@ -3,11 +3,14 @@
 
   <!-- Every help page: short sentences, spoken Persian, one idea a line. Numbers come from
        controllers/help.py, which reads them from the code that enforces them. -->
-  <template id="help_frame" name="ایکیکو — قابِ راهنما">
+  <template id="help_frame" name="قابِ راهنما">
+    <!-- additional_title, not title: website.layout reads «title» as the whole tab title and
+         would drop the site's name. -->
+    <t t-set="additional_title" t-value="help_title"/>
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__help-page">
         <p class="ikiku__kicker"><a href="/help">راهنما</a></p>
-        <h1 class="ikiku__question" t-out="title"/>
+        <h1 class="ikiku__question" t-out="help_title"/>
         <t t-out="0"/>
         <p class="ikiku__links">
           <a href="/help">همه‌ی راهنماها</a>
@@ -17,9 +20,9 @@
     </t>
   </template>
 
-  <template id="help_hub" name="ایکیکو — راهنما">
+  <template id="help_hub" name="راهنما">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'راهنما'"/>
+      <t t-set="help_title" t-value="'راهنما'"/>
       <p class="ikiku__plain">اینجا کوتاه و روشن میگیم ایکیکو چطوری کار می‌کنه.</p>
       <div class="ikiku__tiles ikiku__tiles--two">
         <a class="ikiku__tile ikiku__tile--link" href="/help/kar"><span>دنبالِ کار هستم<small>چطوری ثبت‌نام کنم؟</small></span></a>
@@ -44,9 +47,9 @@
     </t>
   </template>
 
-  <template id="help_kar" name="ایکیکو — راهنما: ثبت‌نام برای کار">
+  <template id="help_kar" name="راهنما: ثبت‌نام برای کار">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'چطوری برای کار ثبت‌نام کنم؟'"/>
+      <t t-set="help_title" t-value="'چطوری برای کار ثبت‌نام کنم؟'"/>
       <ol class="ikiku__helpsteps">
         <li>فقط یه گوشی با شماره‌ی خودتون لازمه. ایمیل و رمز لازم نیست.</li>
         <li>شماره موبایلتون رو بنویسید. یه کد پیامک میشه. کد رو بنویسید.</li>
@@ -66,9 +69,9 @@
     </t>
   </template>
 
-  <template id="help_niroo" name="ایکیکو — راهنما: همکار پیدا کردن">
+  <template id="help_niroo" name="راهنما: همکار پیدا کردن">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'چطوری همکار پیدا کنم؟'"/>
+      <t t-set="help_title" t-value="'چطوری همکار پیدا کنم؟'"/>
       <ol class="ikiku__helpsteps">
         <li>حدودِ ۳ دقیقه طول می‌کشه.</li>
         <li>با شماره موبایلِ خودتون وارد بشید. یه کد پیامک میشه.</li>
@@ -98,9 +101,9 @@
     </t>
   </template>
 
-  <template id="help_code" name="ایکیکو — راهنما: کد نیومد">
+  <template id="help_code" name="راهنما: کد نیومد">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'کدِ پیامک نیومد'"/>
+      <t t-set="help_title" t-value="'کدِ پیامک نیومد'"/>
       <ol class="ikiku__helpsteps">
         <li>یه دقیقه صبر کنید. گاهی پیامک دیر می‌رسه.</li>
         <li>شماره رو نگاه کنید. اگه اشتباهه، «شماره رو اشتباه زدم» رو بزنید.</li>
@@ -118,9 +121,9 @@
     </t>
   </template>
 
-  <template id="help_tarikh" name="ایکیکو — راهنما: روز">
+  <template id="help_tarikh" name="راهنما: روز">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'روز رو چطوری انتخاب کنم؟'"/>
+      <t t-set="help_title" t-value="'روز رو چطوری انتخاب کنم؟'"/>
       <ol class="ikiku__helpsteps">
         <li>تاریخ‌ها شمسی‌ان، مثلِ تقویمِ خونه. امروز: <strong t-out="today"/>.</li>
         <li>دکمه‌ها تاریخ رو براتون نوشتن. مثلاً «از امروز» یا «از اولِ ماهِ بعد».</li>
@@ -132,9 +135,9 @@
     </t>
   </template>
 
-  <template id="help_dide" name="ایکیکو — راهنما: چی دیده میشه">
+  <template id="help_dide" name="راهنما: چی دیده میشه">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'چی از من رو همه می‌بینن، چی رو نه؟'"/>
+      <t t-set="help_title" t-value="'چی از من رو همه می‌بینن، چی رو نه؟'"/>
       <p class="ikiku__plain">قانونِ ما اینه: امنیتِ آدم‌ها از همه‌چی مهم‌تره. <small>بند ۷</small></p>
       <p class="ikiku__lead">این فهرست از همون جدولی ساخته میشه که سایت باهاش تصمیم می‌گیره چی رو نشون بده.</p>
 
@@ -171,9 +174,9 @@
     </t>
   </template>
 
-  <template id="help_etebar" name="ایکیکو — راهنما: اعتبار">
+  <template id="help_etebar" name="راهنما: اعتبار">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'اعتبار و عددها از کجا میاد؟'"/>
+      <t t-set="help_title" t-value="'اعتبار و عددها از کجا میاد؟'"/>
       <p class="ikiku__plain">ایکیکو هیچ عددِ پنهانی نداره. <small>بند ۸</small></p>
       <h2 class="ikiku__subhead">اعتبار</h2>
       <p>اعتبار یه عدده از ۰ تا <t t-out="max"/>. فقط این‌جوری حساب میشه:</p>
@@ -194,9 +197,9 @@
     </t>
   </template>
 
-  <template id="help_daftar" name="ایکیکو — راهنما: دفتر قرارها">
+  <template id="help_daftar" name="راهنما: دفتر قرارها">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'دفترِ قرارهای کار چیه؟'"/>
+      <t t-set="help_title" t-value="'دفترِ قرارهای کار چیه؟'"/>
       <ol class="ikiku__helpsteps">
         <li>هر وقت کسی با یه کافه یا رستوران قرارِ کار می‌ذاره، اینجا نوشته میشه.</li>
         <li>اگه قرار به هم بخوره، اونم نوشته میشه، با دلیلش.</li>
@@ -213,9 +216,9 @@
     </t>
   </template>
 
-  <template id="help_hazine" name="ایکیکو — راهنما: هزینه">
+  <template id="help_hazine" name="راهنما: هزینه">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'هزینه‌ی ایکیکو چطوریه؟'"/>
+      <t t-set="help_title" t-value="'هزینه‌ی ایکیکو چطوریه؟'"/>
       <ol class="ikiku__helpsteps">
         <li>ایکیکو از حقوقِ هیچ‌کس چیزی برنمی‌داره.</li>
         <li>ایکیکو خرج داره: سرور، پیامک، حقوقِ تیمِ ایکیکو. این خرجِ واقعی رو جلوی همه می‌نویسیم.</li>
@@ -230,9 +233,9 @@
     </t>
   </template>
 
-  <template id="help_kalame" name="ایکیکو — راهنما: کلمه‌ها">
+  <template id="help_kalame" name="راهنما: کلمه‌ها">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'این کلمه یعنی چی؟'"/>
+      <t t-set="help_title" t-value="'این کلمه یعنی چی؟'"/>
       <dl class="ikiku__glossary">
         <dt>مرام‌نامه</dt><dd>قانونِ ایکیکو. قول‌هایی که ایکیکو به همه داده.</dd>
         <dt>کارجو</dt><dd>کسی که دنبالِ کاره.</dd>
@@ -257,9 +260,9 @@
     </t>
   </template>
 
-  <template id="help_maram" name="ایکیکو — راهنما: مرام‌نامه، کوتاه">
+  <template id="help_maram" name="راهنما: مرام‌نامه، کوتاه">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'مرام‌نامه، کوتاه'"/>
+      <t t-set="help_title" t-value="'مرام‌نامه، کوتاه'"/>
       <p class="ikiku__notice">این فقط خلاصه‌ست. قانون، <a href="/manifest">متنِ کاملِ مرام‌نامه</a>‌ست.</p>
       <ul class="ikiku__helplist ikiku__helplist--articles">
         <li>هیچ کاری ساده نیست. شست‌وشوی ظرف هم فنه. آدم‌ها شماره نیستن. <small>بند ۱</small></li>
@@ -286,9 +289,9 @@
     </t>
   </template>
 
-  <template id="help_shomare" name="ایکیکو — راهنما: شماره عوض شده">
+  <template id="help_shomare" name="راهنما: شماره عوض شده">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'شماره‌م عوض شده، یا سیم‌کارتم گم شده'"/>
+      <t t-set="help_title" t-value="'شماره‌م عوض شده، یا سیم‌کارتم گم شده'"/>
       <ol class="ikiku__helpsteps">
         <li>شماره‌ای که باهاش وارد میشید، همون شماره‌ایه که تیمِ ایکیکو برای تماس با شما داره. شماره‌ی دیگه‌ای ازتون نمی‌خوایم.</li>
         <li>سیم‌کارت گم شده ولی شماره همونه؟ از دفترِ اپراتور سیم‌کارتِ المثنی بگیرید. با همون شماره وارد بشید. صفحه‌تون سرِ جاشه.</li>
@@ -300,9 +303,9 @@
     </t>
   </template>
 
-  <template id="help_tamas" name="ایکیکو — راهنما: درخواستِ تماس">
+  <template id="help_tamas" name="راهنما: درخواستِ تماس">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'می‌خوام یکی کمکم کنه'"/>
+      <t t-set="help_title" t-value="'می‌خوام یکی کمکم کنه'"/>
       <t t-if="sent">
         <p class="ikiku__status">درخواستتون رسید. تیمِ ایکیکو زنگ می‌زنه.</p>
         <p>ما هیچ‌وقت کدِ پیامکِ شما رو نمی‌خوایم. اگه کسی زنگ زد و کد خواست، ندید.</p>
@@ -338,9 +341,9 @@
     </t>
   </template>
 
-  <template id="help_hardo" name="ایکیکو — راهنما: هم کار، هم کافه یا رستوران">
+  <template id="help_hardo" name="راهنما: هم کار، هم کافه یا رستوران">
     <t t-call="ikiku_portal.help_frame">
-      <t t-set="title" t-value="'هم دنبالِ کارم، هم کافه یا رستوران دارم'"/>
+      <t t-set="help_title" t-value="'هم دنبالِ کارم، هم کافه یا رستوران دارم'"/>
       <ol class="ikiku__helpsteps">
         <li>با یه شماره، هر دو رو دارید. حسابِ دوم لازم نیست.</li>
         <li>بالای صفحه‌تون دو تا دکمه هست: «کار می‌خوام» و «همکار می‌خوام». هر کدوم رو بزنید، همون صفحه باز میشه.</li>

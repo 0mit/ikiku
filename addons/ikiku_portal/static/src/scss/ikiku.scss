@@ -318,6 +318,8 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
     font-family: 'Vazirmatn', Tahoma, sans-serif; font-weight: 700; font-size: 1.5rem;
     color: var(--ik-blue); line-height: 1;
   }
+  &__footer-logo img { display: block; block-size: 3rem; inline-size: auto; }
+  &__tagline { font-weight: 700; color: var(--ik-ink); }
 }
 
 @media (max-width: 900px) {
@@ -564,3 +566,7 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   &__pick-note { margin-block: .4rem 0; min-block-size: 1.5rem; }
 }
 .search-suggest { --search-suggest-active: var(--ik-blue-soft); --search-suggest-border: var(--ik-rule); }
+
+// The wordmark in the header (2026-09-17): the SVG keeps its proportions at any height.
+.ikiku__brand-logo { display: block; block-size: 2.75rem; inline-size: auto; }
+@media (max-width: 520px) { .ikiku__brand-logo { block-size: 2.25rem; } }

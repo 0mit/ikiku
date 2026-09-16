@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-  <template id="public_profile" name="ایکیکو — پروندهٔ عمومی">
+  <template id="public_profile" name="پروندهٔ عمومی">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question" t-out="values.get('name')"/>
@@ -66,7 +66,7 @@
     </t>
   </template>
 
-  <template id="public_jobs" name="ایکیکو — کارهای باز">
+  <template id="public_jobs" name="کارهای باز">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <p class="ikiku__kicker">همه می‌بینن</p>
@@ -95,7 +95,7 @@
     </t>
   </template>
 
-  <template id="public_bookings" name="ایکیکو — دفترِ عمومیِ تعهدها">
+  <template id="public_bookings" name="دفترِ عمومیِ تعهدها">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question">دفترِ قرارهای کار</h1>
@@ -137,7 +137,7 @@
     </t>
   </template>
 
-  <template id="public_costs" name="ایکیکو — هزینهٔ مشترک">
+  <template id="public_costs" name="هزینهٔ مشترک">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--wide">
         <h1 class="ikiku__question">هزینه‌ی مشترک</h1>

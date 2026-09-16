@@ -3,13 +3,16 @@
 
   <!-- Odoo's default footer is placeholder copy ("We are a team of passionate people…",
        a +1 555 phone, info@yourcompany). Replaced whole, not patched. -->
-  <template id="footer" inherit_id="website.footer_custom" name="ایکیکو — پانوشت">
+  <template id="footer" inherit_id="website.footer_custom" name="پانوشت">
     <xpath expr="//div[@id='footer']" position="replace">
       <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
         <section class="ikiku ikiku__footer">
           <div class="ikiku__wide ikiku__footer-grid">
             <div>
-              <h5>ایکیکو</h5>
+              <h5 class="ikiku__footer-logo">
+                <img src="/ikiku_portal/static/src/img/ikiku-horizontal.svg" alt="ایکیکو" width="141" height="48" loading="lazy"/>
+              </h5>
+              <p class="ikiku__tagline">پل بین آدم‌های خوب و کسب‌وکارهای بهتر</p>
               <p>آیکی؟ کو؟ — کسی که دنبالِ کار تو کافه و رستورانه، و کافه یا رستورانی که همکار لازم داره،
                 زودتر و جلوی چشمِ همه به هم می‌رسن.</p>
             </div>
@@ -39,17 +42,18 @@
     </xpath>
   </template>
 
-  <!-- The header brand showed Odoo's default "Your Logo" SVG. iKiKu has no logo yet, so the
-       brand is the site's name, set in the site's own face. -->
-  <template id="header_brand" inherit_id="website.option_header_brand_logo" name="ایکیکو — نامِ سایت">
+  <!-- The header brand showed Odoo's default "Your Logo" SVG. Since 2026-09-17 it is the iKiKu
+       wordmark (static/src/img, from the brand files), with the site's name as its text. -->
+  <template id="header_brand" inherit_id="website.option_header_brand_logo" name="نامِ سایت">
     <xpath expr="//span[@t-field='website.logo']" position="replace">
-      <span class="ikiku__brand ikiku" t-out="website.name"/>
+      <img class="ikiku__brand-logo" src="/ikiku_portal/static/src/img/ikiku-horizontal.svg"
+           t-att-alt="website.name" width="129" height="44"/>
     </xpath>
   </template>
 
   <!-- The header's "text element" is a +1 555 placeholder phone in every variant. iKiKu
        publishes no phone number, so the element is removed rather than filled in. -->
-  <template id="header_text_element" inherit_id="website.header_text_element" name="ایکیکو — بدونِ تلفنِ نمونه">
+  <template id="header_text_element" inherit_id="website.header_text_element" name="بدونِ تلفنِ نمونه">
     <xpath expr="//li" position="replace"/>
   </template>
 
@@ -60,7 +64,7 @@
        Inside a flow it is hidden, so nobody leaves a half-filled step by mistake. The
        classes stay: header_call_to_action_large and _sidebar address the link by
        oe_unremovable. -->
-  <template id="header_call_to_action" inherit_id="website.header_call_to_action" name="ایکیکو — دکمهٔ سرصفحه">
+  <template id="header_call_to_action" inherit_id="website.header_call_to_action" name="دکمهٔ سرصفحه">
     <xpath expr="//a[hasclass('btn_cta')]" position="replace">
       <t t-set="ikiku_in_flow" t-value="request.httprequest.path.startswith(('/join', '/enter', '/business/need', '/web/login'))"/>
       <a t-if="not ikiku_in_flow and request.env.user._is_public()" href="/#ikiku-doors"
@@ -71,9 +75,27 @@
 
   <!-- website.footer_copyright_company_name (priority 15) prints the literal words
        "Company name"; this runs after it. بندِ ۱۰: the code is open. -->
-  <template id="footer_copyright" inherit_id="website.layout" priority="20" name="ایکیکو — حقِ نشر">
+  <template id="footer_copyright" inherit_id="website.layout" priority="20" name="حقِ نشر">
     <xpath expr="//footer//span[hasclass('o_footer_copyright_name')]" position="replace">
       <span class="o_footer_copyright_name me-2 small"><t t-out="res_company.name"/> · کدِ باز، AGPL-3</span>
+    </xpath>
+  </template>
+
+  <!-- The app icon for the tab, the phone home screen and the browser bar colour. -->
+  <template id="head_icons" inherit_id="website.layout" name="آیکون‌ها">
+    <xpath expr="//link[@rel='apple-touch-icon']" position="replace">
+      <link rel="icon" type="image/svg+xml" href="/ikiku_portal/static/src/img/ikiku-icon.svg"/>
+      <link rel="apple-touch-icon" href="/ikiku_portal/static/src/img/ikiku-icon-180.png"/>
+      <meta name="theme-color" content="#2461C9"/>
+    </xpath>
+  </template>
+
+  <!-- The home page's tab title was Odoo's «Home | …». Set before website.layout reads the page
+       name; renaming the page record itself would copy the home page's view. -->
+  <template id="home_title" inherit_id="website.layout" name="عنوانِ صفحه‌ی خانه">
+    <xpath expr="//t[@t-if=&quot;not additional_title and main_object and 'name' in main_object&quot;]" position="before">
+      <t t-if="not additional_title and main_object and 'url' in main_object and main_object.url == '/'"
+         t-set="additional_title" t-value="'آیکی؟ کو؟'"/>
     </xpath>
   </template>
 

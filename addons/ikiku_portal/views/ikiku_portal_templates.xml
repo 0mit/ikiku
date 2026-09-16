@@ -3,7 +3,7 @@
 
   <!-- ============================================================ workers (کی؟) -->
 
-  <template id="join_name" name="ایکیکو — اسم">
+  <template id="join_name" name="اسم">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <t t-if="not for_business" t-call="ikiku_portal.step_head"/>
@@ -27,7 +27,7 @@
     </t>
   </template>
 
-  <template id="join_where" name="ایکیکو — کجا">
+  <template id="join_where" name="کجا">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <t t-call="ikiku_portal.step_head"/>
@@ -44,7 +44,7 @@
     </t>
   </template>
 
-  <template id="join_skills" name="ایکیکو — چه کاری بلدید">
+  <template id="join_skills" name="چه کاری بلدید">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.step_head"/>
@@ -107,7 +107,7 @@
     </t>
   </template>
 
-  <template id="join_when" name="ایکیکو — از کِی تا کِی">
+  <template id="join_when" name="از کِی تا کِی">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.step_head"/>
@@ -125,7 +125,7 @@
     </t>
   </template>
 
-  <template id="join_how" name="ایکیکو — چه جوری">
+  <template id="join_how" name="چه جوری">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.step_head"/>
@@ -178,7 +178,7 @@
     </t>
   </template>
 
-  <template id="resource_home" name="ایکیکو — صفحه‌ی من">
+  <template id="resource_home" name="صفحه‌ی من">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-if="len(sides) == 2" t-call="ikiku_portal.side_switch"><t t-set="side" t-value="'ki'"/></t>
@@ -249,7 +249,7 @@
 
   <!-- ============================================================ businesses (کو؟) -->
 
-  <template id="business_name" name="ایکیکو — اسمِ کافه یا رستوران">
+  <template id="business_name" name="اسمِ کافه یا رستوران">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step"><t t-if="business">عوض کردن</t><t t-elif="another">مجموعه‌ی دیگه</t><t t-else="">شروع</t></p>
@@ -271,7 +271,7 @@
     </t>
   </template>
 
-  <template id="need_who" name="ایکیکو — برای چه کاری">
+  <template id="need_who" name="برای چه کاری">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
@@ -320,7 +320,7 @@
     </t>
   </template>
 
-  <template id="need_type" name="ایکیکو — چه جور کاری">
+  <template id="need_type" name="چه جور کاری">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
@@ -346,7 +346,7 @@
     </t>
   </template>
 
-  <template id="need_count" name="ایکیکو — چند نفر">
+  <template id="need_count" name="چند نفر">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
@@ -368,7 +368,7 @@
     </t>
   </template>
 
-  <template id="need_when" name="ایکیکو — از کِی تا کِی لازمشون دارید">
+  <template id="need_when" name="از کِی تا کِی لازمشون دارید">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
@@ -384,7 +384,7 @@
     </t>
   </template>
 
-  <template id="need_where" name="ایکیکو — کجا و بررسی">
+  <template id="need_where" name="کجا و بررسی">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <t t-call="ikiku_portal.step_head"><t t-set="edit" t-value="False"/></t>
@@ -408,7 +408,7 @@
     </t>
   </template>
 
-  <template id="need_saved" name="ایکیکو — درخواست ثبت شد">
+  <template id="need_saved" name="درخواست ثبت شد">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step">ثبت شد</p>
@@ -436,7 +436,7 @@
     </t>
   </template>
 
-  <template id="business_home" name="ایکیکو — درخواست‌های من">
+  <template id="business_home" name="درخواست‌های من">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell">
         <t t-if="len(sides) == 2" t-call="ikiku_portal.side_switch"><t t-set="side" t-value="'ku'"/></t>
@@ -489,7 +489,7 @@
   <!-- ============================================================ one account, two sides -->
 
   <!-- /my for a person with both sides who has not opened either in this browser. -->
-  <template id="choose_side" name="ایکیکو — امروز برای چی اومدید">
+  <template id="choose_side" name="امروز برای چی اومدید">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step">صفحه‌ی من</p>
@@ -506,7 +506,7 @@
 
   <!-- On /me and /business when the account holds both sides. On the page, not only in the
        menu: on a phone the menu is folded away. -->
-  <template id="side_switch" name="ایکیکو — کار یا همکار">
+  <template id="side_switch" name="کار یا همکار">
     <nav class="ikiku__switch" aria-label="کار می‌خوام یا همکار می‌خوام">
       <a href="/me" t-att-class="'is-on' if side == 'ki' else None" t-att-aria-current="'page' if side == 'ki' else None">کار می‌خوام</a>
       <a href="/business" t-att-class="'is-on' if side == 'ku' else None" t-att-aria-current="'page' if side == 'ku' else None">همکار می‌خوام</a>
@@ -515,7 +515,7 @@
 
   <!-- The person's own number, masked: it is the number they sign in with and the one staff
        call. The whole number is never in the page. -->
-  <template id="my_number" name="ایکیکو — شماره‌ی شما">
+  <template id="my_number" name="شماره‌ی شما">
     <section class="ikiku__card ikiku__number">
       <h2 class="ikiku__subhead">شماره موبایلِ شما</h2>
       <t t-if="number['masked']">
@@ -533,7 +533,7 @@
 
   <!-- Under each need. Open and not booked: change it, or say it is no longer needed.
        Booked: staff only, because a booking is public (بند ۷, D-16 A). -->
-  <template id="need_actions" name="ایکیکو — عوض کردن یا بستنِ درخواست">
+  <template id="need_actions" name="عوض کردن یا بستنِ درخواست">
     <p t-if="is_open and not booked" class="ikiku__links">
       <a t-att-href="'/business/need/%d/edit' % need_rec.id">عوض کنید</a>
       <a t-att-href="'/business/need/%d/close' % need_rec.id">دیگه لازم ندارم</a>
@@ -543,7 +543,7 @@
     <p t-elif="need_rec.state == 'cancelled'" class="ikiku__muted">دلیلِ لغو: <t t-out="need_rec.cancel_reason"/></p>
   </template>
 
-  <template id="need_close" name="ایکیکو — دیگه لازم ندارم">
+  <template id="need_close" name="دیگه لازم ندارم">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step">بستنِ درخواست</p>
@@ -561,7 +561,7 @@
     </t>
   </template>
 
-  <template id="need_cancel" name="ایکیکو — لغوِ درخواست">
+  <template id="need_cancel" name="لغوِ درخواست">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step">لغوِ درخواست</p>
@@ -582,7 +582,7 @@
   </template>
 
   <!-- A person with several businesses says which one a new need is for. -->
-  <template id="need_for" name="ایکیکو — برای کدوم کافه یا رستوران">
+  <template id="need_for" name="برای کدوم کافه یا رستوران">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step">همکارِ تازه</p>
@@ -599,7 +599,7 @@
 
   <!-- Above the tiles: type, choose, and the tile is ticked (ikiku_pick.js, search_suggest).
        Hidden until the script runs; without it the «بنویسید» path below still works. -->
-  <template id="role_pick" name="ایکیکو — پیدا کردنِ کار با نوشتن">
+  <template id="role_pick" name="پیدا کردنِ کار با نوشتن">
     <div class="ikiku__pick" data-ikiku-pick="" hidden="hidden">
       <label for="ikiku-pick-q" class="ikiku__label">زودتر پیدا کنید: اسمِ کار رو بنویسید</label>
       <div data-suggest="" data-suggest-url="/standard/suggest?kind=role" data-suggest-count="{n} پیشنهاد">

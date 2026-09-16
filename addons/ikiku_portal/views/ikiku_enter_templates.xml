@@ -2,7 +2,7 @@
 <odoo>
 
   <!-- E1: the one question is the number. Errors re-render with what was typed. -->
-  <template id="enter_mobile" name="ایکیکو — ورود با شماره">
+  <template id="enter_mobile" name="ورود با شماره">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__step"><t t-if="signed_in">تأییدِ شماره</t><t t-else="">ورود</t></p>
@@ -36,7 +36,7 @@
   </template>
 
   <!-- E2: the code. The status line is updated by ikiku_otp.js and reads right without it. -->
-  <template id="enter_code" name="ایکیکو — کدِ پیامک">
+  <template id="enter_code" name="کدِ پیامک">
     <t t-call="website.layout">
       <t t-set="failed" t-value="status['state'] in ('failed', 'expired')"/>
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">

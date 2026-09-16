@@ -6,7 +6,10 @@ noupdate: it runs on install and again on every `-u ikiku_portal`, so it must be
 idempotent. It only touches what iKiKu owns — its menus, the signup door, and
 Odoo's placeholder company name — and leaves anything a person has set alone.
 """
+import base64
+
 from odoo import api, models
+from odoo.tools.misc import file_open
 
 # The two doors in plain words (کی؟ is the worker, کو؟ the business), the open jobs,
 # and help. The ledgers and the law moved to the footer on 2026-09-16; the home page
@@ -24,6 +27,18 @@ IKIKU_MENUS = [
 RETIRED_MENU_URLS = ('/contactus', '/ikiku/bookings', '/ikiku/costs', '/ikiku/manifest',
                      '/bookings', '/costs', '/manifest')
 PLACEHOLDER_COMPANY_NAMES = ('My Company', 'YourCompany')
+# The brand files (2026-09-17). Each replaces an Odoo default only, never an image a person set.
+BRAND = {
+    'company_logo': 'ikiku_portal/static/src/img/ikiku-horizontal-640.png',
+    'website_logo': 'ikiku_portal/static/src/img/ikiku-horizontal.svg',
+    'favicon': 'ikiku_portal/static/src/img/favicon.ico',
+    'social': 'ikiku_portal/static/src/img/ikiku-social-1200x630.png',
+}
+
+
+def _brand(key):
+    with file_open(BRAND[key], 'rb') as f:
+        return base64.b64encode(f.read())
 SESSION_DAYS = 30
 
 
@@ -35,6 +50,8 @@ class Website(models.Model):
         company = self.env.ref('base.main_company')
         if company.name in PLACEHOLDER_COMPANY_NAMES:
             company.name = 'ایکیکو'
+        if company.uses_default_logo:
+            company.logo = _brand('company_logo')
         # Every sign-in by SMS costs a message, so a session lasts 30 days of inactivity
         # (operator, D-3). The parameter is global: staff sessions last as long.
         params = self.env['ir.config_parameter'].sudo()
@@ -48,6 +65,14 @@ class Website(models.Model):
             # with a mobile number and an SMS code at /enter. /web/login stays for staff
             # and for accounts that already use email.
             website.auth_signup_uninvited = 'b2b'
+            if website.name in ('My Website', 'Website'):
+                website.name = company.name
+            if website.favicon == website._default_favicon():
+                website.favicon = _brand('favicon')
+            if website.logo == website._default_logo():
+                website.logo = _brand('website_logo')
+            if not website.social_default_image:
+                website.social_default_image = _brand('social')
             top = website.menu_id
             if not top:
                 continue

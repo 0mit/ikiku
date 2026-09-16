@@ -3,13 +3,13 @@
 
   <!-- The home page. The inherit only swaps the empty #wrap for home_content, so the
        words live in one template a person can read without the xpath around them. -->
-  <template id="homepage" inherit_id="website.homepage" name="ایکیکو — خانه">
+  <template id="homepage" inherit_id="website.homepage" name="خانه">
     <xpath expr="//div[@id='wrap']" position="replace">
       <div id="wrap"><t t-call="ikiku_portal.home_content"/></div>
     </xpath>
   </template>
 
-  <template id="home_content" name="ایکیکو — محتوای خانه">
+  <template id="home_content" name="محتوای خانه">
     <t t-set="Demand" t-value="request.env['ikiku.demand']"/>
     <t t-set="jobs" t-value="Demand.ikiku_public_open(limit=6)"/>
     <t t-set="jobs_count" t-value="Demand.ikiku_public_open_count()"/>
@@ -124,7 +124,7 @@
 
   <!-- Open needs as cards. Fed only by ikiku.demand.ikiku_public_open(), which hands over
        plain public values, never the record: nothing here can print the business. -->
-  <template id="job_cards" name="ایکیکو — کارتِ کارهای باز">
+  <template id="job_cards" name="کارتِ کارهای باز">
     <div t-if="jobs" class="ikiku__jobs">
       <t t-foreach="jobs" t-as="job">
         <article class="ikiku__job">
@@ -147,7 +147,7 @@
     </div>
   </template>
 
-  <template id="door_ki" name="ایکیکو — کی؟">
+  <template id="door_ki" name="کی؟">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__kicker">برای کسی که دنبالِ کاره</p>
@@ -172,7 +172,7 @@
     </t>
   </template>
 
-  <template id="door_ku" name="ایکیکو — کو؟">
+  <template id="door_ku" name="کو؟">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__kicker">برای کافه و رستوران</p>
@@ -196,7 +196,7 @@
     </t>
   </template>
 
-  <template id="manifest_page" name="ایکیکو — مرام‌نامه">
+  <template id="manifest_page" name="مرام‌نامه">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__manifest">
         <p class="ikiku__note">متنِ کامل و رسمیِ قانونِ ایکیکو. <a href="/help/maram">خلاصه‌ش اینجاست.</a></p>
@@ -207,7 +207,7 @@
 
   <!-- A signed-in person at the other door: asked once, on its own screen, before a second
        side is made (operator, 2026-09-16: one person may hold both). -->
-  <template id="door_add_ki" name="ایکیکو — کی؟ برای کسی که کافه یا رستوران داره">
+  <template id="door_add_ki" name="کی؟ برای کسی که کافه یا رستوران داره">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__kicker">کار می‌خوام</p>
@@ -220,7 +220,7 @@
     </t>
   </template>
 
-  <template id="door_add_ku" name="ایکیکو — کو؟ برای کسی که دنبالِ کاره">
+  <template id="door_add_ku" name="کو؟ برای کسی که دنبالِ کاره">
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <p class="ikiku__kicker">همکار می‌خوام</p>

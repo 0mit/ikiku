@@ -2,7 +2,7 @@
 <odoo>
 
   <!-- «قدم ۲ از ۵ · راهنما», and a bar that fills as the steps go by. -->
-  <template id="step_head" name="ایکیکو — سرِ قدم">
+  <template id="step_head" name="سرِ قدم">
     <div class="ikiku__stephead">
       <span class="ikiku__step">
         <t t-if="edit">عوض کردن</t>
@@ -22,7 +22,7 @@
   <!-- Role tiles from the standard, grouped by family, in the published order. The featured
        roles are buttons; every other role of the family is one tap away under «کارهای دیگه»,
        which opens by itself when one of them is already chosen. -->
-  <template id="skill_tiles" name="ایکیکو — دکمه‌های کار">
+  <template id="skill_tiles" name="دکمه‌های کار">
     <t t-foreach="groups" t-as="group">
       <fieldset class="ikiku__group">
         <legend t-out="group[0].plain_label or group[0].name"/>
@@ -40,7 +40,7 @@
     </t>
   </template>
 
-  <template id="role_tile" name="ایکیکو — دکمه‌ی یک کار">
+  <template id="role_tile" name="دکمه‌ی یک کار">
     <label class="ikiku__tile">
       <input t-att-type="input_type" name="node_id" t-att-value="node.id"
              t-att-checked="node.id in on_ids and 'checked'"
@@ -51,7 +51,7 @@
   </template>
 
   <!-- «از کِی؟» and «تا کِی؟» as buttons, with three selects for another day. -->
-  <template id="date_choices" name="ایکیکو — انتخابِ تاریخ">
+  <template id="date_choices" name="انتخابِ تاریخ">
     <fieldset class="ikiku__group">
       <legend>از کِی؟</legend>
       <div class="ikiku__chips">
@@ -88,7 +88,7 @@
     </fieldset>
   </template>
 
-  <template id="date_selects" name="ایکیکو — روز، ماه، سال">
+  <template id="date_selects" name="روز، ماه، سال">
     <details class="ikiku__custom" t-att-open="dates['custom'].get(prefix) == 'custom' and 'open'">
       <summary>روزِ دیگه رو اینجا انتخاب کنید</summary>
       <div class="ikiku__selects">
@@ -120,7 +120,7 @@
   </template>
 
   <!-- Province first, nothing chosen for the person; the city is typed. -->
-  <template id="place_fields" name="ایکیکو — استان و شهر">
+  <template id="place_fields" name="استان و شهر">
     <label for="province_id" class="ikiku__label">استان</label>
     <select class="ikiku__field ikiku__field--big" id="province_id" name="province_id" required="required"
             t-att-aria-invalid="errors.get('province') and 'true'">

@@ -4,7 +4,7 @@
   <!-- Odoo's own login page with the SMS sign-in first (operator, 2026-09-16). The box posts
        to /enter/send, so the limits, the reuse of the last code and the refusal of staff
        numbers are the ones /enter has. Email and password stay below, unchanged. -->
-  <template id="login_sms" inherit_id="web.login" priority="40" name="ایکیکو — ورود با پیامک">
+  <template id="login_sms" inherit_id="web.login" priority="40" name="ورود با پیامک">
     <xpath expr="//div[@id='oe_structure_login_top']" position="after">
       <section t-if="ikiku_is_public" class="ikiku ikiku__login-sms">
         <h2 class="ikiku__subhead">با شماره موبایل وارد بشید</h2>
