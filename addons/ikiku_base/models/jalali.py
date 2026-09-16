@@ -82,6 +82,19 @@ def to_fa_digits(text):
     return str(text).translate(str.maketrans("0123456789", _FA_DIGITS))
 
 
+# Persian (U+06F0..) and Arabic-Indic (U+0660..) digits, as Persian keyboards type them.
+_TO_LATIN = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
+
+
+def to_latin_digits(text):
+    """Every digit a person types becomes a Latin digit before it is parsed or stored:
+    mobile numbers, codes, dates, counts. Display goes the other way (to_fa_digits, or
+    the Farsi-digits face of the site's font). None and False pass through."""
+    if text is None or text is False:
+        return text
+    return str(text).translate(_TO_LATIN)
+
+
 def format_jalali(date_value, with_month_name=True, fa_digits=True):
     """A date object -> a Persian string. Absolute dates only, never relative."""
     if not date_value:

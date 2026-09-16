@@ -12,8 +12,9 @@ TMP="$(mktemp -d)"
 echo "fetching Vazirmatn v${VER} ..."
 curl -fL "$BASE" -o "$TMP/v.zip"
 unzip -q "$TMP/v.zip" -d "$TMP"
-find "$TMP" -name 'Vazirmatn-Regular.woff2' -exec cp {} "$DEST/" \;
-find "$TMP" -name 'Vazirmatn-Bold.woff2'    -exec cp {} "$DEST/" \;
+# The Farsi-Digits build draws 0-9 as Persian digits, so stored Latin digits display in Persian.
+find "$TMP" -path '*Farsi-Digits*' -name 'Vazirmatn-FD-Regular.woff2' -exec cp {} "$DEST/" \;
+find "$TMP" -path '*Farsi-Digits*' -name 'Vazirmatn-FD-Bold.woff2'    -exec cp {} "$DEST/" \;
 rm -rf "$TMP"
 echo "done. files in $DEST:"
 ls -la "$DEST"

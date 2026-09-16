@@ -9,6 +9,8 @@ is restricted and therefore absent: fail closed.
 from odoo import http
 from odoo.http import request
 
+from odoo.addons.ikiku_base.models.jalali import to_latin_digits
+
 
 class IkikuPublic(http.Controller):
 
@@ -33,7 +35,8 @@ class IkikuPublic(http.Controller):
 
     @http.route('/ikiku/jobs', type='http', auth='public', website=True)
     def public_jobs(self, province=None, **kw):
-        province_id = int(province) if province and str(province).isdigit() else None
+        province = to_latin_digits(province or '').strip()
+        province_id = int(province) if province.isascii() and province.isdigit() else None
         return request.render('ikiku_portal.public_jobs', {
             'jobs': request.env['ikiku.demand'].ikiku_public_open(province_id=province_id),
             'provinces': request.env['ikiku.province'].sudo().search([]),

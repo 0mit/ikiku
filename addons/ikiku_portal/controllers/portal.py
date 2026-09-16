@@ -14,7 +14,7 @@ from odoo import http
 from odoo.exceptions import ValidationError
 from odoo.http import request
 
-from odoo.addons.ikiku_base.models.jalali import jalali_to_gregorian
+from odoo.addons.ikiku_base.models.jalali import jalali_to_gregorian, to_latin_digits
 from odoo.addons.ikiku_portal.models.mobile_challenge import MESSAGES
 
 
@@ -26,7 +26,7 @@ def _parse_jalali(value):
     """Portal input is Jalali; storage is Gregorian. Convert at the boundary."""
     if not value:
         return False
-    parts = value.replace('-', '/').split('/')
+    parts = to_latin_digits(value).strip().replace('-', '/').replace('.', '/').split('/')
     if len(parts) != 3:
         return False
     try:
@@ -35,6 +35,15 @@ def _parse_jalali(value):
         return '%04d-%02d-%02d' % (gy, gm, gd)
     except (ValueError, IndexError):
         return False
+
+
+def _int(value, default=None):
+    """A number from a form, in whatever digits it was typed; `default` when it is not one,
+    rather than a server error."""
+    try:
+        return int(to_latin_digits(value).strip())
+    except (AttributeError, TypeError, ValueError):
+        return default
 
 
 class IkikuPortal(http.Controller):
@@ -66,7 +75,7 @@ class IkikuPortal(http.Controller):
         except ValidationError:
             return request.redirect('/ikiku/join?' + urlencode({'error': 'mobile'}))
         partner_sudo.write({
-            'ikiku_province_id': int(post['province_id']) if post.get('province_id') else False,
+            'ikiku_province_id': _int(post.get('province_id'), False),
             'ikiku_city': post.get('city'),
         })
         resource = Resource.search([('partner_id', '=', partner.id)], limit=1)
@@ -153,7 +162,7 @@ class IkikuPortal(http.Controller):
         resource = request.env['ikiku.resource'].sudo().search(
             [('partner_id', '=', partner.id)], limit=1)
         raw = (post.get('raw') or '').strip()
-        node_id = int(post['node_id']) if post.get('node_id') else False
+        node_id = _int(post.get('node_id'), False)
         if node_id:
             node = request.env['ikiku.spec.node'].sudo().browse(node_id)
             resource.sudo().claim_skill(node)
@@ -188,14 +197,15 @@ class IkikuPortal(http.Controller):
         resource = request.env['ikiku.resource'].sudo().search(
             [('partner_id', '=', partner.id)], limit=1)
         start, end = _parse_jalali(post.get('date_start')), _parse_jalali(post.get('date_end'))
-        if start and end:
+        province_id = _int(post.get('province_id'))
+        if start and end and province_id:
             request.env['ikiku.availability'].sudo().create({
                 'resource_id': resource.id,
                 'date_start': start, 'date_end': end,
-                'province_id': int(post['province_id']),
+                'province_id': province_id,
                 'city': post.get('city'),
                 'can_relocate': bool(post.get('can_relocate')),
-                'hours_per_week': int(post.get('hours_per_week') or 40),
+                'hours_per_week': _int(post.get('hours_per_week'), 40) or 40,
             })
         if resource.state == 'draft' and resource.skill_ids or resource.assertion_ids:
             resource.sudo().state = 'submitted'
@@ -260,7 +270,9 @@ class IkikuPortal(http.Controller):
         business = self._business()
         if not business:
             return request.redirect('/ikiku/business/name')
-        node = request.env['ikiku.spec.node'].sudo().browse(int(post['node_id']))
+        node = request.env['ikiku.spec.node'].sudo().browse(_int(post.get('node_id'), 0)).exists()
+        if not node:
+            return request.redirect('/ikiku/business/position/new')
         request.env['ikiku.position'].sudo().steer(
             business, post.get('raw') or node.name, chosen_node=node)
         return request.redirect('/ikiku/business')
@@ -284,13 +296,14 @@ class IkikuPortal(http.Controller):
         business = request.env['ikiku.business'].sudo().search(
             [('partner_id', '=', partner.id)], limit=1)
         start, end = _parse_jalali(post.get('date_start')), _parse_jalali(post.get('date_end'))
-        if business and start and end:
+        position_id, province_id = _int(post.get('position_id')), _int(post.get('province_id'))
+        if business and start and end and position_id and province_id:
             demand = request.env['ikiku.demand'].sudo().create({
                 'business_id': business.id,
-                'position_id': int(post['position_id']),
-                'seats': int(post.get('seats') or 1),
+                'position_id': position_id,
+                'seats': _int(post.get('seats'), 1) or 1,
                 'date_start': start, 'date_end': end,
-                'province_id': int(post['province_id']),
+                'province_id': province_id,
                 'city': post.get('city'),
                 'note': post.get('note'),
                 'state': 'open',

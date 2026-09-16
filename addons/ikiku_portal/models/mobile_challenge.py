@@ -23,6 +23,7 @@ from datetime import timedelta
 
 from odoo import api, fields, models
 
+from odoo.addons.ikiku_base.models.jalali import to_latin_digits
 from odoo.addons.sms_otp.tools.otp import SmsOtpError
 
 CODE_DIGITS = 6
@@ -33,7 +34,6 @@ MAX_SENDS_PER_HOUR = 3
 WAIT_LIMIT = timedelta(minutes=2)
 KEEP = timedelta(days=1)
 
-TO_ASCII_DIGITS = str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789')
 
 # What the visitor reads. Keys travel in URLs; sentences never do.
 MESSAGES = {
@@ -170,7 +170,7 @@ class IkikuMobileChallenge(models.Model):
             self.state = 'expired'
             return 'tries'
         self.tries += 1
-        typed = ''.join(ch for ch in (code or '').translate(TO_ASCII_DIGITS) if ch.isdigit())
+        typed = ''.join(ch for ch in to_latin_digits(code or '') if ch.isascii() and ch.isdigit())
         if not hmac.compare_digest(self.code_hash, self._hash(typed)):
             if self.tries >= MAX_TRIES:
                 self.state = 'expired'

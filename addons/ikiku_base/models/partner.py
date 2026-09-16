@@ -13,6 +13,8 @@ import re
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
+from .jalali import to_latin_digits
+
 IR_MOBILE = re.compile(r'^(?:\+98|0098|0)?9\d{9}$')
 
 
@@ -61,7 +63,9 @@ class ResPartner(models.Model):
         """+98 canonical form, so the same person cannot arrive twice."""
         if not raw:
             return False
-        digits = re.sub(r'[^0-9+]', '', raw)
+        # [0-9] matches Latin digits only: a number typed in Persian digits was stripped
+        # to nothing and refused, so digits are made Latin first.
+        digits = re.sub(r'[^0-9+]', '', to_latin_digits(raw))
         if not IR_MOBILE.match(digits):
             raise ValidationError("شمارهٔ موبایل ایران معتبر نیست: %s" % raw)
         return '+98' + digits[-10:]
@@ -71,7 +75,7 @@ class ResPartner(models.Model):
         """One-way. The salt lives in system parameters, not in the code."""
         if not nid:
             return False
-        nid = re.sub(r'[^0-9]', '', nid)
+        nid = re.sub(r'[^0-9]', '', to_latin_digits(nid))
         if len(nid) != 10:
             raise ValidationError("کدِ ملی باید ده رقم باشد.")
         salt = self.env['ir.config_parameter'].sudo().get_param('ikiku.nid_salt')

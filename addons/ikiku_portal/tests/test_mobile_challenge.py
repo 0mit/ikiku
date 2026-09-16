@@ -165,12 +165,20 @@ class TestJoinWithOtp(OtpSetup, HttpCase):
         })
         cls.province = cls.env.ref('ikiku_base.province_te')
 
-    def submit_intake(self):
+    def submit_intake(self, mobile='09121234567'):
         page = self.url_open('/ikiku/join').text
         token = re.search(r'name="csrf_token" value="([^"]+)"', page).group(1)
         return self.url_open('/ikiku/join/submit', allow_redirects=False, data={
-            'csrf_token': token, 'mobile': '09121234567', 'headline': "باریستا",
+            'csrf_token': token, 'mobile': mobile, 'headline': "باریستا",
             'province_id': self.province.id, 'city': "تهران"})
+
+    def test_mobile_typed_in_persian_digits(self):
+        self.enable_otp()
+        self.authenticate('otp-walker', 'otp-walker-pass-1')
+        response = self.submit_intake('۰۹۱۲۱۲۳۴۵۶۷')
+        self.assertTrue(response.headers['Location'].endswith('/ikiku/join/verify'))
+        challenge = self.env['ikiku.mobile.challenge'].search([('partner_id', '=', self.user.partner_id.id)], limit=1)
+        self.assertEqual(challenge.mobile, MOBILE)
 
     def test_join_waits_for_the_code(self):
         self.enable_otp()

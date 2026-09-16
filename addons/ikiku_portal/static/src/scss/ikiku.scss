@@ -5,15 +5,20 @@
 // page nobody reports as broken. Drop the .woff2 files into
 // ikiku_portal/static/src/fonts/ (see tools/fetch_fonts.sh) -- the stack below
 // degrades to Tahoma rather than to something unreadable.
+//
+// The files are Vazirmatn's Farsi-Digits (FD) build: every digit on the site DRAWS as Persian
+// while what is typed and stored stays Latin (to_latin_digits at the form boundary). Where a
+// value is formatted in Python, to_fa_digits still does it explicitly, so a fallback face
+// shows Persian digits too.
 
 @font-face {
   font-family: 'Vazirmatn';
-  src: url('/ikiku_portal/static/src/fonts/Vazirmatn-Regular.woff2') format('woff2');
+  src: url('/ikiku_portal/static/src/fonts/Vazirmatn-FD-Regular.woff2') format('woff2');
   font-weight: 400; font-display: swap;
 }
 @font-face {
   font-family: 'Vazirmatn';
-  src: url('/ikiku_portal/static/src/fonts/Vazirmatn-Bold.woff2') format('woff2');
+  src: url('/ikiku_portal/static/src/fonts/Vazirmatn-FD-Bold.woff2') format('woff2');
   font-weight: 700; font-display: swap;
 }
 
