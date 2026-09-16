@@ -72,6 +72,7 @@ class TestStandard(HttpCase):
         roles = self.url_open('/roles').text
         self.assertIn("پذیرایی از مهمان", roles)
         self.assertNotIn('/roles/bartender', roles)
+        self.assertIn("غذای ایرانی", roles, "long families are grouped by sub-family")
         waiter = self.url_open('/roles/waiter')
         self.assertEqual(waiter.status_code, 200)
         self.assertIn("میزبان", waiter.text)
@@ -114,3 +115,5 @@ class TestStandard(HttpCase):
             self.assertIn('/standard/suggest?kind=role', page, url)
             self.assertIn("کارهای دیگه", page, url)
             self.assertNotIn("بارتندر", page, url)
+            self.assertIn('ikiku__subgroup', page, url)
+            self.assertIn("غذای ایرانی", page, url)

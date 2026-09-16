@@ -32,9 +32,12 @@
         <details t-if="group[2]" class="ikiku__more"
                  t-att-open="(group[2] &amp; group[2].browse(on_ids)) and 'open'">
           <summary>کارهای دیگه‌ی <t t-out="group[0].plain_label or group[0].name"/></summary>
-          <div class="ikiku__tiles">
-            <t t-foreach="group[2]" t-as="node"><t t-call="ikiku_portal.role_tile"/></t>
-          </div>
+          <t t-foreach="group[3]" t-as="part">
+            <p t-if="part[0]" class="ikiku__label ikiku__subgroup" t-out="part[0].plain_label or part[0].name"/>
+            <div class="ikiku__tiles">
+              <t t-foreach="part[1]" t-as="node"><t t-call="ikiku_portal.role_tile"/></t>
+            </div>
+          </t>
         </details>
       </fieldset>
     </t>

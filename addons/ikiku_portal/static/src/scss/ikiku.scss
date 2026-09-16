@@ -570,3 +570,6 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
 // The wordmark in the header (2026-09-17): the SVG keeps its proportions at any height.
 .ikiku__brand-logo { display: block; block-size: 2.75rem; inline-size: auto; }
 @media (max-width: 520px) { .ikiku__brand-logo { block-size: 2.25rem; } }
+
+// Sub-family headings inside «کارهای دیگه» (2026-09-17).
+.ikiku__subgroup { margin-block: 1rem .4rem; color: var(--ik-ink-2); }

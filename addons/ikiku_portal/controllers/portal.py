@@ -40,6 +40,16 @@ BUSINESS_STEPS = 5
 MAX_SEATS = 50
 
 
+def subgroups(roles, family):
+    """Roles grouped by their sub-family under `family`, in the published order: the roles
+    directly in the family first (no heading), then each sub-family by its sequence."""
+    direct = roles.filtered(lambda role: role.parent_id == family)
+    out = [(None, direct)] if direct else []
+    for sub_family in (roles - direct).mapped('parent_id').sorted(lambda node: (node.sequence, node.id)):
+        out.append((sub_family, roles.filtered(lambda role: role.parent_id == sub_family)))
+    return out
+
+
 def _form_list(name):
     return [v for v in request.httprequest.form.getlist(name) if v]
 
@@ -51,6 +61,8 @@ class IkikuPortal(http.Controller):
         return request.env.user.partner_id.sudo()
 
     def _competencies(self):
+        # (family, featured, others, [(sub-family or None, roles)]): the rest of a long family
+        # is grouped under its sub-families, those directly in the family first.
         """The tiles: every role on offer, grouped under the family below the F&B root, in the
         published order stored on the nodes (never popularity). A family's featured roles are
         buttons; the rest wait under «کارهای دیگه», so the whole standard is reachable without
@@ -64,9 +76,9 @@ class IkikuPortal(http.Controller):
         for family in Node.search([('kind', '=', 'family'), ('parent_id', '=', root.id)] + offered, order='sequence, id'):
             roles = Node.search([('kind', '=', 'role'), ('parent_id', 'child_of', family.id)] + offered,
                                 order='sequence, id')
-            featured = roles.filtered('featured')
+            featured = roles.filtered('featured') or roles[:6]
             if roles:
-                groups.append((family, featured or roles[:6], roles - (featured or roles[:6])))
+                groups.append((family, featured, roles - featured, subgroups(roles - featured, family)))
         return groups
 
     def _resolve(self, raw):

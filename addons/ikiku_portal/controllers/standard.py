@@ -18,6 +18,7 @@ from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
 from odoo.addons.ikiku_base.models.spec import SUGGEST_ORDER
+from odoo.addons.ikiku_portal.controllers.portal import subgroups
 
 SUGGEST_LIMIT = 8
 IMPORTANCE_ORDER = ('core', 'common', 'specialist')
@@ -90,8 +91,9 @@ class IkikuStandard(http.Controller):
             roles = self._offered(Node.search([('kind', '=', 'role'), ('parent_id', 'child_of', family.id)],
                                               order='sequence, id'))
             if roles:
+                others = roles.filtered(lambda r: not r.featured)
                 families.append({'family': family, 'featured': roles.filtered('featured'),
-                                 'others': roles.filtered(lambda r: not r.featured),
+                                 'others': others, 'parts': subgroups(others, family),
                                  'count': to_fa_digits(len(roles))})
         return request.render('ikiku_portal.standard_roles', {
             'families': families, 'query': query, 'results': results,

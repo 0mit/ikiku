@@ -56,10 +56,13 @@
             </nav>
             <details t-if="row['others']" class="ikiku__more">
               <summary>بقیه‌ی کارهای <t t-out="row['family'].plain_label or row['family'].name"/></summary>
-              <nav class="ikiku__roles ikiku__roles--start">
-                <a t-foreach="row['others']" t-as="node" class="ikiku__role" t-att-href="'/roles/%s' % node.code"
-                   t-out="node.plain_label or node.name"/>
-              </nav>
+              <t t-foreach="row['parts']" t-as="part">
+                <p t-if="part[0]" class="ikiku__label ikiku__subgroup" t-out="part[0].plain_label or part[0].name"/>
+                <nav class="ikiku__roles ikiku__roles--start">
+                  <a t-foreach="part[1]" t-as="node" class="ikiku__role" t-att-href="'/roles/%s' % node.code"
+                     t-out="node.plain_label or node.name"/>
+                </nav>
+              </t>
             </details>
           </section>
         </t>
