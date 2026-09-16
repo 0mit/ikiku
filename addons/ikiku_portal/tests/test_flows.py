@@ -75,6 +75,9 @@ class TestFlows(HttpCase):
         self.goes_to(self.post('/business/name', {'name': "کافه نارنج"}), '/business/need/who')
         waiter = self.env.ref('ikiku_base.spec_waiter')
         self.assertIn("یکی رو انتخاب کنید.", self.post('/business/need/who', {}).text)
+        self.url_open('/ku?node=%d' % waiter.id)
+        self.assertRegex(self.url_open('/business/need/who').text,
+                         r'value="%d"\s+checked="checked"|checked="checked"[^>]*value="%d"' % (waiter.id, waiter.id))
         self.goes_to(self.post('/business/need/who', {'node_id': str(waiter.id)}), '/business/need/type')
         self.goes_to(self.post('/business/need/type', {'work_type_id': str(self.shift.id)}), '/business/need/count')
         more = self.post('/business/need/count', {'seats': '۱', 'adjust': '1'})
@@ -112,6 +115,14 @@ class TestFlows(HttpCase):
                                                'from_page': 'code'}), '/help/tamas?sent=1')
         request = self.env['ikiku.help.request'].search([])
         self.assertEqual((request.mobile, request.best_time, request.state), ('+989121234567', 'noon', 'new'))
+
+    def test_home_has_role_shortcuts_and_cities_are_suggested(self):
+        home = self.url_open('/').text
+        self.assertIn('/ku?node=%d' % self.env.ref('ikiku_base.spec_waiter').id, home)
+        self.authenticate('flow-worker', 'flow-worker-pass-1')
+        self.url_open('/join')
+        self.assertIn('<datalist id="ikiku-cities">', self.url_open('/join/where').text)
+        self.assertIn('value="تهران"', self.url_open('/join/where').text)
 
     def test_old_addresses_move_permanently(self):
         response = self.url_open('/ikiku/jobs?province=5', allow_redirects=False)

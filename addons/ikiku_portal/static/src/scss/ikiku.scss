@@ -495,3 +495,14 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   .ikiku__summary dd { grid-column: 1 / -1; grid-row: 2; }
   .ikiku__tiles { grid-template-columns: 1fr; }
 }
+
+.ikiku {
+  &__roles { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; justify-content: center;
+    span { color: var(--ik-ink-2); font-size: .95rem; }
+  }
+  &__role {
+    display: inline-flex; align-items: center; min-block-size: 2.75rem; padding-inline: .9rem; border-radius: 999px;
+    border: 1px solid var(--ik-rule); background: var(--ik-paper); color: var(--ik-ink); font-weight: 700; text-decoration: none;
+  }
+  a.ikiku__role:hover { border-color: var(--ik-blue); color: var(--ik-blue); }
+}

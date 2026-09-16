@@ -60,6 +60,14 @@ class IkikuPortal(http.Controller):
             return request.env['ikiku.spec.node'].sudo().browse()
         return request.env['ikiku.spec.node'].sudo().resolve_text(raw).filtered(lambda n: n.kind == 'competency')
 
+    def _city_suggestions(self):
+        """What the city field suggests: every province's centre and the cities open jobs
+        already name. Both are public; a city not on the list is still accepted."""
+        cities = set(request.env['ikiku.province'].sudo().search([]).mapped('centre'))
+        cities |= set(request.env['ikiku.demand'].sudo().search(
+            [('state', 'in', ('open', 'proposed')), ('city', '!=', False)]).mapped('city'))
+        return sorted(city for city in cities if city)
+
     def _needs_name(self, partner):
         return not (partner.name or '').strip() or partner.name == NEW_PARTNER_NAME
 
@@ -147,6 +155,7 @@ class IkikuPortal(http.Controller):
                 return self._after_worker_save(self._resource(create=True), edit)
         return self._worker_page('ikiku_portal.join_where', 2, {
             'provinces': request.env['ikiku.province'].sudo().search([]),
+            'cities': self._city_suggestions(),
             'province_id': province_id, 'city': city, 'errors': errors, 'edit': edit})
 
     @http.route('/join/skills', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
@@ -459,6 +468,7 @@ class IkikuPortal(http.Controller):
         end = date.fromisoformat(draft['date_end']) if draft.get('date_end') else None
         return self._business_page('ikiku_portal.need_where', 5, {
             'provinces': request.env['ikiku.province'].sudo().search([]),
+            'cities': self._city_suggestions(),
             'province_id': province_id, 'city': city, 'errors': errors,
             'summary': {
                 'seats': to_fa_digits(draft['seats']),

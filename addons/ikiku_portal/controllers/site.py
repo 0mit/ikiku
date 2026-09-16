@@ -87,7 +87,13 @@ class IkikuSite(http.Controller):
         return self._door('ikiku_portal.door_ki', 'ki', ikiku_home_for(request.env.user) or '/join')
 
     @http.route('/ku', type='http', auth='public', website=True)
-    def door_ku(self, **kw):
+    def door_ku(self, node=None, **kw):
+        """`node` comes from a role shortcut on the home page: the first question of the
+        business flow opens with that role already chosen."""
+        chosen = request.env['ikiku.spec.node'].sudo().browse(
+            int(node) if node and str(node).isdigit() else 0).exists()
+        if chosen and chosen.kind == 'competency':
+            request.session['ikiku_need'] = {'node_id': chosen.id}
         user = request.env.user
         has_business = not user._is_public() and request.env['ikiku.business'].sudo().search_count(
             [('partner_id', '=', user.partner_id.commercial_partner_id.id)], limit=1)

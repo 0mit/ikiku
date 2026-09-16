@@ -37,6 +37,12 @@
               <span class="ikiku__door-go">نیرو می‌خوام</span>
             </a>
             <p class="ikiku__doors-note">ایمیل و رمز لازم نیست. فقط شماره موبایل.</p>
+            <nav class="ikiku__roles" aria-label="نیرو برای چه کاری">
+              <span>نیرو برای:</span>
+              <t t-foreach="Demand.ikiku_role_shortcuts()" t-as="role">
+                <a class="ikiku__role" t-att-href="'/ku?node=%s' % role[0]" t-out="role[1]"/>
+              </t>
+            </nav>
           </div>
 
           <p class="ikiku__lede">

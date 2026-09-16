@@ -4,6 +4,7 @@ from odoo import api, models
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
 
 OPEN_STATES = ('open', 'proposed')
+ROLE_SHORTCUTS = ('spec_dishwashing', 'spec_barista', 'spec_line_cook', 'spec_waiter')
 
 # What an open-job card can show, each tied to the field whose visibility row decides
 # it. A value whose field is not public (or has no row) is left out: fail closed.
@@ -46,6 +47,19 @@ class IkikuDemand(models.Model):
     @api.model
     def ikiku_public_open_count(self):
         return self.sudo().search_count([('state', 'in', OPEN_STATES)])
+
+    @api.model
+    def ikiku_role_shortcuts(self):
+        """The home page's «نیرو برای» links: four common skills as (id, everyday name).
+        Plain values, read with sudo, because a visitor who is not signed in may not read
+        the skill tree itself; the names are the public standard."""
+        out = []
+        for xmlid in ROLE_SHORTCUTS:
+            node = self.env.ref('ikiku_base.%s' % xmlid, raise_if_not_found=False)
+            if node:
+                node = node.sudo()
+                out.append((node.id, node.plain_label or node.name))
+        return out
 
     @api.model
     def ikiku_fa_digits(self, value):

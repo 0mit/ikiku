@@ -117,7 +117,11 @@
     <p t-if="errors.get('province')" class="ikiku__error" role="alert" t-out="errors['province']"/>
     <label for="city" class="ikiku__label">شهر</label>
     <input class="ikiku__field ikiku__field--big" id="city" name="city" t-att-value="city" required="required"
-           placeholder="مثلاً: کرج" autocomplete="address-level2" t-att-aria-invalid="errors.get('city') and 'true'"/>
+           placeholder="مثلاً: کرج" autocomplete="address-level2" list="ikiku-cities"
+           t-att-aria-invalid="errors.get('city') and 'true'"/>
+    <datalist id="ikiku-cities">
+      <t t-foreach="cities or []" t-as="name"><option t-att-value="name"/></t>
+    </datalist>
     <p t-if="errors.get('city')" class="ikiku__error" role="alert" t-out="errors['city']"/>
   </template>
 
