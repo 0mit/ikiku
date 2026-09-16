@@ -1,10 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_resource_portal,resource portal,model_ikiku_resource,base.group_portal,1,1,1,0
+access_resource_portal,resource own,model_ikiku_resource,ikiku_base.group_ikiku_resource,1,0,0,0
 access_resource_staff,resource staff,model_ikiku_resource,ikiku_base.group_ikiku_staff,1,1,1,0
-access_resource_skill_portal,resource skill portal,model_ikiku_resource_skill,base.group_portal,1,1,1,1
+access_resource_skill_portal,resource skill own,model_ikiku_resource_skill,ikiku_base.group_ikiku_resource,1,0,0,0
 access_resource_skill_staff,resource skill staff,model_ikiku_resource_skill,ikiku_base.group_ikiku_staff,1,1,1,1
-access_resume_line_portal,resume line portal,model_ikiku_resume_line,base.group_portal,1,1,1,1
+access_resume_line_portal,resume line own,model_ikiku_resume_line,ikiku_base.group_ikiku_resource,1,0,0,0
 access_resume_line_staff,resume line staff,model_ikiku_resume_line,ikiku_base.group_ikiku_staff,1,1,1,0
-access_availability_portal,availability portal,model_ikiku_availability,base.group_portal,1,1,1,1
+access_availability_portal,availability own,model_ikiku_availability,ikiku_base.group_ikiku_resource,1,0,0,0
 access_availability_staff,availability staff,model_ikiku_availability,ikiku_base.group_ikiku_staff,1,1,1,0
 access_availability_business,availability business read,model_ikiku_availability,ikiku_base.group_ikiku_business,1,0,0,0

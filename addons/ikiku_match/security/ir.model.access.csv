@@ -1,7 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_proposal_portal,proposal portal,model_ikiku_proposal,base.group_portal,1,1,0,0
+access_proposal_portal,proposal business,model_ikiku_proposal,ikiku_base.group_ikiku_business,1,0,0,0
+access_proposal_resource,proposal resource,model_ikiku_proposal,ikiku_base.group_ikiku_resource,1,0,0,0
 access_proposal_staff,proposal staff,model_ikiku_proposal,ikiku_base.group_ikiku_staff,1,1,1,1
-access_booking_portal,booking portal,model_ikiku_booking,base.group_portal,1,1,0,0
+access_booking_portal,booking business,model_ikiku_booking,ikiku_base.group_ikiku_business,1,0,0,0
+access_booking_resource,booking resource,model_ikiku_booking,ikiku_base.group_ikiku_resource,1,0,0,0
 access_booking_staff,booking staff,model_ikiku_booking,ikiku_base.group_ikiku_staff,1,1,1,0
-access_check_portal,check portal,model_ikiku_booking_check,base.group_portal,1,0,0,0
 access_check_staff,check staff,model_ikiku_booking_check,ikiku_base.group_ikiku_staff,1,1,1,0

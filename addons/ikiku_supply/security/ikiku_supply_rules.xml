@@ -21,6 +21,12 @@
       <field name="domain_force">[('resource_id.state', '=', 'active')]</field>
       <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
     </record>
+    <record id="rule_resource_skill_own" model="ir.rule">
+      <field name="name">مهارت: فقط نیروی خود</field>
+      <field name="model_id" ref="model_ikiku_resource_skill"/>
+      <field name="domain_force">[('resource_id.partner_id', '=', user.partner_id.id)]</field>
+      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
+    </record>
     <record id="rule_resume_own" model="ir.rule">
       <field name="name">سابقه: فقط نیروی خود</field>
       <field name="model_id" ref="model_ikiku_resume_line"/>

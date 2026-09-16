@@ -19,13 +19,8 @@
       <field name="domain_force">[('business_id.partner_id', '=', user.partner_id.commercial_partner_id.id)]</field>
       <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
     </record>
-    <!-- Open positions are public by design: the manifest publishes the work,
-         not the worker's calendar. -->
-    <record id="rule_demand_open_for_resources" model="ir.rule">
-      <field name="name">اعلام نیاز: نیروها فقط نیازهای باز را می‌بینند</field>
-      <field name="model_id" ref="model_ikiku_demand"/>
-      <field name="domain_force">[('state', 'in', ('open', 'proposed'))]</field>
-      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
-    </record>
+    <!-- Open needs are public through ikiku.demand.ikiku_public_open, which applies the
+         visibility rows. A worker's account reads no ikiku.demand row directly: the old
+         rule_demand_open_for_resources gave every open need, business included, to RPC. -->
   </data>
 </odoo>
