@@ -6,3 +6,4 @@ access_booking_portal,booking business,model_ikiku_booking,ikiku_base.group_ikik
 access_booking_resource,booking resource,model_ikiku_booking,ikiku_base.group_ikiku_resource,1,0,0,0
 access_booking_staff,booking staff,model_ikiku_booking,ikiku_base.group_ikiku_staff,1,1,1,0
 access_check_staff,check staff,model_ikiku_booking_check,ikiku_base.group_ikiku_staff,1,1,1,0
+access_demand_cancel_staff,demand cancel staff,model_ikiku_demand_cancel,ikiku_base.group_ikiku_staff,1,1,1,1

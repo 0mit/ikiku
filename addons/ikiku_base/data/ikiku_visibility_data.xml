@@ -179,6 +179,24 @@
       <field name="visibility">restricted</field>
       <field name="reason">جای خودِ کافه؛ جای هر نیاز روی خودِ نیاز می‌آید.</field>
     </record>
+    <record id="vis_ikiku_demand_cancel_reason" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">cancel_reason</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">نوشتهٔ کسب‌وکار برای همکاران؛ ممکن است نام یا ماجرای کسی را داشته باشد.</field>
+    </record>
+    <record id="vis_ikiku_demand_closed_on" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">closed_on</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">سابقهٔ کارِ همکاران؛ نیازِ بسته در «کارهای باز» نمی‌آید.</field>
+    </record>
+    <record id="vis_ikiku_demand_closed_by_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">closed_by_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">همان دلیل.</field>
+    </record>
     <record id="vis_ikiku_business_city" model="ikiku.visibility.policy">
       <field name="model_name">ikiku.business</field>
       <field name="field_name">city</field>

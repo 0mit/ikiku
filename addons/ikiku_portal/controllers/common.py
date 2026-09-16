@@ -138,6 +138,25 @@ def _custom(post, prefix):
         return None, prefix + ('_day' if e.args and e.args[0] == 'day' else '_bad')
 
 
+def dates_values(start, end):
+    """What read_dates would need to give back these dates, for a form opened to change them.
+    A start already past becomes today, since a change cannot start in the past."""
+    today = tehran_today()
+    start = max(start, today) if start else today
+    values = {}
+    if start == today:
+        values['start'] = 'today'
+    else:
+        jy, jm, jd = _jalali(start)
+        values.update({'start': 'custom', 'start_day': str(jd), 'start_month': str(jm), 'start_year': str(jy)})
+    if not end:
+        values['end'] = 'none'
+    else:
+        jy, jm, jd = _jalali(max(end, start))
+        values.update({'end': 'custom', 'end_day': str(jd), 'end_month': str(jm), 'end_year': str(jy)})
+    return values
+
+
 def read_dates(post):
     """(start, end, error key) from the date buttons. `end` None means no end."""
     today = tehran_today()

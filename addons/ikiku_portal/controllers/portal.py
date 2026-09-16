@@ -21,14 +21,14 @@ from datetime import date
 from werkzeug.exceptions import Forbidden
 
 from odoo import http
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
 from odoo.addons.ikiku_base.models.partner import STANDING_MAX, STANDING_PER_SUPPORTED, STANDING_VERIFIED
 from odoo.addons.ikiku_portal.controllers.auth import ikiku_sides, remember_side
 from odoo.addons.ikiku_portal.controllers.common import (
-    DATE_ERRORS, date_widget, dates_text, mask, parse_jalali, read_dates, tehran_today, to_int)
+    DATE_ERRORS, date_widget, dates_text, dates_values, mask, parse_jalali, read_dates, tehran_today, to_int)
 from odoo.addons.ikiku_portal.models.mobile_challenge import NEW_PARTNER_NAME
 
 # Older imports keep working.
@@ -323,8 +323,14 @@ class IkikuPortal(http.Controller):
         request.session['ikiku_need'] = draft
 
     def _business_page(self, template, step, values):
-        values.update({'step': step, 'total': BUSINESS_STEPS})
+        values.update({'step': step, 'total': BUSINESS_STEPS, 'changing_need': bool(self._draft().get('edit_id'))})
         return request.render(template, values)
+
+    def _own_need(self, need_id):
+        """The business's own need, or None."""
+        business = self._business()
+        demand = request.env['ikiku.demand'].sudo().browse(need_id).exists()
+        return demand if business and demand.business_id == business else None
 
     def _need_missing(self, draft):
         for key, url in (('position_id', '/business/need/who'), ('work_type_id', '/business/need/type'),
@@ -345,7 +351,12 @@ class IkikuPortal(http.Controller):
         return request.render('ikiku_portal.business_home', {
             'business': business,
             'needs': [{'demand': d, 'seats': to_fa_digits(d.seats),
-                       'dates': dates_text(d.date_start, d.date_end, today)} for d in demands],
+                       'dates': dates_text(d.date_start, d.date_end, today),
+                       'is_open': d.state in ('open', 'proposed'),
+                       'booked': bool(d.ikiku_live_bookings())} for d in demands],
+            'note': {'filled': "درخواست بسته شد: نیرو پیدا کردید.",
+                     'cancelled': "درخواست لغو شد. دلیلی که نوشتید ثبت شد.",
+                     'changed': "تغییرها ثبت شد."}.get(kw.get('done')),
             'sides': ikiku_sides(request.env.user),
             'number': self._number(self._partner()),
         })
@@ -457,7 +468,13 @@ class IkikuPortal(http.Controller):
                 draft.update({'date_start': start.isoformat(), 'date_end': end.isoformat() if end else False})
                 self._keep_draft(draft)
                 return request.redirect('/business/need/where')
-        values = dict(post) if request.httprequest.method == 'POST' else {}
+        if request.httprequest.method == 'POST':
+            values = dict(post)
+        elif draft.get('date_start'):
+            values = dates_values(date.fromisoformat(draft['date_start']),
+                                  date.fromisoformat(draft['date_end']) if draft.get('date_end') else None)
+        else:
+            values = {}
         return self._business_page('ikiku_portal.need_when', 4, {
             'dates': date_widget('business', values), 'error': DATE_ERRORS.get(error)})
 
@@ -483,6 +500,23 @@ class IkikuPortal(http.Controller):
             position = request.env['ikiku.position'].sudo().browse(draft['position_id']).exists()
             if position.business_id != business:
                 return request.redirect('/business/need/who')
+            editing = self._own_need(draft['edit_id']) if draft.get('edit_id') else None
+            if draft.get('edit_id') and not editing:
+                request.session.pop('ikiku_need', None)
+                return request.redirect('/business')
+            if not errors and editing:
+                try:
+                    editing.ikiku_apply_change({
+                        'position_id': position.id, 'work_type_id': draft['work_type_id'], 'seats': draft['seats'],
+                        'date_start': date.fromisoformat(draft['date_start']),
+                        'date_end': date.fromisoformat(draft['date_end']) if draft.get('date_end') else False,
+                        'province_id': province.id, 'city': city,
+                    })
+                except UserError:
+                    request.session.pop('ikiku_need', None)
+                    return request.redirect('/business/need/%d' % editing.id)
+                request.session.pop('ikiku_need', None)
+                return request.redirect('/business?done=changed')
             if not errors:
                 demand = request.env['ikiku.demand'].sudo().create({
                     'business_id': business.id,
@@ -503,6 +537,8 @@ class IkikuPortal(http.Controller):
                 return request.redirect('/business/need/%d' % demand.id)
         else:
             partner = self._partner()
+            if draft.get('edit_id'):
+                last = self._own_need(draft['edit_id']) or last
             province_id = (last.province_id or business.province_id or partner.ikiku_province_id).id
             city = last.city or business.city or partner.ikiku_city or ''
         node = request.env['ikiku.spec.node'].sudo().browse(draft.get('node_id') or 0).exists()
@@ -524,11 +560,71 @@ class IkikuPortal(http.Controller):
 
     @http.route('/business/need/<int:need_id>', type='http', auth='user', website=True, sitemap=False)
     def need_saved(self, need_id, **kw):
-        business = self._business()
-        demand = request.env['ikiku.demand'].sudo().browse(need_id).exists()
-        if not business or demand.business_id != business:
+        demand = self._own_need(need_id)
+        if not demand:
             return request.not_found()
         return request.render('ikiku_portal.need_saved', {
             'demand': demand, 'seats': to_fa_digits(demand.seats),
             'dates': dates_text(demand.date_start, demand.date_end, tehran_today()),
+            'is_open': demand.state in ('open', 'proposed'),
+            'booked': bool(demand.ikiku_live_bookings()),
         })
+
+    @http.route('/business/need/new', type='http', auth='user', website=True, sitemap=False)
+    def need_new(self, **kw):
+        """A fresh need: nothing left over from a change that was not finished."""
+        request.session.pop('ikiku_need', None)
+        return request.redirect('/business/need/who')
+
+    def _changeable(self, need_id):
+        demand = self._own_need(need_id)
+        if not demand:
+            return None, request.not_found()
+        if demand.state not in ('open', 'proposed') or demand.ikiku_live_bookings():
+            return None, request.redirect('/business/need/%d' % demand.id)
+        return demand, None
+
+    @http.route('/business/need/<int:need_id>/edit', type='http', auth='user', website=True, sitemap=False)
+    def need_edit(self, need_id, **kw):
+        """Change a need through the same five questions, each already answered."""
+        demand, refusal = self._changeable(need_id)
+        if refusal:
+            return refusal
+        self._keep_draft({
+            'edit_id': demand.id,
+            'position_id': demand.position_id.id,
+            'node_id': demand.position_id.spec_node_id.id,
+            'work_type_id': demand.work_type_id.id,
+            'seats': demand.seats,
+            'date_start': demand.date_start.isoformat(),
+            'date_end': demand.date_end.isoformat() if demand.date_end else False,
+        })
+        return request.redirect('/business/need/who')
+
+    @http.route('/business/need/<int:need_id>/close', type='http', auth='user', methods=['GET', 'POST'],
+                website=True, sitemap=False)
+    def need_close(self, need_id, **post):
+        """«دیگه لازم ندارم»: found the people, or cancel. Two different ends."""
+        demand, refusal = self._changeable(need_id)
+        if refusal:
+            return refusal
+        if request.httprequest.method == 'POST' and post.get('outcome') == 'found':
+            demand.ikiku_mark_filled()
+            return request.redirect('/business?done=filled')
+        return request.render('ikiku_portal.need_close', {'demand': demand, 'seats': to_fa_digits(demand.seats)})
+
+    @http.route('/business/need/<int:need_id>/cancel', type='http', auth='user', methods=['GET', 'POST'],
+                website=True, sitemap=False)
+    def need_cancel(self, need_id, **post):
+        """A cancellation is not complete without a written reason (operator, 2026-09-16)."""
+        demand, refusal = self._changeable(need_id)
+        if refusal:
+            return refusal
+        reason = ' '.join((post.get('reason') or '').split())[:1000]
+        error = None
+        if request.httprequest.method == 'POST':
+            if reason:
+                demand.ikiku_cancel(reason)
+                return request.redirect('/business?done=cancelled')
+            error = "دلیل رو بنویسید. بدونِ دلیل لغو نمیشه."
+        return request.render('ikiku_portal.need_cancel', {'demand': demand, 'reason': reason, 'error': error})

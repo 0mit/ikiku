@@ -1,5 +1,10 @@
 # Part of iKiKu. Licensed under AGPL-3.0.
-"""A declared need: this many people, this window, this province."""
+"""A declared need: this many people, this window, this province.
+
+A need is never deleted. Every change is tracked in its chatter, and it ends one of two
+ways (operator, 2026-09-16): filled, when the business found the people it needed, or
+cancelled, which is not complete without a written reason.
+"""
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -15,15 +20,15 @@ class IkikuDemand(models.Model):
     name = fields.Char(compute='_compute_name', store=True)
     business_id = fields.Many2one('ikiku.business', required=True, ondelete='cascade',
                                   index=True, string="کسب‌وکار", tracking=True)
-    position_id = fields.Many2one('ikiku.position', required=True, string="جایگاه",
+    position_id = fields.Many2one('ikiku.position', required=True, string="جایگاه", tracking=True,
                                   domain="[('business_id', '=', business_id)]")
     seats = fields.Integer("تعداد نفر", required=True, default=1, tracking=True)
     date_start = fields.Date("از تاریخ", required=True, tracking=True, default=fields.Date.context_today)
     date_end = fields.Date("تا تاریخ", tracking=True, help="خالی یعنی بدون پایان.")
     work_type_id = fields.Many2one('ikiku.work.type', string="نوعِ همکاری", required=True,
                                    tracking=True, default=lambda self: self._default_work_type())
-    province_id = fields.Many2one('ikiku.province', string="استان", required=True)
-    city = fields.Char("شهر")
+    province_id = fields.Many2one('ikiku.province', string="استان", required=True, tracking=True)
+    city = fields.Char("شهر", tracking=True)
     season_factor = fields.Float("ضریب فصل", compute='_compute_season_factor', store=True)
     note = fields.Text("توضیح")
     state = fields.Selection([
@@ -33,6 +38,10 @@ class IkikuDemand(models.Model):
         ('filled', "تکمیل"),
         ('cancelled', "لغو"),
     ], default='draft', required=True, tracking=True, string="وضعیت")
+    cancel_reason = fields.Text("دلیلِ لغو", tracking=True,
+                                help="بدونِ دلیلِ نوشته‌شده هیچ نیازی لغو نمی‌شود.")
+    closed_on = fields.Datetime("زمانِ بستن", readonly=True, copy=False)
+    closed_by_id = fields.Many2one('res.users', string="بست", readonly=True, copy=False)
 
     date_start_fa = fields.Char(compute='_compute_fa', string="از (شمسی)")
     date_end_fa = fields.Char(compute='_compute_fa', string="تا (شمسی)")
@@ -67,6 +76,12 @@ class IkikuDemand(models.Model):
                 raise ValidationError("تاریخ پایان نمی‌تواند پیش از تاریخ آغاز باشد.")
             if rec.seats < 1:
                 raise ValidationError("تعداد نفر باید دست‌کم یک باشد.")
+
+    @api.constrains('state', 'cancel_reason')
+    def _check_cancel_reason(self):
+        for rec in self:
+            if rec.state == 'cancelled' and not (rec.cancel_reason or '').strip():
+                raise ValidationError("نیاز بدونِ دلیلِ نوشته‌شده لغو نمی‌شود.")
 
     def action_open(self):
         self.write({'state': 'open'})

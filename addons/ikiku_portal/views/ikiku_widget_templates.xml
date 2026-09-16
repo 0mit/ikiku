@@ -13,6 +13,8 @@
     <div t-if="not edit" class="ikiku__progress" role="presentation">
       <span t-att-style="'inline-size: ' + str(100 * step // total) + '%'"/>
     </div>
+    <p t-if="changing_need" class="ikiku__notice">دارید درخواستی رو که قبلاً ثبت کردید عوض می‌کنید.
+      <a href="/business">نمی‌خوام عوضش کنم</a></p>
   </template>
 
   <!-- Skill tiles from the standard, grouped by family, in the published order. -->

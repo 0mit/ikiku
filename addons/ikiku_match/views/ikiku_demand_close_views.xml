@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_demand_cancel_form" model="ir.ui.view">
+    <field name="name">ikiku.demand.cancel.form</field>
+    <field name="model">ikiku.demand.cancel</field>
+    <field name="arch" type="xml">
+      <form string="لغوِ نیاز">
+        <p class="text-muted">بدونِ دلیلِ نوشته‌شده لغو نمی‌شود. اگر نیرو پیدا شده، «نیرو پیدا شد» را بزنید.</p>
+        <group>
+          <field name="demand_id" readonly="1"/>
+          <field name="reason" placeholder="چرا این نیاز لغو می‌شود؟"/>
+        </group>
+        <footer>
+          <button name="action_cancel" type="object" string="لغو کن" class="btn-primary"/>
+          <button special="cancel" string="انصراف"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_ikiku_demand_cancel" model="ir.actions.act_window">
+    <field name="name">لغوِ نیاز</field>
+    <field name="res_model">ikiku.demand.cancel</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <!-- A need ends filled or cancelled, never deleted; a cancellation carries its reason. -->
+  <record id="view_demand_form_close" model="ir.ui.view">
+    <field name="name">ikiku.demand.form.close</field>
+    <field name="model">ikiku.demand</field>
+    <field name="inherit_id" ref="ikiku_demand.view_demand_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//header/field[@name='state']" position="before">
+        <button name="action_ikiku_mark_filled" type="object" string="نیرو پیدا شد"
+                invisible="state not in ('open', 'proposed')"/>
+        <button name="%(ikiku_match.action_ikiku_demand_cancel)d" type="action" string="لغو با دلیل"
+                context="{'default_demand_id': id}" invisible="state not in ('open', 'proposed')"/>
+      </xpath>
+      <xpath expr="//field[@name='note']" position="before">
+        <group invisible="state not in ('filled', 'cancelled')">
+          <field name="closed_on"/><field name="closed_by_id"/>
+          <field name="cancel_reason" invisible="state != 'cancelled'" readonly="1"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+</odoo>
