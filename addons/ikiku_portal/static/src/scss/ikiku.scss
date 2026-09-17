@@ -583,3 +583,23 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   &__job-skills .ikiku__role { min-block-size: 2.25rem; padding-inline: .7rem; font-size: .88rem; }
   &__job-more { font-size: .88rem; font-weight: 700; }
 }
+
+// The «کجا؟» field (2026-09-18). The suggest box sits in the form like any other field; the
+// line under it says which place was understood, and the radio buttons appear only when a
+// name fits several places and the person has to pick.
+.ikiku {
+  &__hint { margin-block: .35rem 0; font-size: .9rem; color: var(--ik-muted, #5b616b); }
+  &__choices {
+    margin-block: .75rem; padding: .75rem; border: 1px solid var(--ik-line, #dfe3e8);
+    border-radius: 10px;
+  }
+  &__choices legend { float: none; width: auto; margin: 0 0 .5rem; font-size: 1rem; }
+  &__choice {
+    display: flex; gap: .5rem; align-items: baseline; padding-block: .45rem;
+    min-block-size: 2.5rem; cursor: pointer;
+  }
+  &__choice + .ikiku__choice { border-block-start: 1px solid var(--ik-line, #dfe3e8); }
+  &__choice input { margin-block-start: .35rem; }
+  // The suggest box is a plain block inside the form, and its list must escape the flow.
+  [data-suggest] { position: relative; }
+}

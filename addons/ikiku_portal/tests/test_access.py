@@ -8,6 +8,13 @@ from odoo.exceptions import AccessError
 from odoo.tests import TransactionCase, tagged
 
 
+def place(env, name, kind='city'):
+    """A place from place_ir, by name. Tests say «تهران» and «کرج», not an xmlid nobody reads."""
+    found = env['place.node'].sudo().search([('kind', '=', kind), ('name', '=', name)], limit=1)
+    assert found, "place_ir has no %s called %s" % (kind, name)
+    return found
+
+
 @tagged('post_install', '-at_install')
 class TestPortalAccess(TransactionCase):
 
@@ -15,7 +22,8 @@ class TestPortalAccess(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         env = cls.env
-        cls.tehran = env.ref('ikiku_base.province_te')
+        cls.tehran = place(env, "تهران")
+        cls.karaj = place(env, "کرج")
         cls.node = env.ref('ikiku_base.spec_dishwashing')
         portal = env.ref('base.group_portal')
         worker_group = env.ref('ikiku_base.group_ikiku_resource')
@@ -41,7 +49,7 @@ class TestPortalAccess(TransactionCase):
             position = env['ikiku.position'].create({'name': "ظرف‌شور", 'business_id': biz.id,
                                                      'spec_node_id': cls.node.id})
             return env['ikiku.demand'].create({'business_id': biz.id, 'position_id': position.id,
-                                               'province_id': cls.tehran.id, 'seats': 1, 'state': 'open'})
+                                               'place_id': cls.tehran.id, 'seats': 1, 'state': 'open'})
 
         cls.other_need = need(cls.other_business)
         cls.own_need = need(cls.own_business)
@@ -49,7 +57,7 @@ class TestPortalAccess(TransactionCase):
         def worker(partner):
             resource = env['ikiku.resource'].create({'partner_id': partner.id, 'state': 'active'})
             availability = env['ikiku.availability'].create({'resource_id': resource.id,
-                                                             'province_id': cls.tehran.id})
+                                                             'place_id': cls.tehran.id})
             return resource, availability
 
         cls.dual_resource, cls.dual_availability = worker(cls.dual.partner_id)
@@ -80,7 +88,7 @@ class TestPortalAccess(TransactionCase):
         with self.assertRaises(AccessError):
             self.env['ikiku.availability'].with_user(self.owner).search([])
         with self.assertRaises(AccessError):
-            availability.write({'city': "جای دیگر"})
+            availability.write({'place_id': self.karaj.id})
         with self.assertRaises(AccessError):
             availability.unlink()
         with self.assertRaises(AccessError):

@@ -203,5 +203,164 @@
       <field name="visibility">restricted</field>
       <field name="reason">همان دلیل.</field>
     </record>
+
+    <!-- Where things are, since 2026-09-18: place_public_id is the face each model may
+         show, and the place actually chosen stays restricted because it can be an address. -->
+    <record id="vis_res_partner_place_public_id" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">place_public_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">شهرِ شخص؛ درشت‌ترین جایی که از او نشان داده می‌شود.</field>
+    </record>
+    <record id="vis_res_partner_place_city_id" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">place_city_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">شهر، نه نشانی.</field>
+    </record>
+    <record id="vis_res_partner_place_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">place_province_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">استان، نه نشانی.</field>
+    </record>
+    <record id="vis_res_partner_place_id" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">place_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">جای دقیقی که انتخاب شده؛ می‌تواند از شهر ریزتر باشد و نشانی حساب می‌شود — بند ۷.</field>
+    </record>
+    <record id="vis_res_partner_place_path" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">place_path</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">مسیرِ همان جای دقیق.</field>
+    </record>
+    <record id="vis_res_partner_place_hint" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">place_hint</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">آنچه خودش نوشته و در درخت نبود؛ می‌تواند نشانی باشد.</field>
+    </record>
+    <record id="vis_ikiku_business_place_public_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_public_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">محله یا منطقهٔ کسب‌وکار؛ همان اندازه که روی کارت دیده می‌شود.</field>
+    </record>
+    <record id="vis_ikiku_business_place_city_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_city_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">شهرِ کسب‌وکار.</field>
+    </record>
+    <record id="vis_ikiku_business_place_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_province_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">استانِ کسب‌وکار.</field>
+    </record>
+    <record id="vis_ikiku_business_place_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">ممکن است خیابان باشد؛ نشانیِ کسب‌وکار عمومی نیست.</field>
+    </record>
+    <record id="vis_ikiku_business_place_path" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_path</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">مسیرِ همان جای دقیق.</field>
+    </record>
+    <record id="vis_ikiku_business_place_hint" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_hint</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">آنچه دارنده نوشته است.</field>
+    </record>
+    <record id="vis_ikiku_demand_place_public_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">place_public_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">جای کار، تا محله؛ کسی که دنبالِ کار است باید رفت‌وآمد را بسنجد.</field>
+    </record>
+    <record id="vis_ikiku_demand_place_city_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">place_city_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">شهرِ کار.</field>
+    </record>
+    <record id="vis_ikiku_demand_place_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">place_province_id</field>
+      <field name="visibility">public</field>
+      <field name="reason">استانِ کار.</field>
+    </record>
+    <record id="vis_ikiku_demand_place_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">place_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">ممکن است خیابان باشد.</field>
+    </record>
+    <record id="vis_ikiku_demand_place_path" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">place_path</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">مسیرِ همان جای دقیق.</field>
+    </record>
+    <record id="vis_ikiku_demand_place_hint" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">place_hint</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">آنچه کسب‌وکار نوشته است.</field>
+    </record>
+    <record id="vis_ikiku_availability_place_public_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.availability</field>
+      <field name="field_name">place_public_id</field>
+      <field name="visibility">counterparty</field>
+      <field name="reason">شهری که این نفر می‌تواند در آن کار کند.</field>
+    </record>
+    <record id="vis_ikiku_availability_place_city_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.availability</field>
+      <field name="field_name">place_city_id</field>
+      <field name="visibility">counterparty</field>
+      <field name="reason">همان شهر.</field>
+    </record>
+    <record id="vis_ikiku_availability_place_province_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.availability</field>
+      <field name="field_name">place_province_id</field>
+      <field name="visibility">counterparty</field>
+      <field name="reason">همان استان.</field>
+    </record>
+    <record id="vis_ikiku_availability_place_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.availability</field>
+      <field name="field_name">place_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">جای دقیق؛ نشانی حساب می‌شود.</field>
+    </record>
+    <record id="vis_ikiku_availability_place_path" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.availability</field>
+      <field name="field_name">place_path</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">مسیرِ همان جای دقیق.</field>
+    </record>
+    <record id="vis_ikiku_availability_place_hint" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.availability</field>
+      <field name="field_name">place_hint</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">آنچه خودش نوشته است.</field>
+    </record>
+    <record id="vis_ikiku_resource_place_id" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">place_id</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">جای دقیق؛ از پروندهٔ شخص خوانده می‌شود.</field>
+    </record>
+    <record id="vis_ikiku_resource_place_path" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.resource</field>
+      <field name="field_name">place_path</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">مسیرِ همان جای دقیق.</field>
+    </record>
   </data>
 </odoo>

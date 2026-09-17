@@ -13,6 +13,12 @@
               <field name="partner_id"/><field name="kind"/><field name="seats"/>
             </group>
             <group>
+              <field name="place_id" options="{'no_create': True}"/>
+              <field name="place_path" readonly="1"/>
+              <field name="place_hint" readonly="1" invisible="not place_hint"/>
+              <field name="place_id" options="{'no_create': True}"/>
+              <field name="place_path" readonly="1"/>
+              <field name="place_public_id" readonly="1"/>
               <field name="province_id"/><field name="city"/>
               <field name="is_verified" readonly="1"/><field name="slug" readonly="1"/>
             </group>

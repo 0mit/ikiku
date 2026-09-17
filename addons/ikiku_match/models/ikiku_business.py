@@ -27,19 +27,17 @@ class IkikuBusiness(models.Model):
             last = Demand.search([('business_id', '=', business.id)], order='create_date desc, id desc', limit=1)
             if not last:
                 continue
-            if not business.province_id:
-                business.write({'province_id': last.province_id.id, 'city': last.city})
+            if not business.place_id:
+                business.write({'place_id': last.place_id.id})
                 business.message_post(body=FILLED)
                 filled += 1
                 continue
             holder = business.partner_id
             is_worker = Resource.search_count([('partner_id.commercial_partner_id', '=', holder.id)], limit=1)
-            at_home = (business.province_id == holder.ikiku_province_id
-                       and (business.city or '') == (holder.ikiku_city or ''))
-            elsewhere = (last.province_id != business.province_id
-                         or (last.city or '') != (business.city or ''))
+            at_home = business.place_id and business.place_id == holder.place_id
+            elsewhere = last.place_id != business.place_id
             if is_worker and at_home and elsewhere:
-                business.write({'province_id': last.province_id.id, 'city': last.city})
+                business.write({'place_id': last.place_id.id})
                 business.message_post(body=DETACHED)
                 detached += 1
         return filled, detached

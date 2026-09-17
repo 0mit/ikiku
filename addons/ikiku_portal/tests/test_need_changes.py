@@ -7,6 +7,13 @@ import re
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import HttpCase, tagged
 
+
+def place(env, name, kind='city'):
+    """A place from place_ir, by name. Tests say «تهران» and «کرج», not an xmlid nobody reads."""
+    found = env['place.node'].sudo().search([('kind', '=', kind), ('name', '=', name)], limit=1)
+    assert found, "place_ir has no %s called %s" % (kind, name)
+    return found
+
 TOKEN = re.compile(r'name="csrf_token" value="([^"]+)"')
 
 
@@ -17,8 +24,9 @@ class TestNeedChanges(HttpCase):
     def setUpClass(cls):
         super().setUpClass()
         env = cls.env
-        cls.tehran = env.ref('ikiku_base.province_te')
-        cls.other_province = env['ikiku.province'].search([('id', '!=', cls.tehran.id)], limit=1)
+        cls.tehran = place(env, "تهران")
+        cls.karaj = place(env, "کرج")
+        cls.other_province = cls.karaj
         cls.node = env.ref('ikiku_base.spec_dishwashing')
         cls.full = env.ref('ikiku_base.work_type_full_time')
         cls.owner = env['res.users'].create({'name': "مریم", 'login': 'need-owner', 'password': 'need-owner-pass-1',
@@ -28,10 +36,10 @@ class TestNeedChanges(HttpCase):
                                                  'spec_node_id': cls.node.id})
         cls.need = env['ikiku.demand'].create({
             'business_id': cls.business.id, 'position_id': position.id, 'seats': 2, 'work_type_id': cls.full.id,
-            'province_id': cls.tehran.id, 'city': "تهران", 'state': 'open'})
+            'place_id': cls.tehran.id, 'state': 'open'})
         worker = env['ikiku.resource'].create({'partner_id': env['res.partner'].create({'name': "نیرو"}).id,
                                                'state': 'active'})
-        cls.availability = env['ikiku.availability'].create({'resource_id': worker.id, 'province_id': cls.tehran.id})
+        cls.availability = env['ikiku.availability'].create({'resource_id': worker.id, 'place_id': cls.tehran.id})
         cls.worker = worker
         env['ikiku.proposal'].build_for_demand(cls.need)
 
@@ -66,15 +74,15 @@ class TestNeedChanges(HttpCase):
         where = self.url_open('/business/need/where').text
         self.assertIn('value="تهران"', where)
         self.assertIn("تغییرها رو ثبت کن", where)
-        done = self.post('/business/need/where', {'province_id': str(self.other_province.id), 'city': "کرج"})
+        done = self.post('/business/need/where', {'place_id': str(self.other_province.id)})
         self.assertTrue(self.location(done).endswith('/business?done=changed'))
         self.assertEqual(self.env['ikiku.demand'].search_count([('business_id', '=', self.business.id)]), 1,
                          "changed in place, not a second need")
-        self.assertEqual((self.need.seats, self.need.province_id, self.need.city, self.need.state),
-                         (3, self.other_province, "کرج", 'open'))
+        self.assertEqual((self.need.seats, self.need.place_id, self.need.city, self.need.state),
+                         (3, self.karaj, "کرج", 'open'))
         tracked = self.need.message_ids.mapped('tracking_value_ids.field_id.name')
         self.assertIn('seats', tracked)
-        self.assertIn('city', tracked)
+        self.assertIn('place_id', tracked)
         self.assertTrue(any("عوض شد" in body for body in self.need.message_ids.mapped('body')))
         self.assertEqual(self.need.message_ids.filtered(lambda m: "عوض شد" in m.body).author_id, self.owner.partner_id)
         self.assertFalse(self.env['ikiku.proposal'].search([('demand_id', '=', self.need.id),
@@ -138,7 +146,7 @@ class TestNeedChanges(HttpCase):
         other = self.env['ikiku.business'].create({'name': "کافه دیگر", 'partner_id': stranger.id})
         position = self.env['ikiku.position'].create({'name': "x", 'business_id': other.id, 'spec_node_id': self.node.id})
         need = self.env['ikiku.demand'].create({'business_id': other.id, 'position_id': position.id,
-                                                'province_id': self.tehran.id, 'state': 'open'})
+                                                'place_id': self.tehran.id, 'state': 'open'})
         for url in ('/business/need/%d', '/business/need/%d/edit', '/business/need/%d/close'):
             self.assertEqual(self.url_open(url % need.id, allow_redirects=False).status_code, 404, url)
         self.assertEqual(self.post('/business/need/%d/cancel' % self.need.id, {'reason': ''}).status_code, 200)
@@ -153,7 +161,8 @@ class TestSeveralBusinesses(HttpCase):
     def setUpClass(cls):
         super().setUpClass()
         env = cls.env
-        cls.tehran = env.ref('ikiku_base.province_te')
+        cls.tehran = place(env, "تهران")
+        cls.karaj = place(env, "کرج")
         cls.node = env.ref('ikiku_base.spec_dishwashing')
         cls.full = env.ref('ikiku_base.work_type_full_time')
         cls.owner = env['res.users'].create({'name': "مریم", 'login': 'many-owner', 'password': 'many-owner-pass-1',
@@ -187,7 +196,7 @@ class TestSeveralBusinesses(HttpCase):
         self.post('/business/need/type', {'work_type_id': str(self.full.id)})
         self.post('/business/need/count', {'seats': '1'})
         self.post('/business/need/when', {'start': 'today', 'end': 'none'})
-        return self.post('/business/need/where', {'province_id': str(self.tehran.id), 'city': city})
+        return self.post('/business/need/where', {'place_id': str(self.tehran.id), 'place_q': city})
 
     def test_a_second_business_gets_its_own_needs(self):
         self.assertIn("یه کافه یا رستورانِ دیگه هم دارید؟", self.url_open('/business').text)

@@ -4,7 +4,15 @@ from datetime import timedelta
 from odoo import fields
 from odoo.tests import HttpCase, tagged
 
-PUBLIC_KEYS = {'position', 'seats', 'work_type', 'province', 'city', 'date_start_fa', 'date_end_fa'}
+
+def place(env, name, kind='city'):
+    """A place from place_ir, by name. Tests say «تهران» and «کرج», not an xmlid nobody reads."""
+    found = env['place.node'].sudo().search([('kind', '=', kind), ('name', '=', name)], limit=1)
+    assert found, "place_ir has no %s called %s" % (kind, name)
+    return found
+
+PUBLIC_KEYS = {'position', 'seats', 'work_type', 'province', 'city', 'place',
+               'date_start_fa', 'date_end_fa'}
 # Links into the public standard (the role's page and its skills), never values of the need itself.
 STANDARD_KEYS = {'position_url', 'skills', 'more_skills'}
 
@@ -23,15 +31,17 @@ class TestSite(HttpCase):
         position = env['ikiku.position'].create({
             'name': "عنوانِ داخلیِ ظرف‌شویِ شبِ ما", 'business_id': cls.business.id,
             'spec_node_id': cls.node.id})
-        cls.tehran = env.ref('ikiku_base.province_te')
-        cls.other = env['ikiku.province'].search([('id', '!=', cls.tehran.id)], limit=1)
+        cls.tehran = place(env, "تهران")
+        cls.karaj = place(env, "کرج")
+        cls.tehran_province = place(env, "استان تهران", 'province')
+        cls.other = cls.karaj
         today = fields.Date.today()
         base = {'business_id': cls.business.id, 'position_id': position.id,
                 'date_start': today + timedelta(days=30), 'date_end': today + timedelta(days=60)}
         env['ikiku.demand'].create([
-            dict(base, seats=2, province_id=cls.tehran.id, state='open'),
-            dict(base, seats=3, province_id=cls.other.id, state='proposed'),
-            dict(base, seats=9, province_id=cls.tehran.id, state='draft'),
+            dict(base, seats=2, place_id=cls.tehran.id, state='open'),
+            dict(base, seats=3, place_id=cls.other.id, state='proposed'),
+            dict(base, seats=9, place_id=cls.tehran.id, state='draft'),
         ])
 
     def test_open_jobs_are_plain_public_values(self):
@@ -51,7 +61,7 @@ class TestSite(HttpCase):
         self.assertNotIn('عنوانِ داخلیِ ظرف‌شویِ شبِ ما', page)
 
     def test_jobs_filter_by_province(self):
-        page = self.url_open('/jobs?province=%d' % self.tehran.id).text
+        page = self.url_open('/jobs?province=%d' % self.tehran_province.id).text
         self.assertIn('۲ نفر لازمه', page)
         self.assertNotIn('۳ نفر', page)
         self.assertNotIn('۹ نفر', page)

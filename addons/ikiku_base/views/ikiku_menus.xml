@@ -24,8 +24,6 @@
 
   <menuitem id="menu_ikiku_config" name="پیکربندی" parent="menu_ikiku_root" sequence="90"
             groups="ikiku_base.group_ikiku_master"/>
-  <menuitem id="menu_ikiku_province" parent="menu_ikiku_config"
-            action="action_province" sequence="10"/>
   <menuitem id="menu_ikiku_season" parent="menu_ikiku_config"
             action="action_season" sequence="20"/>
   <menuitem id="menu_ikiku_visibility" parent="menu_ikiku_config"

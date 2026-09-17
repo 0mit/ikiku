@@ -25,9 +25,12 @@ class IkikuResource(models.Model):
     name = fields.Char(related='partner_id.name', store=True, readonly=False, string="نام")
     slug = fields.Char("نشانیِ عمومی", copy=False, index=True,
                        help="بخشِ پایانیِ نشانیِ پروندهٔ عمومی.")
-    province_id = fields.Many2one(related='partner_id.ikiku_province_id',
-                                  store=True, readonly=False, string="استان")
-    city = fields.Char(related='partner_id.ikiku_city', store=True, readonly=False, string="شهر")
+    place_id = fields.Many2one(related='partner_id.place_id', store=True, readonly=False,
+                               string="جا")
+    place_path = fields.Char(related='partner_id.place_path', store=True, string="نشانیِ کوتاه")
+    province_id = fields.Many2one(related='partner_id.ikiku_province_id', store=True,
+                                  string="استان", readonly=True)
+    city = fields.Char(related='partner_id.ikiku_city', store=True, string="شهر", readonly=True)
     standing = fields.Float(related='partner_id.ikiku_standing', store=True, string="اعتبار")
     is_verified = fields.Boolean(related='partner_id.ikiku_is_verified', store=True,
                                  string="هویت تأییدشده")

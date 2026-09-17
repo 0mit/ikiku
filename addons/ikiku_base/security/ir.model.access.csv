@@ -1,7 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_province_all,province all,model_ikiku_province,base.group_user,1,0,0,0
-access_province_master,province master,model_ikiku_province,group_ikiku_master,1,1,1,1
-access_province_portal,province portal,model_ikiku_province,base.group_portal,1,0,0,0
 access_season_all,season all,model_ikiku_season,base.group_user,1,0,0,0
 access_season_master,season master,model_ikiku_season,group_ikiku_master,1,1,1,1
 access_season_window_all,season window all,model_ikiku_season_window,base.group_user,1,0,0,0
@@ -36,3 +33,6 @@ access_spec_requirement_user,spec requirement user,model_ikiku_spec_requirement,
 access_spec_requirement_master,spec requirement master,model_ikiku_spec_requirement,group_ikiku_master,1,1,1,1
 access_spec_country_rule_user,spec country rule user,model_ikiku_spec_country_rule,base.group_user,1,0,0,0
 access_spec_country_rule_master,spec country rule master,model_ikiku_spec_country_rule,group_ikiku_master,1,1,1,1
+access_place_node_portal,place.node portal,place_graph.model_place_node,base.group_portal,1,0,0,0
+access_place_alias_portal,place.alias portal,place_graph.model_place_alias,base.group_portal,1,0,0,0
+access_place_node_master,place.node master,place_graph.model_place_node,group_ikiku_master,1,1,1,1

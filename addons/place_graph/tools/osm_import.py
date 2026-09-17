@@ -103,6 +103,15 @@ def strip_word(name, word):
     return parts[1].strip() if len(parts) == 2 and fold(parts[0]) == word else name
 
 
+def said_name(name):
+    """The name as people say it, for comparing two rows: no «خیابان», no «شهر».
+
+    Both register words have to go before two names are compared, and this runs BEFORE the
+    names themselves are shortened -- «شهر تهران» the city and «تهران» the label node inside
+    it are the same place, and comparing the written forms would miss that."""
+    return fold(strip_word(street_name(name), CITY_WORD))
+
+
 def street_name(name):
     """«خیابان فلسطین» -> «فلسطین»: the name people say, without the word for the thing."""
     for word in STREET_WORDS:
@@ -365,12 +374,20 @@ def build(collector, iso, country_name, out_dir, keep_villages=True):
 
     # A place mapped as a point inside its own boundary is the boundary's label, not a
     # second place: «فلسطین» inside «فلسطین» is one neighbourhood written twice.
+    # A place mapped as a point inside a place of the same name is that place written twice:
+    # the label node «کرج» sits inside the neighbourhood «جهانشهر», inside the city «کرج», so
+    # the match has to be looked for all the way up and not only at the parent.
     folded_in = {}
     for item in everything:
-        parent = item['parent']
-        if item['is_point'] and parent is not None and not parent['is_point'] \
-                and fold(street_name(item['name'])) == fold(street_name(parent['name'])):
-            folded_in[item['key']] = parent
+        if not item['is_point']:
+            continue
+        own = said_name(item['name'])
+        ancestor = item['parent']
+        while ancestor is not None:
+            if not ancestor['is_point'] and said_name(ancestor['name']) == own:
+                folded_in[item['key']] = ancestor
+                break
+            ancestor = ancestor['parent']
     if folded_in:
         everything = [item for item in everything if item['key'] not in folded_in]
         for item in everything:
@@ -386,7 +403,7 @@ def build(collector, iso, country_name, out_dir, keep_villages=True):
             continue
         if street['parent']['kind'] not in ('city', 'district', 'neighbourhood'):
             continue          # a road between towns is not a place inside one
-        key = (fold(street_name(street['name'])), street['parent']['key'])
+        key = (said_name(street['name']), street['parent']['key'])
         if key in seen_streets:
             continue
         seen_streets.add(key)

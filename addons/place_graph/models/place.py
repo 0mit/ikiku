@@ -23,6 +23,8 @@ Three things this file exists for:
      neighbour finds the place -- through the same six match kinds search_suggest publishes,
      with no separate scoring rule hidden here.
 """
+from math import cos, radians, sqrt
+
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -65,6 +67,7 @@ SUGGEST_ORDER = 'sequence, id'
 PATH_SEPARATOR = ' · '
 PATH_DEPTH = 3   # what a person reads: the place and the two shown places above it
 MAX_DEPTH = 12   # how far up a tree is ever walked in one go: country to street is eight
+KM_PER_DEGREE = 111.195   # a degree of latitude; longitude is scaled by cos(latitude)
 
 
 class PlaceNode(models.Model):
@@ -182,6 +185,32 @@ class PlaceNode(models.Model):
             level.fetch(['name', 'parent_id'])
             level = level.parent_id
         return super()._suggest_rank(query, records, limit, boost)
+
+    def place_of_kinds(self, kinds):
+        """This place if it is one of `kinds`, else the nearest place above it that is.
+
+        How a record shows a coarser place than the one it holds, and how a city or a province
+        is read off a neighbourhood: one walk up the tree, no rule repeated anywhere else."""
+        if not self:
+            return self
+        self.ensure_one()
+        for place in self + self.ancestor_places():
+            if place.kind in kinds:
+                return place
+        return self.browse()
+
+    def distance_km(self, other):
+        """Roughly how far apart two places are, by their points. False if either has none.
+
+        Great-circle on a sphere: this answers «is that across the city or across the country»,
+        which is all a person needs from it, and all the points in the tree support."""
+        self.ensure_one()
+        if not other or not (self.latitude or self.longitude) or not (other.latitude or other.longitude):
+            return False
+        mean_latitude = radians((self.latitude + other.latitude) / 2.0)
+        north = (self.latitude - other.latitude) * KM_PER_DEGREE
+        east = (self.longitude - other.longitude) * KM_PER_DEGREE * cos(mean_latitude)
+        return sqrt(north * north + east * east)
 
     def ancestor_places(self):
         """The places above this one, nearest first, shown or not."""

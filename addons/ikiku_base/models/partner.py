@@ -36,7 +36,10 @@ MOBILE_BY_TOOLS = "شمارهٔ ورود فقط با کدِ پیامک یا اب
 
 
 class ResPartner(models.Model):
-    _inherit = ['res.partner', 'ikiku.publishable']
+    _inherit = ['res.partner', 'ikiku.publishable', 'place.located']
+    # A person's public face stops at their city: a neighbourhood is nearly an address, and
+    # بند ۷ keeps an address out of public reach.
+    _place_public_kinds = ('city', 'village', 'province')
 
     ikiku_mobile = fields.Char("موبایل (لنگرِ هویت)", index=True, copy=False)
     # بند ۷: mail tracks `phone`, which would copy every number into the chatter.
@@ -47,8 +50,13 @@ class ResPartner(models.Model):
     ikiku_nid_hash = fields.Char("اثرِ کدِ ملی", index=True, copy=False, groups='ikiku_base.group_ikiku_staff',
                                  help="درهم‌سازیِ نمک‌دار. خودِ کدِ ملی هرگز ذخیره نمی‌شود.")
     ikiku_nid_checked_on = fields.Date("تاریخِ بررسیِ کدِ ملی", groups='ikiku_base.group_ikiku_staff')
-    ikiku_province_id = fields.Many2one('ikiku.province', string="استان")
-    ikiku_city = fields.Char("شهر")
+    # Where a person is, since 2026-09-18: `place_id` of place.located is the one field
+    # anybody sets, and these two are read off the tree above it. They keep their names
+    # because every page, filter and report that asks for a province or a city still asks
+    # with them -- what changed is that neither can drift from the other any more.
+    ikiku_province_id = fields.Many2one('place.node', related='place_province_id', store=True,
+                                        string="استان", readonly=True)
+    ikiku_city = fields.Char(related='place_city_name', store=True, string="شهر", readonly=True)
     ikiku_is_verified = fields.Boolean("هویت تأییدشده", default=False, tracking=True)
     ikiku_assertion_ids = fields.One2many('ikiku.assertion', 'resource_id', string="ادعاها")
     ikiku_standing = fields.Float(

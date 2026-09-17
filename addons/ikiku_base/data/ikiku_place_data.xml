@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <!-- Inside noupdate, so it runs on install only: an order changed later survives -u. -->
+    <function model="place.node" name="_ikiku_apply_province_order"/>
+  </data>
+</odoo>

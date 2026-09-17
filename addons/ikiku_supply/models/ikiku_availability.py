@@ -16,6 +16,9 @@ OPEN_END_FA = "بدون پایان"
 class IkikuAvailability(models.Model):
     _name = 'ikiku.availability'
     _description = "بازهٔ در دسترس بودن"
+    _inherit = ['place.located']
+    # A person's own place is never published finer than their city.
+    _place_public_kinds = ('city', 'village', 'province')
     _order = 'date_start'
 
     resource_id = fields.Many2one('ikiku.resource', required=True, index=True,
@@ -25,8 +28,14 @@ class IkikuAvailability(models.Model):
     work_type_ids = fields.Many2many(
         'ikiku.work.type', string="نوع‌های همکاری",
         help="هر نوعی که این نیرو می‌پذیرد. خالی یعنی نگفته، و از هیچ نیازی کنار گذاشته نمی‌شود.")
-    province_id = fields.Many2one('ikiku.province', string="استان", required=True)
-    city = fields.Char("شهر")
+    place_id = fields.Many2one('place.node', string="جا", required=True, index=True,
+                               ondelete='restrict')
+    # Where this person can work, since 2026-09-18: one place from the tree (place.located),
+    # with the province and the city read off it. A person's own place is never published
+    # finer than their city -- _place_public_kinds says so once, here.
+    province_id = fields.Many2one('place.node', related='place_province_id', store=True,
+                                  string="استان", readonly=True)
+    city = fields.Char(related='place_city_name', store=True, string="شهر", readonly=True)
     can_relocate = fields.Boolean("امکانِ جابه‌جایی", default=False)
     hours_per_week = fields.Integer("ساعت در هفته", default=40)
     details_confirmed = fields.Boolean(

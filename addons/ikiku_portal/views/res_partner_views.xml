@@ -46,4 +46,41 @@
     </field>
   </record>
 
+  <!-- Where the person is (operator, 2026-09-18): one searchable field over the place tree,
+       with what it means underneath. Staff type «کاخ» or a post code and pick
+       «فلسطین · دانشگاه تهران · تهران»; the city and the province are read off the tree and
+       cannot be typed, so the two can never disagree. -->
+  <record id="ikiku_view_partner_form_place" model="ir.ui.view">
+    <field name="name">res.partner.form.ikiku.place</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="(//field[@name='phone'])[1]/.." position="after">
+        <group class="w-md-50">
+          <field name="place_id" options="{'no_create': True, 'no_open': True}"/>
+          <field name="place_path" readonly="1" invisible="not place_id"/>
+          <field name="ikiku_city" readonly="1" invisible="not place_id"/>
+          <field name="ikiku_province_id" readonly="1" invisible="not place_id"/>
+          <field name="place_hint" readonly="1" invisible="not place_hint"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="ikiku_view_res_partner_filter_place" model="ir.ui.view">
+    <field name="name">res.partner.search.ikiku.place</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='email']" position="after">
+        <field name="place_id"/>
+      </xpath>
+      <xpath expr="//filter[@name='type_company']" position="before">
+        <filter name="ikiku_group_city" string="شهر" context="{'group_by': 'place_city_id'}"/>
+        <filter name="ikiku_group_province" string="استان" context="{'group_by': 'place_province_id'}"/>
+        <separator/>
+      </xpath>
+    </field>
+  </record>
+
 </odoo>

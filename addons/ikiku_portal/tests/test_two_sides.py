@@ -9,6 +9,13 @@ from odoo.tests import HttpCase, TransactionCase, tagged
 
 from odoo.addons.ikiku_portal.tests.test_mobile_challenge import CODE, MOBILE, RANDBELOW, OtpSetup
 
+
+def place(env, name, kind='city'):
+    """A place from place_ir, by name. Tests say «تهران» and «کرج», not an xmlid nobody reads."""
+    found = env['place.node'].sudo().search([('kind', '=', kind), ('name', '=', name)], limit=1)
+    assert found, "place_ir has no %s called %s" % (kind, name)
+    return found
+
 TOKEN = re.compile(r'name="csrf_token" value="([^"]+)"')
 
 
@@ -17,13 +24,14 @@ class TwoSidesData:
     @classmethod
     def make_people(cls):
         env = cls.env
-        cls.tehran = env.ref('ikiku_base.province_te')
-        cls.alborz = env['ikiku.province'].search([('id', '!=', cls.tehran.id)], limit=1)
+        cls.tehran = place(env, "تهران")
+        cls.karaj = place(env, "کرج")
+        cls.alborz = cls.karaj
         cls.node = env.ref('ikiku_base.spec_dishwashing')
         portal = env.ref('base.group_portal')
         cls.person = env['res.users'].create({'name': "سارا", 'login': 'two-sides', 'password': 'two-sides-pass-1',
                                               'group_ids': [(6, 0, [portal.id])]})
-        cls.person.partner_id.write({'ikiku_province_id': cls.tehran.id, 'ikiku_city': "تهران"})
+        cls.person.partner_id.write({'place_id': cls.tehran.id})
 
     @classmethod
     def give_worker(cls, user):
@@ -48,7 +56,7 @@ class TestTwoSidesModel(TwoSidesData, TransactionCase):
         position = self.env['ikiku.position'].create({'name': "ظرف‌شور", 'business_id': business.id,
                                                       'spec_node_id': self.node.id})
         return self.env['ikiku.demand'].create({'business_id': business.id, 'position_id': position.id,
-                                                'province_id': (province or self.tehran).id, 'city': city,
+                                                'place_id': (province or self.tehran).id,
                                                 'seats': 1, 'state': 'open'})
 
     def test_one_account_holds_both_sides(self):
@@ -68,21 +76,22 @@ class TestTwoSidesModel(TwoSidesData, TransactionCase):
 
     def test_business_location_is_its_own(self):
         cafe = self.give_cafe(self.person)
-        cafe.write({'province_id': self.tehran.id, 'city': "تهران"})
-        self.person.partner_id.write({'ikiku_province_id': self.alborz.id, 'ikiku_city': "کرج"})
-        self.assertEqual((cafe.province_id, cafe.city), (self.tehran, "تهران"))
-        cafe.write({'city': "ری"})
-        self.assertEqual(self.person.partner_id.ikiku_city, "کرج")
+        cafe.write({'place_id': self.tehran.id})
+        self.person.partner_id.write({'place_id': self.karaj.id})
+        self.assertEqual((cafe.place_id, cafe.city), (self.tehran, "تهران"))
+        cafe.write({'place_id': place(self.env, "ری").id})
+        self.assertEqual(cafe.city, "ری")
+        self.assertEqual(self.person.partner_id.ikiku_city, "کرج", "the holder did not move")
 
     def test_holder_not_ranked_for_own_business(self):
         resource = self.give_worker(self.person)
-        self.env['ikiku.availability'].create({'resource_id': resource.id, 'province_id': self.tehran.id})
+        self.env['ikiku.availability'].create({'resource_id': resource.id, 'place_id': self.tehran.id})
         own = self.need(self.give_cafe(self.person))
         other_partner = self.env['res.partner'].create({'name': "کافه‌دار"})
         other = self.need(self.env['ikiku.business'].create({'name': "کافه دیگر", 'partner_id': other_partner.id}))
         stranger = self.env['ikiku.resource'].create({
             'partner_id': self.env['res.partner'].create({'name': "غریبه"}).id, 'state': 'active'})
-        self.env['ikiku.availability'].create({'resource_id': stranger.id, 'province_id': self.tehran.id})
+        self.env['ikiku.availability'].create({'resource_id': stranger.id, 'place_id': self.tehran.id})
         own_ranked = self.env['ikiku.proposal'].build_for_demand(own).mapped('resource_id')
         self.assertNotIn(resource, own_ranked)
         self.assertIn(stranger, own_ranked)
@@ -109,14 +118,14 @@ class TestTwoSidesModel(TwoSidesData, TransactionCase):
 
     def test_location_migration(self):
         # A holder with no worker record keeps a staff-typed place.
-        lone_partner = self.env['res.partner'].create({'name': "تنها", 'ikiku_province_id': self.tehran.id})
+        lone_partner = self.env['res.partner'].create({'name': "تنها", 'place_id': self.tehran.id})
         lone = self.env['ikiku.business'].create({'name': "تنها", 'partner_id': lone_partner.id,
-                                                  'province_id': self.tehran.id, 'city': "تهران"})
+                                                  'place_id': self.tehran.id})
         self.need(lone, province=self.alborz, city="کرج")
         # A dual holder whose café sat at their home while its need is elsewhere is moved.
         self.give_worker(self.person)
         dual = self.give_cafe(self.person)
-        dual.write({'province_id': self.tehran.id, 'city': "تهران"})
+        dual.write({'place_id': self.tehran.id})
         self.need(dual, province=self.alborz, city="کرج")
         # A business with no place learns it from its latest need.
         empty = self.env['ikiku.business'].create({'name': "خالی", 'partner_id': self.env['res.partner'].create(
@@ -124,10 +133,10 @@ class TestTwoSidesModel(TwoSidesData, TransactionCase):
         self.need(empty, province=self.alborz, city="کرج")
         filled, detached = self.env['ikiku.business']._ikiku_place_from_needs()
         self.assertEqual((filled, detached), (1, 1))
-        self.assertEqual((lone.province_id, lone.city), (self.tehran, "تهران"))
-        self.assertEqual((dual.province_id, dual.city), (self.alborz, "کرج"))
+        self.assertEqual((lone.place_id, lone.city), (self.tehran, "تهران"))
+        self.assertEqual((dual.place_id, dual.city), (self.karaj, "کرج"))
         self.assertIn("آخرین اعلامِ نیاز", dual.message_ids[0].body)
-        self.assertEqual((empty.province_id, empty.city), (self.alborz, "کرج"))
+        self.assertEqual((empty.place_id, empty.city), (self.karaj, "کرج"))
 
     def test_staff_give_a_second_side(self):
         staff = self.env['res.users'].create({'name': "همکار", 'login': 'two-helper',
@@ -214,13 +223,13 @@ class TestTwoSidesPages(TwoSidesData, OtpSetup, HttpCase):
     def test_moving_home_does_not_move_the_cafe(self):
         self.give_worker(self.person)
         cafe = self.give_cafe(self.person)
-        cafe.write({'province_id': self.tehran.id, 'city': "تهران"})
+        cafe.write({'place_id': self.tehran.id})
         self.authenticate('two-sides', 'two-sides-pass-1')
         page = self.url_open('/join/where?edit=1').text
         self.assertIn("شهرِ مجموعه‌تون عوض نمیشه", page)
-        self.post('/join/where?edit=1', {'province_id': str(self.alborz.id), 'city': "کرج", 'edit': '1'})
+        self.post('/join/where?edit=1', {'place_id': str(self.karaj.id), 'edit': '1'})
         self.assertEqual(self.person.partner_id.ikiku_city, "کرج")
-        self.assertEqual((cafe.province_id, cafe.city), (self.tehran, "تهران"))
+        self.assertEqual((cafe.place_id, cafe.city), (self.tehran, "تهران"))
 
     def test_signing_in_honours_a_named_door(self):
         self.enable_otp()

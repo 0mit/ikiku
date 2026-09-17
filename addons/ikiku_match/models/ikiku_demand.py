@@ -14,7 +14,7 @@ from odoo.exceptions import UserError
 
 LIVE_BOOKING_STATES = ('confirmed', 'at_risk', 'in_progress')
 OPEN_STATES = ('open', 'proposed')
-CHANGEABLE = ('position_id', 'work_type_id', 'seats', 'date_start', 'date_end', 'province_id', 'city')
+CHANGEABLE = ('position_id', 'work_type_id', 'seats', 'date_start', 'date_end', 'place_id')
 
 
 class IkikuDemand(models.Model):

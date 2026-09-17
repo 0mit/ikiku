@@ -25,7 +25,8 @@ class IkikuSeason(models.Model):
     start_month = fields.Integer("ماه آغاز", required=True)
     start_day = fields.Integer("روز آغاز", required=True)
     duration_days = fields.Integer("طول (روز)", required=True, default=1)
-    province_ids = fields.Many2many('ikiku.province', string="استان‌ها",
+    province_ids = fields.Many2many('place.node', string="استان‌ها",
+                                    domain="[('kind', '=', 'province')]",
                                     help="خالی یعنی سراسر کشور.")
     demand_factor = fields.Float(
         "ضریب تقاضا", default=1.0,

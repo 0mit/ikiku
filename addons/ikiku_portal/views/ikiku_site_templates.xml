@@ -134,8 +134,12 @@
           </div>
           <h3><a t-if="job.get('position_url')" t-att-href="job['position_url']" t-out="job['position']"/>
             <t t-else="" t-out="job['position']"/></h3>
+          <!-- «دانشگاه تهران · منطقه ۶ · تهران» when the need names a neighbourhood, the city
+               and province when it names no more than that. `place` is place_public_id's path,
+               so a card can never say the street even when the café told us one. -->
           <p class="ikiku__job-where">
-            <t t-out="job.get('province')"/><t t-if="job.get('city')">، <t t-out="job['city']"/></t></p>
+            <t t-if="job.get('place')" t-out="job['place']"/>
+            <t t-else=""><t t-out="job.get('province')"/><t t-if="job.get('city')">، <t t-out="job['city']"/></t></t></p>
           <p t-if="job.get('date_start_fa')" class="ikiku__job-when">
             از <span t-out="job['date_start_fa']"/>
             <t t-if="job.get('date_end_fa') == 'بدون پایان'"> · بدون پایان</t>

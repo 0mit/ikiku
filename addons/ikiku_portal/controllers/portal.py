@@ -54,6 +54,9 @@ def _form_list(name):
     return [v for v in request.httprequest.form.getlist(name) if v]
 
 
+# What a person may say about where they live: a city, and nothing finer (بند ۷).
+CITY_KINDS = ('city', 'village', 'province')
+
 class IkikuPortal(http.Controller):
 
     # ------------------------------------------------------------------ shared
@@ -86,13 +89,68 @@ class IkikuPortal(http.Controller):
             return request.env['ikiku.spec.node'].sudo().browse()
         return request.env['ikiku.spec.node'].sudo().resolve_text(raw, kinds=('role',))
 
-    def _city_suggestions(self):
-        """What the city field suggests: every province's centre and the cities open jobs
-        already name. Both are public; a city not on the list is still accepted."""
-        cities = set(request.env['ikiku.province'].sudo().search([]).mapped('centre'))
-        cities |= set(request.env['ikiku.demand'].sudo().search(
-            [('state', 'in', ('open', 'proposed')), ('city', '!=', False)]).mapped('city'))
-        return sorted(city for city in cities if city)
+    # ------------------------------------------------------------------- where
+    # One question, «کجا؟», answered by one row of the place tree. What somebody types is
+    # matched against names, former names, the square or the metro stop, and the places
+    # around them (place_graph); a post code is read as its first five digits and never kept.
+    PLACE_CANDIDATES = 6
+
+    def _place_from_post(self, post, city_only=False, previous=None):
+        """(place, hint, candidates, error) for what was typed, picked or read off a code.
+
+        Four ways in, in the order a person is most likely to have used them:
+          - they chose from the suggestions, and the id came back in the form;
+          - they wrote a post code, whose first five digits name an area;
+          - they wrote a name that matches one place well enough to be the answer;
+          - they wrote a name that matches several, and are asked which.
+        `city_only` climbs from whatever they picked to its city: a person says which city
+        they work in, and nothing finer about where they live is asked for or kept.
+        """
+        Place = request.env['place.node'].sudo()
+        typed = ' '.join((post.get('place_q') or '').split())
+        chosen = Place.browse(to_int(post.get('place_id')) or 0).exists()
+        if not chosen:
+            code = request.env['place.postcode'].sudo().prefix_of(post.get('postcode') or '')
+            if code:
+                chosen = request.env['place.postcode'].sudo().place_for_code(post.get('postcode'))
+                if not chosen:
+                    return None, typed, Place.browse(), "این کد پستی رو نمی‌شناسم؛ اسمِ جا رو بنویسید."
+        if not chosen and typed:
+            within = (previous or Place.browse()).place_of_kinds(('city', 'village')) if previous else None
+            found = Place.suggest_places(typed, kinds=CITY_KINDS if city_only else None,
+                                         within=within, limit=self.PLACE_CANDIDATES)
+            places, scores = [], []
+            for result in found:
+                place = result['record']
+                if city_only:
+                    place = place.place_of_kinds(CITY_KINDS) or place
+                if place not in places:          # several streets in one city are that city
+                    places.append(place)
+                    scores.append(result['score'])
+            if len(places) == 1 or (places and scores[0] > scores[1]):
+                chosen = places[0]
+            elif places:
+                return None, typed, Place.browse([place.id for place in places]), \
+                    "چندتا جا با این اسم هست؛ کدومش؟"
+            else:
+                return None, typed, Place.browse(), \
+                    "این جا رو پیدا نکردم. اسمِ شهر رو بنویسید؛ محله رو بعداً می‌تونید اضافه کنید."
+        if not chosen:
+            return None, typed, Place.browse(), "بنویسید کجا."
+        if city_only:
+            chosen = chosen.place_of_kinds(CITY_KINDS) or chosen
+        return chosen, (typed if typed and typed != chosen.name else ''), Place.browse(), None
+
+    def _place_values(self, place, typed='', candidates=None, error=None, city_only=False):
+        """What ikiku_portal.place_fields needs, from one place or from a failed attempt."""
+        return {
+            'place_id': place.id if place else '',
+            'place_q': typed or (place.name if place else ''),
+            'place_path': place.path if place else '',
+            'place_candidates': candidates or request.env['place.node'].browse(),
+            'ask_postcode': not city_only,
+            'errors_place': error,
+        }
 
     def _needs_name(self, partner):
         return not (partner.name or '').strip() or partner.name == NEW_PARTNER_NAME
@@ -137,7 +195,7 @@ class IkikuPortal(http.Controller):
             return '/enter'
         if self._needs_name(partner):
             return '/join/name'
-        if not partner.ikiku_province_id:
+        if not partner.place_id:
             return '/join/where'
         if not self._skill_claims(resource):
             return '/join/skills'
@@ -186,29 +244,21 @@ class IkikuPortal(http.Controller):
     @http.route('/join/where', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
     def join_where(self, edit=None, **post):
         partner = self._partner()
-        errors = {}
-        province_id = to_int(post.get('province_id')) if request.httprequest.method == 'POST' \
-            else partner.ikiku_province_id.id
-        city = ' '.join((post.get('city') or '').split()) if request.httprequest.method == 'POST' \
-            else (partner.ikiku_city or '')
+        place, typed, candidates, error = partner.place_id, '', None, None
         if request.httprequest.method == 'POST':
-            province = request.env['ikiku.province'].sudo().browse(province_id or 0).exists()
-            if not province:
-                errors['province'] = "استان رو انتخاب کنید."
-            if not city:
-                errors['city'] = "شهر رو بنویسید."
-            if not errors:
-                partner.write({'ikiku_province_id': province.id, 'ikiku_city': city})
+            place, typed, candidates, error = self._place_from_post(post, city_only=True,
+                                                                   previous=partner.place_id)
+            if place:
+                partner.write({'place_id': place.id, 'place_hint': typed})
                 resource = self._resource(create=True)
                 availability = self._availability(resource)
                 if availability and not self._availability_referenced(availability):
-                    availability.write({'province_id': province.id, 'city': city})
+                    availability.write({'place_id': place.id})
                 return self._after_worker_save(resource, edit)
-        return self._worker_page('ikiku_portal.join_where', 2, {
-            'provinces': request.env['ikiku.province'].sudo().search([]),
-            'cities': self._city_suggestions(),
-            'has_business': 'ku' in ikiku_sides(request.env.user),
-            'province_id': province_id, 'city': city, 'errors': errors, 'edit': edit})
+        values = self._place_values(place, typed or partner.place_hint or '', candidates, error,
+                                   city_only=True)
+        values.update({'has_business': 'ku' in ikiku_sides(request.env.user), 'edit': edit})
+        return self._worker_page('ikiku_portal.join_where', 2, values)
 
     @http.route('/join/skills', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
     def join_skills(self, edit=None, **post):
@@ -249,7 +299,7 @@ class IkikuPortal(http.Controller):
                 current = self._availability(resource)
                 referenced = self._availability_referenced(current)
                 vals = {'date_start': start, 'date_end': end or False,
-                        'province_id': partner.ikiku_province_id.id, 'city': partner.ikiku_city}
+                        'place_id': partner.place_id.id}
                 try:
                     with request.env.cr.savepoint():
                         if current and not referenced:
@@ -545,14 +595,12 @@ class IkikuPortal(http.Controller):
         last = request.env['ikiku.demand'].sudo().search([('business_id', '=', business.id)],
                                                          order='create_date desc', limit=1)
         errors = {}
+        place, typed, candidates, place_error = None, '', None, None
         if request.httprequest.method == 'POST':
-            province_id = to_int(post.get('province_id'))
-            city = ' '.join((post.get('city') or '').split())
-            province = request.env['ikiku.province'].sudo().browse(province_id or 0).exists()
-            if not province:
-                errors['province'] = "استان رو انتخاب کنید."
-            if not city:
-                errors['city'] = "شهر رو بنویسید."
+            place, typed, candidates, place_error = self._place_from_post(
+                post, previous=business.place_id)
+            if place_error or candidates:
+                errors['place'] = place_error or "کدومش؟"
             position = request.env['ikiku.position'].sudo().browse(draft['position_id']).exists()
             if position.business_id != business:
                 return request.redirect('/business/need/who')
@@ -566,7 +614,7 @@ class IkikuPortal(http.Controller):
                         'position_id': position.id, 'work_type_id': draft['work_type_id'], 'seats': draft['seats'],
                         'date_start': date.fromisoformat(draft['date_start']),
                         'date_end': date.fromisoformat(draft['date_end']) if draft.get('date_end') else False,
-                        'province_id': province.id, 'city': city,
+                        'place_id': place.id, 'place_hint': typed,
                     })
                 except UserError:
                     request.session.pop('ikiku_need', None)
@@ -581,13 +629,13 @@ class IkikuPortal(http.Controller):
                     'seats': draft['seats'],
                     'date_start': draft['date_start'],
                     'date_end': draft['date_end'] or False,
-                    'province_id': province.id,
-                    'city': city,
+                    'place_id': place.id,
+                    'place_hint': typed,
                     'state': 'open',
                 })
-                if not business.province_id:
+                if not business.place_id:
                     # A café's first need teaches it its place; the holder's own place stays.
-                    business.write({'province_id': province.id, 'city': city})
+                    business.write({'place_id': place.id, 'place_hint': typed})
                 request.session.pop('ikiku_need', None)
                 request.env['ikiku.proposal'].sudo().build_for_demand(demand)
                 return request.redirect('/business/need/%d' % demand.id)
@@ -595,17 +643,17 @@ class IkikuPortal(http.Controller):
             partner = self._partner()
             if draft.get('edit_id'):
                 last = self._own_need(draft['edit_id']) or last
-            province_id = (last.province_id or business.province_id or partner.ikiku_province_id).id
-            city = last.city or business.city or partner.ikiku_city or ''
+            # What the café said last time, else the café's own place, else where the holder is.
+            place = last.place_id or business.place_id or partner.place_id
+            typed = last.place_hint or business.place_hint or ''
         node = request.env['ikiku.spec.node'].sudo().browse(draft.get('node_id') or 0).exists()
         work_type = request.env['ikiku.work.type'].sudo().browse(draft['work_type_id']).exists()
         today = tehran_today()
         start = date.fromisoformat(draft['date_start'])
         end = date.fromisoformat(draft['date_end']) if draft.get('date_end') else None
-        return self._business_page('ikiku_portal.need_where', 5, {
-            'provinces': request.env['ikiku.province'].sudo().search([]),
-            'cities': self._city_suggestions(),
-            'province_id': province_id, 'city': city, 'errors': errors,
+        values = self._place_values(place, typed, candidates, place_error)
+        values.update({
+            'errors': errors,
             'has_resource': 'ki' in ikiku_sides(request.env.user),
             'summary': {
                 'seats': to_fa_digits(draft['seats']),
@@ -613,6 +661,7 @@ class IkikuPortal(http.Controller):
                 'type': work_type.name,
                 'dates': dates_text(start, end, today),
             }})
+        return self._business_page('ikiku_portal.need_where', 5, values)
 
     @http.route('/business/need/<int:need_id>', type='http', auth='user', website=True, sitemap=False)
     def need_saved(self, need_id, **kw):

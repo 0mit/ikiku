@@ -10,6 +10,13 @@ from odoo.tests import TransactionCase, tagged
 from odoo.addons.ikiku_base.models.jalali import jalali_date, jalali_month_days
 
 
+def place(env, name, kind='city'):
+    """A place from place_ir, by name. Tests say «تهران» and «کرج», not an xmlid nobody reads."""
+    found = env['place.node'].sudo().search([('kind', '=', kind), ('name', '=', name)], limit=1)
+    assert found, "place_ir has no %s called %s" % (kind, name)
+    return found
+
+
 @tagged('post_install', '-at_install')
 class TestWorkAndDates(TransactionCase):
 
@@ -18,7 +25,8 @@ class TestWorkAndDates(TransactionCase):
         super().setUpClass()
         env = cls.env
         cls.today = fields.Date.context_today(env['ikiku.demand'])
-        cls.tehran = env.ref('ikiku_base.province_te')
+        cls.tehran = place(env, "تهران")
+        cls.karaj = place(env, "کرج")
         cls.full = env.ref('ikiku_base.work_type_full_time')
         cls.part = env.ref('ikiku_base.work_type_part_time')
         cls.shift = env.ref('ikiku_base.work_type_per_shift')
@@ -31,13 +39,13 @@ class TestWorkAndDates(TransactionCase):
     def worker(self, name, **availability):
         partner = self.env['res.partner'].create({'name': name})
         resource = self.env['ikiku.resource'].create({'partner_id': partner.id, 'state': 'active'})
-        vals = {'resource_id': resource.id, 'province_id': self.tehran.id}
+        vals = {'resource_id': resource.id, 'place_id': self.tehran.id}
         vals.update(availability)
         return resource, self.env['ikiku.availability'].create(vals)
 
     def need(self, **vals):
         base = {'business_id': self.business.id, 'position_id': self.position.id,
-                'province_id': self.tehran.id, 'seats': 1, 'state': 'open'}
+                'place_id': self.tehran.id, 'seats': 1, 'state': 'open'}
         base.update(vals)
         return self.env['ikiku.demand'].create(base)
 
@@ -57,7 +65,7 @@ class TestWorkAndDates(TransactionCase):
         resource, _availability = self.worker("ب")
         with self.assertRaises(ValidationError):
             self.env['ikiku.availability'].create({
-                'resource_id': resource.id, 'province_id': self.tehran.id,
+                'resource_id': resource.id, 'place_id': self.tehran.id,
                 'date_start': self.today + timedelta(days=100), 'date_end': self.today + timedelta(days=110)})
 
     def test_a_need_with_an_end_needs_the_whole_window(self):

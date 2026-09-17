@@ -123,24 +123,41 @@
   </template>
 
   <!-- Province first, nothing chosen for the person; the city is typed. -->
-  <template id="place_fields" name="استان و شهر">
-    <label for="province_id" class="ikiku__label">استان</label>
-    <select class="ikiku__field ikiku__field--big" id="province_id" name="province_id" required="required"
-            t-att-aria-invalid="errors.get('province') and 'true'">
-      <option value="">استان رو انتخاب کنید</option>
-      <t t-foreach="provinces" t-as="p">
-        <option t-att-value="p.id" t-att-selected="p.id == province_id and 'selected'" t-out="p.name"/>
+  <template id="place_fields" name="جا">
+    <label for="place_q" class="ikiku__label">کجا؟</label>
+    <div data-suggest="" data-suggest-url="/places/suggest" data-suggest-target="place_id"
+         data-suggest-min="2" data-suggest-count="{n} جا پیدا شد"
+         data-suggest-waiting="هنوز دنبالِ بقیه‌ام…"
+         t-att-data-suggest-kinds="ask_postcode and 'all' or 'city'">
+      <input class="ikiku__field ikiku__field--big" id="place_q" name="place_q" type="search"
+             t-att-value="place_q" required="required" autocomplete="off"
+             t-att-placeholder="ask_postcode and 'مثلاً: فلسطین، تهران' or 'مثلاً: کرج'"
+             t-att-aria-invalid="errors_place and 'true'"/>
+    </div>
+    <input type="hidden" name="place_id" t-att-value="place_id"/>
+    <p t-if="place_path" class="ikiku__hint">الان: <t t-out="place_path"/></p>
+    <p t-if="not ask_postcode" class="ikiku__hint">شهر کافیه. آدرسِ خونه رو نمی‌خوایم.</p>
+
+    <!-- The text matched more than one place: the person says which, and the form works
+         without JavaScript because this is an ordinary group of radio buttons. -->
+    <fieldset t-if="place_candidates" class="ikiku__choices">
+      <legend class="ikiku__label">کدومش؟</legend>
+      <t t-foreach="place_candidates" t-as="candidate">
+        <label class="ikiku__choice">
+          <input type="radio" name="place_id" t-att-value="candidate.id"/>
+          <span t-out="candidate.path"/>
+        </label>
       </t>
-    </select>
-    <p t-if="errors.get('province')" class="ikiku__error" role="alert" t-out="errors['province']"/>
-    <label for="city" class="ikiku__label">شهر</label>
-    <input class="ikiku__field ikiku__field--big" id="city" name="city" t-att-value="city" required="required"
-           placeholder="مثلاً: کرج" autocomplete="address-level2" list="ikiku-cities"
-           t-att-aria-invalid="errors.get('city') and 'true'"/>
-    <datalist id="ikiku-cities">
-      <t t-foreach="cities or []" t-as="name"><option t-att-value="name"/></t>
-    </datalist>
-    <p t-if="errors.get('city')" class="ikiku__error" role="alert" t-out="errors['city']"/>
+    </fieldset>
+
+    <t t-if="ask_postcode">
+      <label for="postcode" class="ikiku__label">یا کد پستی (اختیاری)</label>
+      <input class="ikiku__field" id="postcode" name="postcode" inputmode="numeric"
+             autocomplete="postal-code" placeholder="مثلاً: ۱۴۱۶۷۵۳۹۵۵"/>
+      <p class="ikiku__hint">از کد پستی فقط پنج رقمِ اولش رو نگه می‌داریم، که محله رو نشون میده.
+        خودِ کد پستی جایی ذخیره نمیشه.</p>
+    </t>
+    <p t-if="errors_place" class="ikiku__error" role="alert" t-out="errors_place"/>
   </template>
 
 </odoo>

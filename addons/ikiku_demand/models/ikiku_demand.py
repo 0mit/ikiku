@@ -14,7 +14,9 @@ from odoo.addons.ikiku_base.models.jalali import format_jalali
 class IkikuDemand(models.Model):
     _name = 'ikiku.demand'
     _description = "اعلام نیاز"
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'place.located']
+    # A need names a place; a card shows the neighbourhood it is in, never the street.
+    _place_public_kinds = ('neighbourhood', 'district', 'city', 'village', 'province')
     _order = 'date_start'
 
     name = fields.Char(compute='_compute_name', store=True)
@@ -27,8 +29,14 @@ class IkikuDemand(models.Model):
     date_end = fields.Date("تا تاریخ", tracking=True, help="خالی یعنی بدون پایان.")
     work_type_id = fields.Many2one('ikiku.work.type', string="نوعِ همکاری", required=True,
                                    tracking=True, default=lambda self: self._default_work_type())
-    province_id = fields.Many2one('ikiku.province', string="استان", required=True, tracking=True)
-    city = fields.Char("شهر", tracking=True)
+    # Where the work is, since 2026-09-18: one place from the tree (place.located). A card
+    # shows place_public_id -- the neighbourhood, never the street. Moving the work is a
+    # change the people already proposed for it are told about, so it is tracked.
+    place_id = fields.Many2one('place.node', string="جا", required=True, index=True,
+                               ondelete='restrict', tracking=True)
+    province_id = fields.Many2one('place.node', related='place_province_id', store=True,
+                                  string="استان", readonly=True)
+    city = fields.Char(related='place_city_name', store=True, string="شهر", readonly=True)
     season_factor = fields.Float("ضریب فصل", compute='_compute_season_factor', store=True)
     note = fields.Text("توضیح")
     state = fields.Selection([

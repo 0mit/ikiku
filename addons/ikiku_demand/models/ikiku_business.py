@@ -13,7 +13,9 @@ from odoo.exceptions import UserError, ValidationError
 class IkikuBusiness(models.Model):
     _name = 'ikiku.business'
     _description = "کسب‌وکار"
-    _inherit = ['mail.thread', 'ikiku.publishable']
+    _inherit = ['mail.thread', 'ikiku.publishable', 'place.located']
+    # A café is a place of business: its neighbourhood is public, its street is not.
+    _place_public_kinds = ('neighbourhood', 'district', 'city', 'village', 'province')
     _order = 'name'
 
     partner_id = fields.Many2one('res.partner', string="دارنده", required=True,
@@ -28,9 +30,13 @@ class IkikuBusiness(models.Model):
     # The café's own place. Until 2026-09-16 these were related to the holder's partner, so a
     # holder who also looks for work (operator, 2026-09-16) moved the café by saying where they
     # live, and a staff edit of the café moved the person. The columns and values are kept.
-    province_id = fields.Many2one('ikiku.province', string="استان", tracking=True,
-                                  help="جای کسب‌وکار، نه جای زندگیِ دارنده‌اش.")
-    city = fields.Char("شهر", tracking=True)
+    # Since 2026-09-18 the place is one row of the tree (place.located): a café may name its
+    # neighbourhood or its street, and _place_public_kinds decides what a page shows.
+    place_id = fields.Many2one('place.node', string="جا", index=True, ondelete='restrict',
+                               tracking=True)
+    province_id = fields.Many2one('place.node', related='place_province_id', store=True,
+                                  string="استان", readonly=True)
+    city = fields.Char(related='place_city_name', store=True, string="شهر", readonly=True)
     kind = fields.Selection([
         ('cafe', "کافه"), ('restaurant', "رستوران"),
         ('bakery', "نانوایی/قنادی"), ('other', "دیگر"),

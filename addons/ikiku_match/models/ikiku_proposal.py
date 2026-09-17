@@ -14,6 +14,23 @@ from odoo.exceptions import UserError
 
 from odoo.addons.ikiku_base.models.jalali import format_jalali, to_fa_digits
 
+# How close counts, since 2026-09-18. The place tree is finer than a province, so nearness is
+# read off it in steps a person can check on a map, from "the same part of town" down to "the
+# same province". Everything coarser than a province is a different province and scores zero.
+# A step is a number, not a distance in kilometres, because a person judges a commute by the
+# parts of the city it crosses and not by how far apart two points are.
+NEARNESS = (
+    ('same_place', 1.0, "همان جا"),
+    ('same_area', 0.9, "همان محله یا منطقه"),
+    ('neighbouring_area', 0.8, "محلهٔ همسایه"),
+    ('same_city', 0.7, "همان شهر"),
+    ('same_province', 0.45, "همان استان"),
+    ('can_relocate', 0.4, "امکانِ جابه‌جایی دارد"),
+    ('far', 0.0, "جای دیگر"),
+)
+NEARNESS_VALUE = {key: value for key, value, _label in NEARNESS}
+NEARNESS_LABEL = {key: label for key, _value, label in NEARNESS}
+
 # The published weights. Changing one is a visible change to a public rule.
 W_COMPETENCY = 3.0
 W_HISTORY = 2.0
@@ -59,6 +76,31 @@ class IkikuProposal(models.Model):
 
     # ---------------------------------------------------------------- scoring
     @api.model
+    def _nearness(self, demand, availability):
+        """How near this person's place is to the work's, as one of the published steps.
+
+        Read from the place tree, in order, and the first that is true wins. «محلهٔ همسایه»
+        is the graph rather than the tree: two neighbourhoods either side of one street are
+        neighbours, and their districts are not, so a tree alone would call that far."""
+        if not availability:
+            return 'far'
+        here, there = availability.place_id, demand.place_id
+        if here and there:
+            if here == there:
+                return 'same_place'
+            area_here = here.place_of_kinds(('neighbourhood', 'district'))
+            area_there = there.place_of_kinds(('neighbourhood', 'district'))
+            if area_here and area_here == area_there:
+                return 'same_area'
+            if area_here and area_there and area_there in area_here.neighbour_ids:
+                return 'neighbouring_area'
+            if availability.place_city_id and availability.place_city_id == demand.place_city_id:
+                return 'same_city'
+        if availability.province_id and availability.province_id == demand.province_id:
+            return 'same_province'
+        return 'can_relocate' if availability.can_relocate else 'far'
+
+    @api.model
     def _score(self, demand, resource, availability):
         position = demand.position_id
         required = position.required_node_ids
@@ -78,12 +120,8 @@ class IkikuProposal(models.Model):
 
         standing = W_STANDING * (resource.standing / 5.0)
 
-        if availability and availability.province_id == demand.province_id:
-            proximity_raw = 1.0
-        elif availability and availability.can_relocate:
-            proximity_raw = 0.5
-        else:
-            proximity_raw = 0.0
+        nearness = self._nearness(demand, availability)
+        proximity_raw = NEARNESS_VALUE[nearness]
         proximity = W_PROXIMITY * proximity_raw
 
         season = W_SEASON * min(demand.season_factor or 1.0, 2.0) / 2.0
@@ -100,8 +138,7 @@ class IkikuProposal(models.Model):
                to_fa_digits(round(resource.standing, 2))),
             "نزدیکی: %s از %s — %s."
             % (to_fa_digits(round(proximity, 2)), to_fa_digits(W_PROXIMITY),
-               "همان استان" if proximity_raw == 1.0
-               else ("امکانِ جابه‌جایی دارد" if proximity_raw else "استانِ دیگر")),
+               NEARNESS_LABEL[nearness]),
             "فصل: %s از %s — ضریبِ تقاضا %s."
             % (to_fa_digits(round(season, 2)), to_fa_digits(W_SEASON),
                to_fa_digits(round(demand.season_factor or 1.0, 2))),

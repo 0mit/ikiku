@@ -8,6 +8,13 @@ from odoo.tests import HttpCase, tagged
 
 from odoo.addons.ikiku_portal.controllers import help as help_controller
 
+
+def place(env, name, kind='city'):
+    """A place from place_ir, by name. Tests say «تهران» and «کرج», not an xmlid nobody reads."""
+    found = env['place.node'].sudo().search([('kind', '=', kind), ('name', '=', name)], limit=1)
+    assert found, "place_ir has no %s called %s" % (kind, name)
+    return found
+
 TOKEN = re.compile(r'name="csrf_token" value="([^"]+)"')
 
 
@@ -22,7 +29,8 @@ class TestFlows(HttpCase):
                                                   'password': 'flow-worker-pass-1', 'group_ids': [(6, 0, [portal.id])]})
         cls.owner = cls.env['res.users'].create({'name': "مریم", 'login': 'flow-owner',
                                                  'password': 'flow-owner-pass-1', 'group_ids': [(6, 0, [portal.id])]})
-        cls.tehran = cls.env.ref('ikiku_base.province_te')
+        cls.tehran = place(cls.env, "تهران")
+        cls.karaj = place(cls.env, "کرج")
         cls.full = cls.env.ref('ikiku_base.work_type_full_time')
         cls.shift = cls.env.ref('ikiku_base.work_type_per_shift')
 
@@ -38,11 +46,13 @@ class TestFlows(HttpCase):
     def test_a_worker_answers_one_question_per_screen(self):
         self.authenticate('flow-worker', 'flow-worker-pass-1')
         self.goes_to(self.url_open('/join', allow_redirects=False), '/join/where')
-        where = self.post('/join/where', {'city': "کرج"})
-        self.assertEqual(where.status_code, 200)
-        self.assertIn("استان رو انتخاب کنید.", where.text)
-        self.assertIn('value="کرج"', where.text, "what was typed stays")
-        self.goes_to(self.post('/join/where', {'province_id': str(self.tehran.id), 'city': "کرج"}), '/join/skills')
+        nowhere = self.post('/join/where', {'place_q': "ژژژژ"})
+        self.assertEqual(nowhere.status_code, 200)
+        self.assertIn("این جا رو پیدا نکردم", nowhere.text)
+        self.assertIn('value="ژژژژ"', nowhere.text, "what was typed stays")
+        # A city typed by name, with nothing picked: the server finds it and moves on.
+        self.goes_to(self.post('/join/where', {'place_q': "کرج"}), '/join/skills')
+        self.assertEqual(self.worker.partner_id.ikiku_city, "کرج")
         tiles = self.url_open('/join/skills').text
         self.assertIn(self.env.ref('ikiku_base.spec_dishwashing').plain_label, tiles)
         self.assertNotIn("شیفت صبح", tiles, "shifts are not skills")
@@ -66,7 +76,7 @@ class TestFlows(HttpCase):
         me = self.url_open('/me').text
         self.assertIn("ثبت شد. تیمِ ایکیکو نگاهش می‌کنه", me)
         self.assertIn("بدون پایان", me)
-        self.goes_to(self.post('/join/where?edit=1', {'province_id': str(self.tehran.id), 'city': "تهران",
+        self.goes_to(self.post('/join/where?edit=1', {'place_id': str(self.tehran.id),
                                                       'edit': '1'}), '/me')
 
     def test_a_business_asks_for_people_in_five_taps(self):
@@ -87,7 +97,7 @@ class TestFlows(HttpCase):
         check = self.url_open('/business/need/where').text
         self.assertIn(waiter.plain_label, check)
         self.assertIn("اسمِ مجموعه‌تون دیده نمیشه", check)
-        saved = self.post('/business/need/where', {'province_id': str(self.tehran.id), 'city': "تهران"})
+        saved = self.post('/business/need/where', {'place_id': str(self.tehran.id)})
         demand = self.env['ikiku.demand'].search([('business_id.name', '=', "کافه نارنج")])
         self.goes_to(saved, '/business/need/%d' % demand.id)
         self.assertEqual((demand.seats, demand.work_type_id, demand.city, demand.state), (2, self.shift, "تهران", 'open'))
@@ -121,8 +131,11 @@ class TestFlows(HttpCase):
         self.assertIn('/ku?node=%d' % self.env.ref('ikiku_base.spec_waiter').id, home)
         self.authenticate('flow-worker', 'flow-worker-pass-1')
         self.url_open('/join')
-        self.assertIn('<datalist id="ikiku-cities">', self.url_open('/join/where').text)
-        self.assertIn('value="تهران"', self.url_open('/join/where').text)
+        self.assertIn('data-suggest-url="/places/suggest"', self.url_open('/join/where').text)
+        self.worker.partner_id.place_id = self.tehran
+        where = self.url_open('/join/where').text
+        self.assertIn('value="تهران"', where, "the box opens on where they already are")
+        self.assertIn("الان: تهران", where, "and says which تهران that is")
 
     def test_old_addresses_move_permanently(self):
         response = self.url_open('/ikiku/jobs?province=5', allow_redirects=False)

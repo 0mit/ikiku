@@ -58,7 +58,7 @@ class IkikuPublic(http.Controller):
         province_id = int(province) if province.isascii() and province.isdigit() else None
         return request.render('ikiku_portal.public_jobs', {
             'jobs': request.env['ikiku.demand'].ikiku_public_open(province_id=province_id),
-            'provinces': request.env['ikiku.province'].sudo().search([]),
+            'provinces': request.env['place.node'].sudo().search([('kind', '=', 'province')]),
             'province_id': province_id,
         })
 

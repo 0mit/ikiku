@@ -16,6 +16,9 @@ PUBLIC_DISPLAY = [
     ('work_type', 'work_type_id', lambda d: d.work_type_id.name or ''),
     ('province', 'province_id', lambda d: d.province_id.name or ''),
     ('city', 'city', lambda d: d.city or ''),
+    # Where the work is, as fine as this record may say it: place_public_id is the
+    # neighbourhood of a need whose place is a street (place.located decides, not this line).
+    ('place', 'place_public_id', lambda d: d.place_public_id.path or ''),
     ('date_start_fa', 'date_start', lambda d: d.date_start_fa),
     ('date_end_fa', 'date_end', lambda d: d.date_end_fa),
 ]
