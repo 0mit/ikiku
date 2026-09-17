@@ -22,6 +22,8 @@ _logger = logging.getLogger(__name__)
 
 SCAN_LIMIT = 5000   # below this many records in the domain, a miss in SQL is re-checked in full
 PREFIX = 3          # letters of a word kept when looking for a word that was mistyped
+CANDIDATE_LIMIT = 1500   # most rows ever read for one query, whatever the query matches
+SHORTLIST = 60      # rows ranked in full when there are more candidates than that
 
 
 class SearchSuggestMixin(models.AbstractModel):
@@ -120,15 +122,26 @@ class SearchSuggestMixin(models.AbstractModel):
         if not widen:
             attempts = [self._suggest_head_of(query) or self._suggest_any_of(words)]
         else:
+            # From what is called this, out to what merely contains these letters. Each is
+            # wider and dearer than the last, and a wider one is only asked when the tighter
+            # came back with less than the asker wanted.
             attempts = []
+            everything = words + ([compact] if compact not in words else [])
             if len(words) > 1:
-                attempts.append(self._suggest_all_of(words))    # every word, as typed
-            attempts.append(self._suggest_any_of(words + ([compact] if compact not in words else [])))
+                attempts.append(self._suggest_all_of(words, how='whole'))
+            attempts.append(self._suggest_any_of(everything, how='whole'))
+            if len(words) > 1:
+                attempts.append(self._suggest_all_of(words, how='start'))
+            attempts.append(self._suggest_any_of(everything, how='start'))
             if prefixes:
-                attempts.append(self._suggest_any_of(prefixes))  # first letters only: for typos
+                attempts.append(self._suggest_any_of(prefixes, how='start'))   # for typos
+            # Last: the letters anywhere, even inside a word. The only attempt that can find a
+            # `compact` match inside a longer word, and the only one whose cost does not fall
+            # with how much of the query was typed -- so it is asked last.
+            attempts.append(self._suggest_any_of(everything, how='anywhere'))
         candidates, results = self.browse(), []
         for attempt in attempts:
-            found = self.search(domain + attempt, order=order)
+            found = self.search(domain + attempt, order=order, limit=CANDIDATE_LIMIT)
             if len(found) <= len(candidates):
                 continue
             candidates = found
@@ -158,21 +171,82 @@ class SearchSuggestMixin(models.AbstractModel):
         return (['|'] * (len(pieces) - 1)) + pieces
 
     @api.model
-    def _suggest_all_of(self, pieces):
-        return [('suggest_index', 'ilike', piece) for piece in pieces]
+    def _suggest_whole_word(self, piece):
+        """A piece as a COMPLETE word of the index: «کاخ», not «کاخک».
+
+        This is the first thing worth asking, and it is the cheapest: it separates the rows
+        that are called this from the many more that merely begin this way, so what comes
+        back is small enough to rank in full and already the best of what there is."""
+        return ['|', '|', '|',
+                ('suggest_index', '=ilike', piece),
+                ('suggest_index', '=ilike', '%s %%' % piece),
+                ('suggest_index', '=ilike', '%% %s' % piece),
+                ('suggest_index', '=ilike', '%% %s %%' % piece)]
 
     @api.model
-    def _suggest_any_of(self, pieces):
+    def _suggest_word_start(self, piece):
+        """A piece at the START of a word of the index -- the only place it can earn a score.
+
+        Every match kind above `typo` requires the query to begin a word (see tools/text.py),
+        so a row that merely contains the letters inside a longer word was read, ranked and
+        thrown away. On a small table nobody notices; on a hundred thousand places, «ته»
+        matched tens of thousands of rows and took seconds to answer. The index stores each
+        text spaced and compact, and both forms start a word, so nothing findable is lost."""
+        return ['|', ('suggest_index', '=ilike', '%s%%' % piece),
+                     ('suggest_index', '=ilike', '%% %s%%' % piece)]
+
+    @api.model
+    def _suggest_terms(self, piece, how):
+        if how == 'whole':
+            return self._suggest_whole_word(piece)
+        if how == 'start':
+            return self._suggest_word_start(piece)
+        return [('suggest_index', 'ilike', piece)]      # anywhere, even inside a word
+
+    @api.model
+    def _suggest_all_of(self, pieces, how='start'):
+        domain = []
+        for piece in [piece for piece in pieces if piece]:
+            domain += self._suggest_terms(piece, how)
+        return domain
+
+    @api.model
+    def _suggest_any_of(self, pieces, how='start'):
         pieces = [piece for piece in pieces if piece]
-        return (['|'] * (len(pieces) - 1)) + self._suggest_all_of(pieces) if pieces else []
+        if not pieces:
+            return []
+        parts = [self._suggest_terms(piece, how) for piece in pieces]
+        return (['|'] * (len(parts) - 1)) + [term for part in parts for term in part]
 
     @api.model
     def _suggest_rank(self, query, records, limit, boost=None):
-        by_id = {record.id: record for record in records}
+        # The boost is worked out BEFORE the shortlist and used by it: the whole point of
+        # «the city you are already in» is that it decides between rows of the same name, and
+        # a shortlist that could not see it would throw the right one away first.
         factors = self._suggest_boost_factors(records, boost)
+        records = self._suggest_shortlist(query, records, limit, factors)
+        by_id = {record.id: record for record in records}
         ranked = suggest_text.rank(query, ((record.id, record._suggest_texts()) for record in records),
                                    limit, boost=factors.get if factors else None)
         return [dict(result, record=by_id[result.pop('key')]) for result in ranked]
+
+    @api.model
+    def _suggest_shortlist(self, query, records, limit, factors=None):
+        """The records worth ranking properly, when there are too many to rank properly.
+
+        The full ranking reads every text about a record -- its names, its aliases, the names
+        above it. The stored index already holds all of that as one string, so a first pass
+        over the index alone puts the plausible rows in front for the price of one query. It
+        decides nothing: the scores that are returned all come from the full pass.
+        """
+        if len(records) <= max(SHORTLIST, limit):
+            return records
+        records.fetch(['suggest_index'])
+        ranked = suggest_text.rank(
+            query, ((record.id, [('suggest_index', 1.0, record.suggest_index or '')])
+                    for record in records), max(SHORTLIST, limit),
+            boost=factors.get if factors else None)
+        return records.browse([result['key'] for result in ranked])
 
     @api.model
     def _suggest_boost_factors(self, records, boost):

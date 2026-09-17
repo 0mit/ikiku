@@ -21,7 +21,11 @@ SUGGEST_LIMIT = 8
 KINDS = {
     'city': ('city', 'village', 'province'),
     'area': ('neighbourhood', 'district', 'city', 'village'),
-    'all': None,
+    # Everything a person could mean by «کجا» -- which leaves out the layers nobody says. A
+    # county is in the tree because cities hang off it, and «شهرستان دماوند» is not an answer
+    # to «where is your café»: offering it would also read oddly, since an unsaid place's path
+    # is the path of what is above it.
+    'all': ('street', 'neighbourhood', 'district', 'city', 'village', 'province'),
 }
 
 

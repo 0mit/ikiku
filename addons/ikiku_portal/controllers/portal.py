@@ -56,6 +56,8 @@ def _form_list(name):
 
 # What a person may say about where they live: a city, and nothing finer (بند ۷).
 CITY_KINDS = ('city', 'village', 'province')
+# What a café may say: down to its street. Not a county -- cities hang off one, nobody says one.
+PLACE_KINDS = ('street', 'neighbourhood', 'district', 'city', 'village', 'province')
 
 class IkikuPortal(http.Controller):
 
@@ -117,7 +119,7 @@ class IkikuPortal(http.Controller):
                     return None, typed, Place.browse(), "این کد پستی رو نمی‌شناسم؛ اسمِ جا رو بنویسید."
         if not chosen and typed:
             within = (previous or Place.browse()).place_of_kinds(('city', 'village')) if previous else None
-            found = Place.suggest_places(typed, kinds=CITY_KINDS if city_only else None,
+            found = Place.suggest_places(typed, kinds=CITY_KINDS if city_only else PLACE_KINDS,
                                          within=within, limit=self.PLACE_CANDIDATES)
             places, scores = [], []
             for result in found:
