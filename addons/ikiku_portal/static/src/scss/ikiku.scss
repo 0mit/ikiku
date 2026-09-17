@@ -558,7 +558,8 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   &__roles--start { justify-content: flex-start; margin-block: .5rem 1rem; }
   &__search { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: end; margin-block: 1rem 1.5rem; }
   &__search .ikiku__label { grid-column: 1 / -1; margin: 0; }
-  &__search .ikiku__secondary { margin-top: 0; }
+  // The button fills the row, so it is exactly as tall as the input beside it.
+  &__search .ikiku__secondary { margin-top: 0; align-self: stretch; }
   &__knowledge { list-style: none; padding: 0; margin-block: .5rem; display: grid; gap: .6rem; }
   &__knowledge li { line-height: 1.8; }
   &__knowledge p { margin: .1rem 0 0; font-size: .92rem; }
