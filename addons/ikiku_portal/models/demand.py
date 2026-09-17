@@ -4,6 +4,9 @@ from odoo import api, models
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
 
 OPEN_STATES = ('open', 'proposed')
+# Skill chips on an open-job card (2026-09-17): the need's own required skills first, then the
+# role's core skills from the standard, at most this many; the rest are on the role's page.
+CARD_SKILLS = 4
 ROLE_SHORTCUTS = ('spec_dishwashing', 'spec_barista', 'spec_line_cook', 'spec_waiter')
 
 # What an open-job card can show, each tied to the field whose visibility row decides
@@ -36,8 +39,19 @@ class IkikuDemand(models.Model):
         if province_id:
             domain.append(('province_id', '=', province_id))
         out = []
+        hidden = set(self.env['ikiku.spec.node'].sudo().ikiku_hidden_ids())
         for demand in self.sudo().search(domain, order='date_start, id', limit=limit):
-            values = {'position': demand.position_id.spec_node_id.name or ''}
+            node = demand.position_id.spec_node_id
+            values = {'position': node.name or ''}
+            # The standard is public: the role and its skills link into /roles and /skills, the
+            # knowledge base. Nothing here reaches the business.
+            if node.kind == 'role' and node.id not in hidden:
+                values['position_url'] = '/roles/%s' % node.code
+                skills = demand.position_id.required_node_ids.filtered(lambda n: n.kind == 'competency')
+                skills |= node.requirement_ids.filtered(lambda r: r.importance == 'core').mapped('skill_id')
+                skills = skills.filtered(lambda n: n.id not in hidden)
+                values['skills'] = [(s.plain_label or s.name, '/skills/%s' % s.code) for s in skills[:CARD_SKILLS]]
+                values['more_skills'] = len(node.requirement_ids) > len(values['skills'])
             for key, field_name, getter in PUBLIC_DISPLAY:
                 if policy.get(field_name) == 'public':
                     values[key] = getter(demand)

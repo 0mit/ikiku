@@ -5,6 +5,8 @@ from odoo import fields
 from odoo.tests import HttpCase, tagged
 
 PUBLIC_KEYS = {'position', 'seats', 'work_type', 'province', 'city', 'date_start_fa', 'date_end_fa'}
+# Links into the public standard (the role's page and its skills), never values of the need itself.
+STANDARD_KEYS = {'position_url', 'skills', 'more_skills'}
 
 
 @tagged('post_install', '-at_install')
@@ -35,7 +37,7 @@ class TestSite(HttpCase):
     def test_open_jobs_are_plain_public_values(self):
         jobs = self.env['ikiku.demand'].ikiku_public_open()
         self.assertEqual(sorted(job['seats'] for job in jobs), ['۲', '۳'])
-        self.assertTrue(all(set(job) == PUBLIC_KEYS for job in jobs))
+        self.assertTrue(all(set(job) == PUBLIC_KEYS | STANDARD_KEYS for job in jobs))
         self.assertTrue(all(job['position'] == self.node.name for job in jobs))
         self.assertEqual(self.env['ikiku.demand'].ikiku_public_open_count(), 2)
 
@@ -73,3 +75,25 @@ class TestSite(HttpCase):
             page = self.url_open(url).text
             self.assertIn('<title>%s | %s</title>' % (title, website.name), page, url)
             self.assertNotIn('<title>ایکیکو —', page, url)
+
+    def test_job_cards_link_the_role_and_its_skills_into_the_knowledge_base(self):
+        jobs = self.env['ikiku.demand'].ikiku_public_open()
+        job = jobs[0]
+        self.assertEqual(job['position_url'], '/roles/%s' % self.node.code)
+        self.assertTrue(job['skills'])
+        self.assertLessEqual(len(job['skills']), 4)
+        core = self.node.requirement_ids.filtered(lambda r: r.importance == 'core').mapped('skill_id')
+        self.assertIn('/skills/%s' % core[0].code, [url for _label, url in job['skills']])
+        for url in ('/jobs', '/'):
+            page = self.url_open(url).text
+            self.assertIn('href="/roles/%s"' % self.node.code, page, url)
+            self.assertIn('href="/skills/', page, url)
+        self.assertNotIn(self.business.name, self.url_open('/jobs').text, "still never the business")
+        # A role a country rule withholds is shown by name only, with no links.
+        rule = self.env['ikiku.spec.country.rule'].create({
+            'node_id': self.node.id, 'country_id': self.env['ikiku.spec.node'].ikiku_country().id,
+            'offered': False, 'reason': "test"})
+        withheld = self.env['ikiku.demand'].ikiku_public_open()[0]
+        self.assertNotIn('position_url', withheld)
+        rule.unlink()
+

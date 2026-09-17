@@ -132,13 +132,19 @@
             <span t-if="job.get('seats')" class="ikiku__job-seats"><t t-out="job['seats']"/> نفر لازمه</span>
             <span t-if="job.get('work_type')" class="ikiku__job-type" t-out="job['work_type']"/>
           </div>
-          <h3 t-out="job['position']"/>
+          <h3><a t-if="job.get('position_url')" t-att-href="job['position_url']" t-out="job['position']"/>
+            <t t-else="" t-out="job['position']"/></h3>
           <p class="ikiku__job-where">
             <t t-out="job.get('province')"/><t t-if="job.get('city')">، <t t-out="job['city']"/></t></p>
           <p t-if="job.get('date_start_fa')" class="ikiku__job-when">
             از <span t-out="job['date_start_fa']"/>
             <t t-if="job.get('date_end_fa') == 'بدون پایان'"> · بدون پایان</t>
             <t t-else=""> تا <span t-out="job.get('date_end_fa')"/></t></p>
+          <nav t-if="job.get('skills')" class="ikiku__job-skills" aria-label="مهارت‌های این کار">
+            <a t-foreach="job['skills']" t-as="skill" class="ikiku__role" t-att-href="skill[1]" t-out="skill[0]"/>
+            <a t-if="job.get('more_skills')" class="ikiku__job-more" t-att-href="job['position_url']">
+              همه‌ی مهارت‌ها</a>
+          </nav>
         </article>
       </t>
     </div>

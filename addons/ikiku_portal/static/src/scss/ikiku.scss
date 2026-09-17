@@ -574,3 +574,12 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
 
 // Sub-family headings inside «کارهای دیگه» (2026-09-17).
 .ikiku__subgroup { margin-block: 1rem .4rem; color: var(--ik-ink-2); }
+
+// Skill chips on open-job cards, linking into the knowledge base (2026-09-17).
+.ikiku {
+  &__job h3 a { color: inherit; text-decoration: none; }
+  &__job h3 a:hover { color: var(--ik-blue); text-decoration: underline; }
+  &__job-skills { display: flex; flex-wrap: wrap; gap: .35rem; margin-block-start: .75rem; align-items: center; }
+  &__job-skills .ikiku__role { min-block-size: 2.25rem; padding-inline: .7rem; font-size: .88rem; }
+  &__job-more { font-size: .88rem; font-weight: 700; }
+}
