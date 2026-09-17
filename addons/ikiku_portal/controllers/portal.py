@@ -139,6 +139,10 @@ class IkikuPortal(http.Controller):
             return None, typed, Place.browse(), "بنویسید کجا."
         if city_only:
             chosen = chosen.place_of_kinds(CITY_KINDS) or chosen
+        else:
+            # They gave a code AND a place: that is somebody telling us which area a prefix
+            # belongs to, which is the only way this table learns. The code is not kept.
+            request.env['place.postcode'].sudo().learn(post.get('postcode') or '', chosen)
         return chosen, (typed if typed and typed != chosen.name else ''), Place.browse(), None
 
     def _place_values(self, place, typed='', candidates=None, error=None, city_only=False):

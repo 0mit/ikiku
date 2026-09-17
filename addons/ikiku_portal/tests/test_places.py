@@ -126,6 +126,22 @@ class TestNearness(TransactionCase):
 
 
 @tagged('post_install', '-at_install')
+class TestPostCodeLearning(HttpCase):
+    """A café that gives a code and confirms a place teaches the table what that prefix means."""
+
+    def test_a_confirmed_place_with_a_code_is_learned_and_the_code_is_not_kept(self):
+        Postcode = self.env['place.postcode']
+        university = place(self.env, "دانشگاه تهران", 'neighbourhood')
+        self.assertFalse(Postcode.search([('prefix', '=', '14167')]))
+        # The controller's own step, which is what the need form calls on every save.
+        Postcode.learn("1416753955", university)
+        Postcode.learn("۱۴۱۶۷-۵۳۹۵۵", university)
+        learned = Postcode.search([('prefix', '=', '14167')])
+        self.assertEqual((learned.place_id, learned.source, learned.hits), (university, 'learned', 2))
+        self.assertEqual(len(learned.prefix), 5)
+
+
+@tagged('post_install', '-at_install')
 class TestPlaceSuggestPage(HttpCase):
 
     def test_the_suggest_endpoint_answers_anybody_and_says_where_each_place_is(self):
