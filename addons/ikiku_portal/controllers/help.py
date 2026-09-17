@@ -96,6 +96,7 @@ class IkikuHelp(http.Controller):
             values.update({
                 'resend_minutes': to_fa_digits(int(mobile_challenge.RESEND_AFTER.total_seconds() // 60)),
                 'per_hour': to_fa_digits(mobile_challenge.MAX_SENDS_PER_HOUR),
+                'wrong_per_day': to_fa_digits(mobile_challenge.MAX_WRONG_PER_DAY),
                 'code_ttl': mobile_challenge.duration_text(mobile_challenge.CODE_TTL),
                 'code_digits': to_fa_digits(mobile_challenge.CODE_DIGITS),
             })

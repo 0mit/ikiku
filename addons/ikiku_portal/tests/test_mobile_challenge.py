@@ -72,6 +72,38 @@ class TestMobileChallenge(OtpSetup, TransactionCase):
         self.assertEqual(challenge.check('123456'), 'expired')
         self.assertFalse(self.partner.ikiku_mobile)
 
+    def test_twenty_wrong_codes_a_day_lock_the_number(self):
+        from odoo.addons.ikiku_portal.models import mobile_challenge
+        wrong = 0
+        while wrong < mobile_challenge.MAX_WRONG_PER_DAY:
+            challenge, error = self.start(force=True)
+            self.assertFalse(error, "a new code while under the limit")
+            self.send_queued()
+            for _i in range(mobile_challenge.MAX_TRIES - 1):
+                if wrong >= mobile_challenge.MAX_WRONG_PER_DAY:
+                    break
+                result = challenge.check('000000')
+                wrong += 1
+            if result != 'locked':
+                challenge.state = 'expired'   # as if the person asked for another code later
+        self.assertEqual(result, 'locked')
+        self.assertTrue(self.Challenge._locked(MOBILE))
+        _none, error = self.start(force=True)
+        self.assertEqual(error, 'locked', "no new SMS for a locked number")
+        self.assertEqual(self.Challenge.start(self.other, MOBILE, force=True)[1], 'locked', "from any account")
+        # The right code of a live challenge is refused too while locked.
+        live = self.Challenge.create({'partner_id': self.partner.id, 'purpose': 'verify', 'mobile': MOBILE,
+                                      'code_hash': self.Challenge._hash('123456'), 'state': 'sent',
+                                      'sent_at': fields.Datetime.now(),
+                                      'expires_at': fields.Datetime.now() + timedelta(hours=1)})
+        self.assertEqual(live.check('123456'), 'locked')
+        self.assertFalse(self.partner.ikiku_mobile)
+        # A day later the number is free again.
+        self.Challenge.search([('mobile', '=', MOBILE)]).write(
+            {'last_wrong_at': fields.Datetime.now() - timedelta(hours=25)})
+        self.assertFalse(self.Challenge._locked(MOBILE))
+        self.assertFalse(self.start(force=True)[1])
+
     def test_code_runs_out(self):
         challenge, _error = self.start()
         self.send_queued()

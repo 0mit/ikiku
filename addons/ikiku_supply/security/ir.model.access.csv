@@ -7,4 +7,3 @@ access_resume_line_portal,resume line own,model_ikiku_resume_line,ikiku_base.gro
 access_resume_line_staff,resume line staff,model_ikiku_resume_line,ikiku_base.group_ikiku_staff,1,1,1,0
 access_availability_portal,availability own,model_ikiku_availability,ikiku_base.group_ikiku_resource,1,0,0,0
 access_availability_staff,availability staff,model_ikiku_availability,ikiku_base.group_ikiku_staff,1,1,1,0
-access_availability_business,availability business read,model_ikiku_availability,ikiku_base.group_ikiku_business,1,0,0,0

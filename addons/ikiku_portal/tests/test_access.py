@@ -73,9 +73,12 @@ class TestPortalAccess(TransactionCase):
         with self.assertRaises(AccessError):
             self.other_need.with_user(self.worker).write({'seats': 9})
 
-    def test_business_reads_but_never_writes_availability(self):
+    def test_business_never_reads_availability(self):
         availability = self.worker_availability.with_user(self.owner)
-        self.assertTrue(availability.read(['date_start']))
+        with self.assertRaises(AccessError):
+            availability.read(['date_start'])
+        with self.assertRaises(AccessError):
+            self.env['ikiku.availability'].with_user(self.owner).search([])
         with self.assertRaises(AccessError):
             availability.write({'city': "جای دیگر"})
         with self.assertRaises(AccessError):

@@ -42,6 +42,12 @@ CODE_DIGITS = 6
 # who comes back tomorrow, can still use the last code instead of paying for a new one.
 CODE_TTL = timedelta(hours=24)
 MAX_TRIES = 5
+# Wrong codes a number may take across all its codes in a day (2026-09-17). Five tries per code
+# alone let a guesser ask for code after code; at 20 wrong a day the odds of guessing a six-digit
+# code stay below 1 in 50,000 a day. The number's owner is locked out too until the day passes,
+# and is told how to get a call back.
+MAX_WRONG_PER_DAY = 20
+WRONG_WINDOW = timedelta(hours=24)
 RESEND_AFTER = timedelta(seconds=60)
 MAX_SENDS_PER_HOUR = 10
 WAIT_LIMIT = timedelta(minutes=2)
@@ -81,6 +87,8 @@ MESSAGES = {
     'mobile': "این شماره درست نیست. باید ۱۱ رقم باشه و با ۰۹ شروع بشه. مثلِ ۰۹۱۲۱۲۳۴۵۶۷",
     'staff': "این شماره مالِ حسابِ تیمِ ایکیکوست. از «ورود با ایمیل» وارد بشید.",
     'session': "این صفحه کهنه شده. شماره رو دوباره بنویسید.",
+    'locked': "برای این شماره امروز چند بار کدِ اشتباه زده شد، پس تا فردا کدی قبول نمی‌کنیم. اگه خودتون بودید، "
+              "فردا دوباره امتحان کنید یا بگید باهاتون تماس بگیریم.",
     'staff_here': "این شماره مالِ حسابِ تیمِ ایکیکوست. پایینِ همین صفحه با ایمیل و رمز وارد بشید.",
     'login_is_mobile': "اگه با شماره موبایل ثبت‌نام کردید، رمز ندارید: بالای همین صفحه کدِ پیامک بخواید.",
 }
@@ -112,6 +120,8 @@ class IkikuMobileChallenge(models.Model):
     code_hash = fields.Char(required=True, groups='base.group_system')
     pending_code = fields.Char(groups='base.group_system')
     tries = fields.Integer("تلاش‌ها", default=0)
+    wrong_count = fields.Integer("کدهای اشتباه", default=0, readonly=True)
+    last_wrong_at = fields.Datetime("آخرین کدِ اشتباه", readonly=True)
     queued_at = fields.Datetime("درخواست", required=True, default=fields.Datetime.now)
     sent_at = fields.Datetime("ارسال")
     expires_at = fields.Datetime("انقضا")
@@ -186,6 +196,8 @@ class IkikuMobileChallenge(models.Model):
         ikiku_reused in its context so the page can say so. A forced resend replaces it,
         so only the last code ever works."""
         now = fields.Datetime.now()
+        if self._locked(mobile):
+            return self.browse(), 'locked'
         if not force:
             reusable = self._reusable(partner, mobile)
             if reusable:
@@ -266,6 +278,15 @@ class IkikuMobileChallenge(models.Model):
             'resend_in': max(0, int(resend_in.total_seconds())),
         }
 
+    @api.model
+    def _locked(self, mobile):
+        """True when `mobile` took MAX_WRONG_PER_DAY wrong codes in the last day, whichever codes
+        and browsers they came from."""
+        since = fields.Datetime.now() - WRONG_WINDOW
+        groups = self.sudo()._read_group([('mobile', '=', mobile), ('last_wrong_at', '>=', since)],
+                                         aggregates=['wrong_count:sum'])
+        return bool(groups) and (groups[0][0] or 0) >= MAX_WRONG_PER_DAY
+
     def check(self, code):
         """Returns an error key, or False once the code is proven: for `verify` the number
         is then the partner's anchor; for `enter` the controller calls _issue_login."""
@@ -276,9 +297,16 @@ class IkikuMobileChallenge(models.Model):
         if self.tries >= MAX_TRIES:
             self.state = 'expired'
             return 'tries'
+        if self._locked(self.mobile):
+            # Even the right code: a guesser who got lucky on the 21st try must not get in.
+            return 'locked'
         self.tries += 1
         typed = ''.join(ch for ch in to_latin_digits(code or '') if ch.isascii() and ch.isdigit())
         if not hmac.compare_digest(self.code_hash, self._hash(typed)):
+            self.write({'wrong_count': self.wrong_count + 1, 'last_wrong_at': fields.Datetime.now()})
+            if self._locked(self.mobile):
+                self.state = 'expired'
+                return 'locked'
             if self.tries >= MAX_TRIES:
                 self.state = 'expired'
                 return 'tries'

@@ -13,14 +13,10 @@
       <field name="domain_force">[('resource_id.partner_id', '=', user.partner_id.id)]</field>
       <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_resource'))]"/>
     </record>
-    <!-- بند ۷: a business may see availability windows, and only of ACTIVE
-         resources. It never reaches the person's contact details. -->
-    <record id="rule_availability_business" model="ir.rule">
-      <field name="name">در دسترس بودن: کسب‌وکارِ تأییدشده</field>
-      <field name="model_id" ref="model_ikiku_availability"/>
-      <field name="domain_force">[('resource_id.state', '=', 'active')]</field>
-      <field name="groups" eval="[(4, ref('ikiku_base.group_ikiku_business'))]"/>
-    </record>
+    <!-- A business account reads no worker's availability (2026-09-17): no portal page needs it, and
+         the old rule_availability_business let any account holding a café name read every active
+         worker's dates and city over RPC. Matching reads availability with sudo, and بند ۷ keeps a
+         person's schedule out of reach until they are booked. -->
     <record id="rule_resource_skill_own" model="ir.rule">
       <field name="name">مهارت: فقط نیروی خود</field>
       <field name="model_id" ref="model_ikiku_resource_skill"/>
