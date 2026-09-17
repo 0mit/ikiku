@@ -12,11 +12,16 @@ Translated fields are read in every installed language, so a Persian page finds 
 name and the other way round. `suggest_index` is the folded text of all of it, stored so SQL
 can narrow the candidates before the readable ranking in tools/text.py decides the order.
 """
+import logging
+
 from odoo import api, fields, models
 
 from odoo.addons.search_suggest.tools import text as suggest_text
 
+_logger = logging.getLogger(__name__)
+
 SCAN_LIMIT = 5000   # below this many records in the domain, a miss in SQL is re-checked in full
+PREFIX = 3          # letters of a word kept when looking for a word that was mistyped
 
 
 class SearchSuggestMixin(models.AbstractModel):
@@ -39,10 +44,32 @@ class SearchSuggestMixin(models.AbstractModel):
                 texts.append(suggest_text.compact(value))
             record.suggest_index = ' '.join(t for t in texts if t)
 
+    def init(self):
+        """A trigram index on the stored index, so narrowing stays a lookup as the table grows.
+
+        `ilike '%piece%'` cannot use an ordinary index: on a few hundred rows that is a scan
+        nobody feels, on tens of thousands of places it is the whole query. pg_trgm makes it
+        an index lookup. It is optional on purpose -- a database that will not create the
+        extension keeps working, more slowly, and says so once."""
+        super().init()
+        if self._abstract or not self._auto or not self._fields.get('suggest_index'):
+            return
+        with self.env.cr.savepoint(flush=False):
+            try:
+                self.env.cr.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
+                self.env.cr.execute(
+                    'CREATE INDEX IF NOT EXISTS "%s_suggest_index_trgm" ON "%s" '
+                    'USING gin (suggest_index gin_trgm_ops)' % (self._table, self._table))
+            except Exception as error:
+                _logger.info("search_suggest: no trigram index on %s (%s); search still works.",
+                             self._table, error)
+
     def _suggest_texts(self):
         """(field, weight, text) for this record, every translated field in every installed language."""
         self.ensure_one()
         languages = [code for code, _name in self.env['res.lang'].get_installed()] or [None]
+        if len(languages) == 1:
+            languages = [None]      # the record as it is: no second reading to fetch
         out = []
         for name, weight in self._suggest_fields.items():
             field = self._fields.get(name)
@@ -60,31 +87,99 @@ class SearchSuggestMixin(models.AbstractModel):
         return out
 
     @api.model
-    def suggest(self, query, domain=None, limit=10, order=None):
+    def suggest(self, query, domain=None, limit=10, order=None, boost=None, widen=True):
         """Records for `query`, best first, each with its score and the reason it was found.
-        Equal scores keep `order` (default: the model's own), so a published order breaks ties."""
+        Equal scores keep `order` (default: the model's own), so a published order breaks ties.
+
+        boost: [(domain, factor), ...] for context the asker is already in -- the city they
+        picked, the family they are browsing. A record the domain matches has its score
+        multiplied. It lifts what already matched and never adds a record, so a boosted
+        result is still found for the reason it says.
+
+        widen=False answers from the first, tightest search only -- what a page shows while
+        the rest is still coming, so something true is on the screen in a few milliseconds
+        instead of nothing for a quarter of a second. The scores are the same either way; the
+        wide answer only adds records the tight one could not see."""
         query = (query or '').strip()
         if not suggest_text.spaced(query):
             return []
         domain = list(domain or [])
-        words = [w for w in suggest_text.words(query) if w]
-        narrowing = []
-        for word in words + [suggest_text.compact(query)]:
-            piece = word[:3] if len(word) >= 3 else word
-            if piece:
-                narrowing.append(('suggest_index', 'ilike', piece))
-        candidates = self.search(domain + (['|'] * (len(narrowing) - 1)) + narrowing, order=order) \
-            if narrowing else self.browse()
-        results = self._suggest_rank(query, candidates, limit)
-        if len(results) < limit and self.search_count(domain, limit=SCAN_LIMIT + 1) <= SCAN_LIMIT:
-            # A typo in the first letters escapes the SQL narrowing; small sets are checked in full.
+        words = [word for word in suggest_text.words(query) if word]
+        compact = suggest_text.compact(query)
+        prefixes = [word[:PREFIX] for word in words if len(word) > PREFIX]
+
+        # The tightest search that answers is the one that answers. Each attempt below is
+        # wider than the last, and the ranking is the same in all of them; a wider attempt
+        # only runs when the tighter one came back with less than the asker wanted. This is
+        # what keeps a common word cheap: «تهران» is in tens of thousands of rows, and
+        # nothing ranks all of them for a query that also said «دانشگاه».
+        # The quick answer is a DIFFERENT, cheaper question: which records are NAMED this.
+        # It is never allowed to end a full search, because a record named «کاخ» in another
+        # province must not hide the place in this city that people CALL «کاخ» -- and which
+        # question was asked is the only reason the two answers can differ.
+        if not widen:
+            attempts = [self._suggest_head_of(query) or self._suggest_any_of(words)]
+        else:
+            attempts = []
+            if len(words) > 1:
+                attempts.append(self._suggest_all_of(words))    # every word, as typed
+            attempts.append(self._suggest_any_of(words + ([compact] if compact not in words else [])))
+            if prefixes:
+                attempts.append(self._suggest_any_of(prefixes))  # first letters only: for typos
+        candidates, results = self.browse(), []
+        for attempt in attempts:
+            found = self.search(domain + attempt, order=order)
+            if len(found) <= len(candidates):
+                continue
+            candidates = found
+            results = self._suggest_rank(query, candidates, limit, boost)
+            if len(results) >= limit:
+                return results
+        if widen and len(results) < limit \
+                and self.search_count(domain, limit=SCAN_LIMIT + 1) <= SCAN_LIMIT:
+            # A typo in the first letters escapes every search above; small sets are read whole.
             everything = self.search(domain, order=order)
             if len(everything) > len(candidates):
-                results = self._suggest_rank(query, everything, limit)
+                results = self._suggest_rank(query, everything, limit, boost)
         return results
 
     @api.model
-    def _suggest_rank(self, query, records, limit):
+    def _suggest_head_of(self, query):
+        """The cheapest search worth doing: the fields that ARE the record's name, starting
+        with what was typed. Few rows, an index can find them, and they are the answers a
+        person is least surprised by -- which is why they are shown first and alone."""
+        text = suggest_text.spaced(query)
+        names = [name for name, weight in self._suggest_fields.items()
+                 if weight >= 1.0 and self._fields.get(name)
+                 and self._fields[name].type in ('char', 'text') and self._fields[name].store]
+        pieces = [(name, 'ilike', text + '%') for name in names]
+        if not pieces:
+            return []
+        return (['|'] * (len(pieces) - 1)) + pieces
+
+    @api.model
+    def _suggest_all_of(self, pieces):
+        return [('suggest_index', 'ilike', piece) for piece in pieces]
+
+    @api.model
+    def _suggest_any_of(self, pieces):
+        pieces = [piece for piece in pieces if piece]
+        return (['|'] * (len(pieces) - 1)) + self._suggest_all_of(pieces) if pieces else []
+
+    @api.model
+    def _suggest_rank(self, query, records, limit, boost=None):
         by_id = {record.id: record for record in records}
-        ranked = suggest_text.rank(query, ((record.id, record._suggest_texts()) for record in records), limit)
+        factors = self._suggest_boost_factors(records, boost)
+        ranked = suggest_text.rank(query, ((record.id, record._suggest_texts()) for record in records),
+                                   limit, boost=factors.get if factors else None)
         return [dict(result, record=by_id[result.pop('key')]) for result in ranked]
+
+    @api.model
+    def _suggest_boost_factors(self, records, boost):
+        """id -> factor for the records a boost domain matches. The domains are read in
+        memory against the candidates already found, so a boost costs no second query."""
+        factors = {}
+        for domain, factor in (boost or ()):
+            for record in records.filtered_domain(domain):
+                factors[record.id] = factors.get(record.id, 1.0) * factor
+        return factors

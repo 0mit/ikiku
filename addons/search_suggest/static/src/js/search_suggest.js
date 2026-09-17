@@ -6,7 +6,11 @@
  *     <input type="search" name="q" autocomplete="off"/>
  *   </div>
  *
- * The URL answers GET ?q=… with {"results": [{"id", "label", "detail"?, "url"?}]}.
+ * The URL answers GET ?q=… with {"results": [{"id", "label", "detail"?, "url"?}]}, and
+ * &quick=1 with the tightest, cheapest search only. The full answer is asked for first; if it
+ * has not arrived within QUICK_AFTER milliseconds, the quick one is asked for too and shown
+ * in the meantime, so a slow search puts something true on the screen instead of nothing.
+ * A search that answers quickly is asked once.
  * Choosing a result fires "search-suggest:choose" on the container with the result as
  * detail; unless a listener calls preventDefault(), a result with a url is opened.
  * Without JavaScript the input is an ordinary field of its form, so nothing is lost.
@@ -15,6 +19,7 @@
     "use strict";
 
     const DELAY = 180;
+    const QUICK_AFTER = 70;    // ms to wait for the full answer before showing a partial one
     let counter = 0;
 
     function setup(box) {
@@ -49,7 +54,7 @@
         let results = [];
         let active = -1;
         let timer = null;
-        let controller = null;
+        let controllers = [];
 
         function close() {
             list.hidden = true;
@@ -58,9 +63,9 @@
             active = -1;
         }
 
-        function render(query, items) {
+        function render(query, items, waiting) {
+            const chosen = active >= 0 ? results[active] : null;
             results = items;
-            active = -1;
             list.replaceChildren();
             items.forEach(function (item, index) {
                 const option = document.createElement("li");
@@ -85,9 +90,19 @@
                 list.append(option);
             });
             const template = box.dataset.suggestCount || "{n}";
-            status.textContent = query ? template.replace("{n}", String(items.length)) : "";
+            const more = box.dataset.suggestWaiting || "…";
+            status.textContent = query
+                ? template.replace("{n}", String(items.length)) + (waiting ? " " + more : "")
+                : "";
             list.hidden = !items.length;
+            list.setAttribute("aria-busy", waiting ? "true" : "false");
             input.setAttribute("aria-expanded", items.length ? "true" : "false");
+            // Whatever the person had highlighted stays highlighted, wherever it moved to.
+            const stillThere = chosen ? items.findIndex(function (item) { return item.id === chosen.id; }) : -1;
+            active = -1;
+            if (stillThere >= 0) {
+                highlight(stillThere);
+            }
         }
 
         function highlight(index) {
@@ -116,32 +131,49 @@
             }
         }
 
+        function ask(query, quick) {
+            const controller = new AbortController();
+            controllers.push(controller);
+            const target = url + (url.includes("?") ? "&" : "?") + "q=" + encodeURIComponent(query)
+                + (quick ? "&quick=1" : "");
+            return fetch(target, {signal: controller.signal, credentials: "same-origin",
+                                  headers: {Accept: "application/json"}})
+                .then(function (response) { return response.ok ? response.json() : {results: []}; })
+                .then(function (data) { return Array.isArray(data.results) ? data.results : []; });
+        }
+
         function fetchResults() {
             const query = input.value.trim();
             if (query.length < Number(box.dataset.suggestMin || 1)) {
-                render("", []);
+                render("", [], false);
                 close();
                 return;
             }
             if (cache.has(query)) {
-                render(query, cache.get(query));
+                render(query, cache.get(query), false);
                 return;
             }
-            if (controller) {
-                controller.abort();
-            }
-            controller = new AbortController();
-            const target = url + (url.includes("?") ? "&" : "?") + "q=" + encodeURIComponent(query);
-            fetch(target, {signal: controller.signal, credentials: "same-origin", headers: {Accept: "application/json"}})
-                .then(function (response) { return response.ok ? response.json() : {results: []}; })
-                .then(function (data) {
-                    const items = Array.isArray(data.results) ? data.results : [];
-                    cache.set(query, items);
-                    if (input.value.trim() === query) {
-                        render(query, items);
+            controllers.forEach(function (controller) { controller.abort(); });
+            controllers = [];
+            const current = function () { return input.value.trim() === query; };
+            let full = false;
+            ask(query, false).then(function (items) {
+                full = true;
+                cache.set(query, items);
+                if (current()) {
+                    render(query, items, false);
+                }
+            }).catch(function () { full = true; /* aborted or offline: the form still works */ });
+            setTimeout(function () {
+                if (full || !current()) {
+                    return;             // it was quick enough; one question was enough
+                }
+                ask(query, true).then(function (items) {
+                    if (!full && current()) {
+                        render(query, items, true);   // true so far, and still looking
                     }
-                })
-                .catch(function () { /* aborted or offline: the form still works */ });
+                }).catch(function () { /* the full answer is on its way regardless */ });
+            }, QUICK_AFTER);
         }
 
         input.addEventListener("input", function () {

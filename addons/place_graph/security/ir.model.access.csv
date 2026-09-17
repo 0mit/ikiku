@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_place_node_user,place.node read,model_place_node,base.group_user,1,0,0,0
+access_place_node_editor,place.node editor,model_place_node,place_graph.group_place_editor,1,1,1,1
+access_place_alias_user,place.alias read,model_place_alias,base.group_user,1,0,0,0
+access_place_alias_editor,place.alias editor,model_place_alias,place_graph.group_place_editor,1,1,1,1
+access_place_link_user,place.link read,model_place_link,base.group_user,1,0,0,0
+access_place_link_editor,place.link editor,model_place_link,place_graph.group_place_editor,1,1,1,1
+access_place_postcode_user,place.postcode read,model_place_postcode,base.group_user,1,0,0,0
+access_place_postcode_editor,place.postcode editor,model_place_postcode,place_graph.group_place_editor,1,1,1,1

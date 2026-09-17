@@ -116,12 +116,17 @@ def match(query, text):
     return None, 0.0
 
 
-def rank(query, documents, limit=10):
+def rank(query, documents, limit=10, boost=None):
     """Rank documents for a query.
 
     documents: iterable of (key, [(field, weight, text), ...]); a field may repeat, e.g. one
     text per language or per hint term. Returns [{'key', 'score', 'field', 'match'}] best first;
     ties keep the documents' own order, so a published order survives.
+
+    boost: key -> factor, for what the asker is already inside -- the city they picked, the
+    family they are browsing. It multiplies the score of a document that matched; it never
+    creates a match and never changes which field or kind is reported, so a boosted result
+    still says truthfully why it was found, and says by how much it was lifted.
     """
     results = []
     for position, (key, fields) in enumerate(documents):
@@ -131,7 +136,11 @@ def rank(query, documents, limit=10):
             if kind and (best is None or weight * value > best[0]):
                 best = (weight * value, field, kind)
         if best:
-            results.append((-best[0], position, {'key': key, 'score': round(best[0], 4),
-                                                 'field': best[1], 'match': best[2]}))
+            factor = (boost(key) if boost else 1.0) or 1.0
+            result = {'key': key, 'score': round(best[0] * factor, 4),
+                      'field': best[1], 'match': best[2]}
+            if factor != 1.0:
+                result['boost'] = round(factor, 4)
+            results.append((-result['score'], position, result))
     results.sort(key=lambda item: (item[0], item[1]))
     return [item[2] for item in results[:limit]]

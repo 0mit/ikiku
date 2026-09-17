@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_place_node_list" model="ir.ui.view">
+    <field name="name">place.node.list</field>
+    <field name="model">place.node</field>
+    <field name="arch" type="xml">
+      <list string="Places">
+        <field name="path"/>
+        <field name="kind"/>
+        <field name="name_en" optional="show"/>
+        <field name="code"/>
+        <field name="in_path" optional="hide"/>
+        <field name="sequence" optional="hide"/>
+        <field name="source" optional="hide"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_place_node_form" model="ir.ui.view">
+    <field name="name">place.node.form</field>
+    <field name="model">place.node</field>
+    <field name="arch" type="xml">
+      <form string="Place">
+        <sheet>
+          <div class="oe_title">
+            <h1><field name="name" placeholder="Name"/></h1>
+            <h3><field name="path" readonly="1"/></h3>
+          </div>
+          <group>
+            <group>
+              <field name="kind"/>
+              <field name="parent_id"/>
+              <field name="code"/>
+              <field name="in_path"/>
+            </group>
+            <group>
+              <field name="name_en"/>
+              <field name="sequence"/>
+              <field name="latitude"/>
+              <field name="longitude"/>
+              <field name="source"/>
+              <field name="active" widget="boolean_toggle"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Also called" name="aliases">
+              <field name="alias_ids">
+                <list editable="bottom">
+                  <field name="name"/>
+                  <field name="kind"/>
+                  <field name="source"/>
+                </list>
+              </field>
+            </page>
+            <page string="Neighbours" name="neighbours">
+              <field name="link_ids">
+                <list editable="bottom">
+                  <field name="other_id"/>
+                  <field name="relation"/>
+                  <field name="source"/>
+                </list>
+              </field>
+            </page>
+            <page string="Post code prefixes" name="postcodes">
+              <field name="postcode_ids">
+                <list editable="bottom">
+                  <field name="prefix"/>
+                  <field name="source"/>
+                  <field name="hits"/>
+                </list>
+              </field>
+            </page>
+            <page string="Parts" name="parts">
+              <field name="child_ids">
+                <list>
+                  <field name="name"/>
+                  <field name="kind"/>
+                  <field name="code"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_place_node_search" model="ir.ui.view">
+    <field name="name">place.node.search</field>
+    <field name="model">place.node</field>
+    <field name="arch" type="xml">
+      <search string="Places">
+        <field name="name"/>
+        <field name="code"/>
+        <field name="parent_id"/>
+        <filter name="group_kind" string="Kind" context="{'group_by': 'kind'}"/>
+        <filter name="group_parent" string="Part of" context="{'group_by': 'parent_id'}"/>
+        <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_place_node" model="ir.actions.act_window">
+    <field name="name">Places</field>
+    <field name="res_model">place.node</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <menuitem id="menu_place_root" name="Places" web_icon="base,static/description/icon.png"
+            groups="place_graph.group_place_editor" sequence="95"/>
+  <menuitem id="menu_place_node" parent="menu_place_root" action="action_place_node" sequence="10"/>
+
+</odoo>

@@ -178,12 +178,16 @@ class IkikuStandard(http.Controller):
 
     # ----------------------------------------------------------------- suggest
     @http.route('/standard/suggest', type='http', auth='public', methods=['GET'], website=True, sitemap=False)
-    def suggest(self, q=None, kind='role', **kw):
+    def suggest(self, q=None, kind='role', quick=None, **kw):
         query = (q or '').strip()[:80]
+        # quick=1: the widget asking for whatever can be answered at once, because the full
+        # answer is taking long enough that an empty list is the wrong thing to be showing.
+        widen = not quick
         results = []
         if query and kind in ('role', 'skill', 'knowledge'):
             if kind == 'knowledge':
-                for found in request.env['ikiku.knowledge.class'].sudo().suggest(query, limit=SUGGEST_LIMIT):
+                for found in request.env['ikiku.knowledge.class'].sudo().suggest(
+                        query, limit=SUGGEST_LIMIT, widen=widen):
                     klass = found['record']
                     results.append({'id': klass.id, 'label': klass.name,
                                     'detail': "%s · %s" % (klass.code, klass.name_en),
@@ -192,7 +196,8 @@ class IkikuStandard(http.Controller):
                 node_kind = 'role' if kind == 'role' else 'competency'
                 Node = self._nodes()
                 domain = [('kind', '=', node_kind)] + Node.ikiku_offered_domain()
-                for found in Node.suggest(query, domain=domain, limit=SUGGEST_LIMIT, order=SUGGEST_ORDER):
+                for found in Node.suggest(query, domain=domain, limit=SUGGEST_LIMIT,
+                                          order=SUGGEST_ORDER, widen=widen):
                     node = found['record']
                     family = node.parent_id
                     detail = self._label(family) if family else ''
