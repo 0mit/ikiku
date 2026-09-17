@@ -117,3 +117,6 @@ class TestStandard(HttpCase):
             self.assertNotIn("بارتندر", page, url)
             self.assertIn('ikiku__subgroup', page, url)
             self.assertIn("غذای ایرانی", page, url)
+
+    def test_the_administrator_is_staff(self):
+        self.assertTrue(self.env.ref('base.user_admin').has_group('ikiku_base.group_ikiku_staff'))
