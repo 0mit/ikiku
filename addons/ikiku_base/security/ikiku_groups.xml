@@ -32,16 +32,14 @@
     <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
   </record>
 
+  <!-- The administrator is iKiKu staff (operator, 2026-09-17): the «کمک به آدم‌ها» menus, the
+       login-number badge and every staff-only field are behind this group. Set here on the group,
+       which this module owns: base.user_admin is noupdate data of base and ignores other modules. -->
   <record id="group_ikiku_staff" model="res.groups">
     <field name="name">کارکنان پلتفرم</field>
     <field name="privilege_id" ref="privilege_ikiku"/>
     <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-  </record>
-
-  <!-- The administrator is iKiKu staff (operator, 2026-09-17): the «کمک به آدم‌ها» menus, the
-       login-number badge and every staff-only field are behind this group. -->
-  <record id="base.user_admin" model="res.users">
-    <field name="group_ids" eval="[(4, ref('group_ikiku_staff'))]"/>
+    <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
   </record>
 
   <record id="group_ikiku_master" model="res.groups">
