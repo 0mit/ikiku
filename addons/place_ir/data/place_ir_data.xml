@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Not noupdate: this runs on install AND on every update of place_ir. The loader stores
+       the bundle's fingerprint, so an update with the same bundle costs one hash; a new
+       bundle loads its difference and leaves what people decided here alone. -->
+  <function model="place.node" name="_place_ir_sync"/>
+</odoo>

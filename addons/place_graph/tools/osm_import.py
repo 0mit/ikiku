@@ -2,11 +2,12 @@
 # Part of place_graph. Licensed under AGPL-3.0.
 """Turn an OpenStreetMap extract into place_graph rows.
 
-    python3 osm_import.py iran-latest.osm.pbf --module place_ir --out addons/place_ir/data
+    python3 osm_import.py iran-latest.osm.pbf --out addons/place_ir/data --cache /tmp/passes.pickle
 
-It writes three CSV files Odoo loads as data: place.node.csv, place.alias.csv and
-place.link.csv. It is a TOOL, not part of the running module: Odoo never imports it, and
-nothing on a server needs osmium or shapely.
+It writes a place BUNDLE (bundle.py): places.csv, aliases.csv, links.csv and a sealed
+manifest.json. Odoo takes it in with place_graph's bulk loader; the place responder serves it
+as it is. This is a TOOL, not part of the running module: Odoo never imports it, and nothing on
+a server needs osmium or shapely.
 
 WHAT IT TAKES FROM THE MAP
   - administrative areas, by level, kept only where they lie inside the country asked for,
@@ -22,8 +23,8 @@ WHAT IT DECIDES
   - the graph, by asking which boundaries touch: adjacency is the map's, not a guess.
 
 LICENCE. OpenStreetMap data is © OpenStreetMap contributors, licensed ODbL 1.0. A database
-derived from it carries that licence: the CSV files this writes are such a database, and the
-module that ships them says so in its README and its manifest. The code here is AGPL-3.0,
+derived from it carries that licence: the bundle this writes is such a database, and its
+manifest says so, as does the module that ships it. The code here is AGPL-3.0,
 like the rest of place_graph.
 """
 import argparse
@@ -37,6 +38,8 @@ from collections import defaultdict
 
 import osmium
 import shapely
+
+import bundle  # noqa: E402  (a sibling: this runs as a script, outside Odoo)
 from shapely.geometry import shape
 from shapely.strtree import STRtree
 
@@ -509,7 +512,7 @@ def build(collector, iso, country_name, out_dir, keep_villages=True):
             if fold(landmark['name']) != fold(best['name']):
                 aliases.append((best, landmark['name'], landmark['kind']))
 
-    write(everything, aliases, links, out_dir)
+    write(everything, aliases, links, out_dir, country=iso)
 
 
 def parents_first(places):
@@ -535,45 +538,42 @@ def parents_first(places):
     return sorted(places, key=lambda place: (depth[place['key']], place['key']))
 
 
-def write(places, aliases, links, out_dir):
+def write(places, aliases, links, out_dir, country='ir'):
+    """The places as a BUNDLE (bundle.py): places, aliases and links keyed by code, parents
+    first, sealed with checksums and the OpenStreetMap licence. What Odoo, the responder and
+    anybody else read, with no step in between."""
     places = parents_first(places)
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, 'place.node.csv'), 'w', newline='') as handle:
-        writer = csv.writer(handle, lineterminator='\n')
-        writer.writerow(['id', 'name', 'name_en', 'code', 'kind', 'parent_id/id', 'in_path',
-                         'latitude', 'longitude', 'source'])
-        for place in places:
-            point = None if place['geom'] is None else (
-                place['geom'] if place['geom'].geom_type == 'Point'
-                else place['geom'].representative_point())
-            writer.writerow([
-                place['xmlid'], place['name'], place['name_en'] or '', place['code'], place['kind'],
-                place['parent']['xmlid'] if place['parent'] else '',
-                'False' if (place['kind'] in UNSHOWN_KINDS or place.get('unsaid')) else 'True',
-                round(point.y, 6) if point else '', round(point.x, 6) if point else '',
-                'osm:%s' % place['key']])
-    seen = set()
-    with open(os.path.join(out_dir, 'place.alias.csv'), 'w', newline='') as handle:
-        writer = csv.writer(handle, lineterminator='\n')
-        writer.writerow(['id', 'place_id/id', 'name', 'kind', 'source'])
-        for index, (place, name, kind) in enumerate(aliases):
-            if (place['xmlid'], name) in seen:
-                continue
-            seen.add((place['xmlid'], name))
-            writer.writerow(['alias_%s_%d' % (place['key'], index), place['xmlid'],
-                             name, kind, 'osm'])
-    pairs = set()
-    with open(os.path.join(out_dir, 'place.link.csv'), 'w', newline='') as handle:
-        writer = csv.writer(handle, lineterminator='\n')
-        writer.writerow(['id', 'place_id/id', 'other_id/id', 'relation', 'source'])
-        for one, other, relation in links:
-            key = tuple(sorted((one['xmlid'], other['xmlid'])))
-            if key in pairs:
-                continue
-            pairs.add(key)
-            writer.writerow(['link_%s_%s' % (one['key'], other['key']),
-                             one['xmlid'], other['xmlid'], relation, 'osm'])
-    _logger.info("written: %d places, %d aliases, %d links", len(places), len(seen), len(pairs))
+    rows = []
+    for place in places:
+        point = None if place['geom'] is None else (
+            place['geom'] if place['geom'].geom_type == 'Point'
+            else place['geom'].representative_point())
+        rows.append({
+            'code': place['code'], 'name': place['name'], 'name_en': place['name_en'] or '',
+            'kind': place['kind'], 'parent': place['parent']['code'] if place['parent'] else '',
+            'in_path': 'False' if (place['kind'] in UNSHOWN_KINDS or place.get('unsaid')) else 'True',
+            'latitude': round(point.y, 6) if point else '', 'longitude': round(point.x, 6) if point else '',
+            'source': 'osm:%s' % place['key']})
+    bundle.write_csv(os.path.join(out_dir, 'places.csv'), bundle.FILES['places.csv'], rows)
+    seen, alias_rows = set(), []
+    for place, name, kind in aliases:
+        if (place['code'], name) in seen:
+            continue
+        seen.add((place['code'], name))
+        alias_rows.append({'place': place['code'], 'name': name, 'kind': kind, 'source': 'osm'})
+    bundle.write_csv(os.path.join(out_dir, 'aliases.csv'), bundle.FILES['aliases.csv'], alias_rows)
+    pairs, link_rows = set(), []
+    for one, other, relation in links:
+        key = tuple(sorted((one['code'], other['code'])))
+        if key in pairs:
+            continue
+        pairs.add(key)
+        link_rows.append({'place': one['code'], 'other': other['code'], 'relation': relation, 'source': 'osm'})
+    bundle.write_csv(os.path.join(out_dir, 'links.csv'), bundle.FILES['links.csv'], link_rows)
+    bundle.seal(out_dir, sources=[bundle.OSM_SOURCE], country=country.lower())
+    bundle.check(bundle.read(out_dir))
+    _logger.info("bundle written: %d places, %d aliases, %d links", len(rows), len(alias_rows), len(link_rows))
 
 
 def main():

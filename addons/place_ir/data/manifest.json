@@ -1,0 +1,92 @@
+{
+  "country": "ir",
+  "files": {
+    "aliases.csv": {
+      "rows": 11477,
+      "sha256": "833ee85c3289da5c1999146ff9815c68c60cf1b5a8a1b6a8991d0d6f518ba6ba"
+    },
+    "links.csv": {
+      "rows": 16152,
+      "sha256": "c3e11068fa3f318f0f59c7fdd091bb29043a1735575c02e391449fab628c617a"
+    },
+    "places.csv": {
+      "rows": 103415,
+      "sha256": "44f5347394a6512e503cce22d32e281ffa8a8737efadc1c46df48ff1abc79971"
+    }
+  },
+  "format": "place-bundle/1",
+  "note": "Iran from an OpenStreetMap extract of 2026-09-18 (Geofabrik asia/iran-latest.osm.pbf), by place_graph/tools/osm_import.py; converted to a bundle by bundle.py convert",
+  "sealed": "2026-09-18T00:59:54Z",
+  "sources": [
+    {
+      "attribution": "© OpenStreetMap contributors",
+      "extract": "Geofabrik asia/iran-latest.osm.pbf, read 2026-09-18",
+      "how": "place_graph/tools/osm_import.py",
+      "licence": "ODbL-1.0",
+      "name": "OpenStreetMap",
+      "url": "https://www.openstreetmap.org/copyright"
+    }
+  ],
+  "spec": {
+    "alias_weight": {
+      "colloquial": 0.9,
+      "landmark": 0.6,
+      "old": 0.9,
+      "spelling": 0.9,
+      "square": 0.6,
+      "transit": 0.6
+    },
+    "alias_weight_default": 0.6,
+    "format": "place-responder-spec/1",
+    "match_kinds": {
+      "compact": 0.6,
+      "exact": 1.0,
+      "partial": 0.45,
+      "phrase": 0.85,
+      "typo": 0.35,
+      "words": 0.75
+    },
+    "neighbour_weight": 0.25,
+    "order": "sequence, id",
+    "own_fields": [
+      [
+        "name",
+        1.0
+      ],
+      [
+        "name_en",
+        0.8
+      ],
+      [
+        "code",
+        0.4
+      ]
+    ],
+    "parent_weight": 0.35,
+    "path_separator": " · ",
+    "picker_default": "all",
+    "picker_kinds": {
+      "all": [
+        "street",
+        "neighbourhood",
+        "district",
+        "city",
+        "village",
+        "province"
+      ],
+      "area": [
+        "neighbourhood",
+        "district",
+        "city",
+        "village"
+      ],
+      "city": [
+        "city",
+        "village",
+        "province"
+      ]
+    },
+    "typo_threshold": 0.45,
+    "within_boost": 1.35
+  }
+}

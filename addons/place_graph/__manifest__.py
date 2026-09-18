@@ -20,6 +20,9 @@ Somewhere to put a place, once, so every model that needs one points at the same
   inside it, so «فلسطین» typed in Tehran means the one in Tehran.
 * Post code prefixes, never whole post codes: a full code names one building and is nobody's
   business but theirs. Prefixes come from a table and from what people confirm.
+* A country's places arrive as a BUNDLE (tools/bundle.py): files made outside Odoo, checked,
+  checksummed, and taken in with COPY -- a hundred thousand places in seconds, an update as
+  its difference. Rows are the source's (origin 'bundle') or decided here (origin 'overlay').
 
 Nothing here is about one country: the tree, the kinds and the graph are the same
 everywhere, and a country's own places are data.
@@ -27,7 +30,7 @@ everywhere, and a country's own places are data.
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Hidden/Tools',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'license': 'AGPL-3',
     'depends': ['search_suggest'],
     'data': [

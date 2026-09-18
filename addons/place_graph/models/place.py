@@ -23,51 +23,33 @@ Three things this file exists for:
      neighbour finds the place -- through the same six match kinds search_suggest publishes,
      with no separate scoring rule hidden here.
 """
+import json
 from math import cos, radians, sqrt
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
-# How much a text about a place counts, compared with the place's own name (1.0).
-# Written here, once, because a weight buried in a method is a weight nobody reads.
-#
-# A name the place once had, or that people use for it, is nearly its name. A landmark
-# INSIDE it is weaker on purpose: a square or a metro stop stands in one place and is named
-# for something else, so it should lose to any place actually called that.
-ALIAS_WEIGHT = {'old': 0.9, 'colloquial': 0.9, 'spelling': 0.9,
-                'square': 0.6, 'transit': 0.6, 'landmark': 0.6}
-ALIAS_WEIGHT_DEFAULT = 0.6
-PARENT_WEIGHT = 0.35      # «تهران» typed while looking for a neighbourhood of Tehran
-NEIGHBOUR_WEIGHT = 0.25   # «ولیعصر» typed by someone who means the street beside it
+from odoo.addons.place_graph.tools import tree
+# The rules live in tools/tree.py, once, because the bundle loader, the pipeline and the
+# responder need exactly the same ones; these names are kept so nothing that imported them
+# from here has to change.
+from odoo.addons.place_graph.tools.tree import (  # noqa: F401
+    ALIAS_WEIGHT, ALIAS_WEIGHT_DEFAULT, FINENESS, KINDS, MAX_DEPTH, NEIGHBOUR_WEIGHT,
+    PARENT_WEIGHT, PATH_AREA_KINDS, PATH_DEPTH, PATH_PLACE_KINDS, PATH_REGION_KINDS,
+    PATH_SEPARATOR, PICKER_KINDS, SUGGEST_ORDER)
 
-KINDS = [
-    ('country', "Country"),
-    ('province', "Province"),
-    ('county', "County"),
-    ('city', "City"),
-    ('village', "Village"),
-    ('district', "District"),
-    ('neighbourhood', "Neighbourhood"),
-    ('street', "Street"),
-    ('other', "Other"),
-]
-# How fine each kind is. Only the order matters: it says which kinds are above a place and
-# which are below it, so a path can be built without asking how deep the tree happens to be
-# in this country -- one has counties and districts, another neither.
-FINENESS = {'country': 0, 'province': 1, 'county': 2, 'city': 3, 'village': 3,
-            'district': 4, 'neighbourhood': 5, 'street': 6, 'other': 4}
-# A path is read out the way an address is said: the place, the area of the city it is in,
-# and the city (or, with no city above it, the province). The layers in between are true and
-# unsaid -- nobody says «ناحیه ۲» to explain where a café is.
-PATH_AREA_KINDS = ('neighbourhood', 'district')
-PATH_PLACE_KINDS = ('city', 'village')
-PATH_REGION_KINDS = ('province',)
-# Equal scores keep the published order: the sequence a person set, then the id.
-SUGGEST_ORDER = 'sequence, id'
-PATH_SEPARATOR = ' · '
-PATH_DEPTH = 3   # what a person reads: the place and the two shown places above it
-MAX_DEPTH = 12   # how far up a tree is ever walked in one go: country to street is eight
 KM_PER_DEGREE = 111.195   # a degree of latitude; longitude is scaled by cos(latitude)
+# Where a row came from, so a loader knows what it may change. A bundle row is the source's
+# until a person changes it; what a person decided -- a place staff added, an alias somebody
+# suggested and staff ratified -- is the overlay, and no bundle ever overwrites or retires it.
+ORIGINS = [('bundle', "Imported (bundle)"), ('overlay', "Decided here")]
+# The fields a bundle carries. When a person edits one of them on a bundle row, the field is
+# written into `kept_fields`, and the next bundle load leaves that field alone.
+BUNDLE_FIELDS = ('name', 'name_en', 'kind', 'parent_id', 'in_path', 'latitude', 'longitude',
+                 'active')
+LOADING = 'place_bundle_loading'   # context key the loader sets: its writes are the source's
+SPEC_PARAM = 'place_graph.responder_spec'
+NOTIFY_CHANNEL = 'place_graph_changed'
 
 
 class PlaceNode(models.Model):
@@ -111,6 +93,12 @@ class PlaceNode(models.Model):
                                      string="Neighbouring places")
     postcode_ids = fields.One2many('place.postcode', 'place_id', string="Post code prefixes")
     source = fields.Char("Source", help="Where this row came from, for a reader who has to check it.")
+    origin = fields.Selection(ORIGINS, string="Origin", required=True, default='overlay', index=True,
+                              help="Imported rows follow their bundle; rows decided here are never "
+                                   "changed or retired by a bundle.")
+    kept_fields = fields.Char(
+        "Kept by a person", readonly=True, copy=False,
+        help="Fields of an imported row that a person changed. A bundle load leaves them alone.")
 
     _code_uniq = models.Constraint('UNIQUE(code)', "A place code is used once.")
 
@@ -118,23 +106,11 @@ class PlaceNode(models.Model):
     @api.depends('name', 'in_path', 'kind', 'parent_id.path', 'parent_path')
     def _compute_path(self):
         """«فلسطین · دانشگاه تهران · تهران»: the place, the part of the city it is in, and the
-        city. Not every layer it hangs off -- a path that says every true thing about a place
-        is one nobody reads to the end, and the layers a register needs (a county, a ناحیه)
-        are not how anybody says where they are."""
+        city -- tree.read_path, which the bundle loader uses too."""
         for place in self:
-            parts = [place.name] if place.in_path else []
-            fineness = FINENESS.get(place.kind, 4)
-            ancestors = [a for a in place.ancestor_places() if a.in_path]
-            for kinds in (PATH_AREA_KINDS, PATH_PLACE_KINDS, PATH_REGION_KINDS):
-                if len(parts) >= PATH_DEPTH:
-                    break
-                found = next((a for a in ancestors if a.kind in kinds
-                              and FINENESS.get(a.kind, 4) < fineness), None)
-                if found and found.name not in parts:
-                    parts.append(found.name)
-                    if kinds is PATH_PLACE_KINDS:
-                        break          # a city says enough; its province is not needed too
-            place.path = PATH_SEPARATOR.join(parts[:PATH_DEPTH])
+            place.path = tree.read_path(
+                (place.name, place.kind, place.in_path),
+                [(a.name, a.kind, a.in_path) for a in place.ancestor_places()])
 
     @api.depends('link_ids.other_id')
     def _compute_neighbour_ids(self):
@@ -152,21 +128,21 @@ class PlaceNode(models.Model):
             raise ValidationError("A place cannot be inside itself.")
 
     # -------------------------------------------------------------------- search
-    @api.depends('alias_ids.name', 'alias_ids.kind', 'parent_id.suggest_index',
-                 'link_ids.other_id.name')
+    @api.depends('alias_ids.name', 'alias_ids.kind', 'alias_ids.active', 'parent_id.suggest_index',
+                 'link_ids.other_id.name', 'link_ids.active')
     def _compute_suggest_index(self):
         return super()._compute_suggest_index()
 
     def _suggest_texts(self):
-        """The place's own names, then what else leads a person to it, each with its weight."""
-        texts = super()._suggest_texts()
-        for alias in self.alias_ids:
-            texts.append(('alias', ALIAS_WEIGHT.get(alias.kind, ALIAS_WEIGHT_DEFAULT), alias.name))
-        for ancestor in self.ancestor_places():
-            texts.append(('parent', PARENT_WEIGHT, ancestor.name))
-        for neighbour in self.link_ids.other_id:
-            texts.append(('neighbour', NEIGHBOUR_WEIGHT, neighbour.name))
-        return texts
+        """The place's own names, then what else leads a person to it, each with its weight
+        (tree.suggest_texts, the same list the bundle loader and the responder build)."""
+        own = super()._suggest_texts()
+        names = [value for field, _weight, value in own if field == 'name']
+        return tree.suggest_texts(
+            names, self.name_en, self.code,
+            [(alias.name, alias.kind) for alias in self.alias_ids],
+            [ancestor.name for ancestor in self.ancestor_places()],
+            [neighbour.name for neighbour in self.link_ids.other_id])
 
     @api.model
     def _suggest_rank(self, query, records, limit, boost=None):
@@ -235,3 +211,20 @@ class PlaceNode(models.Model):
             boost = [([('id', 'child_of', within_id)], 1.0 + PARENT_WEIGHT)]
         return self.suggest(query, domain=domain, limit=limit, order=SUGGEST_ORDER, boost=boost,
                             widen=widen)
+
+    # ------------------------------------------------------------------ overlay
+    def write(self, vals):
+        """A person changing an imported row takes that field over from the bundle.
+
+        The loader writes with LOADING in its context (and mostly in SQL); anything else that
+        touches a field the bundle carries is somebody's decision, and the next load must
+        leave it where they put it."""
+        if not self.env.context.get(LOADING):
+            touched = [name for name in BUNDLE_FIELDS if name in vals]
+            if touched:
+                for place in self.filtered(lambda p: p.origin == 'bundle'):
+                    kept = set(filter(None, (place.kept_fields or '').split(',')))
+                    if not kept.issuperset(touched):
+                        super(PlaceNode, place).write(
+                            {'kept_fields': ','.join(sorted(kept.union(touched)))})
+        return super().write(vals)

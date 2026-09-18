@@ -14,8 +14,12 @@ has to be able to tell them apart:
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
+from odoo.addons.place_graph.models.alias import _keep
+from odoo.addons.place_graph.models.place import LOADING, ORIGINS
+
 RELATIONS = [('adjacent', "Borders it"), ('near', "Near it")]
 MIRRORING = 'place_link_mirroring'   # set while the mirror row is being written
+BUNDLE_FIELDS = ('relation', 'active')
 
 
 class PlaceLink(models.Model):
@@ -29,6 +33,11 @@ class PlaceLink(models.Model):
                                ondelete='cascade', index=True)
     relation = fields.Selection(RELATIONS, string="How", required=True, default='adjacent')
     source = fields.Char("Source")
+    active = fields.Boolean(default=True)
+    origin = fields.Selection(ORIGINS, string="Origin", required=True, default='overlay', index=True)
+    bundle_key = fields.Char("Bundle key", index=True, readonly=True, copy=False,
+                             help="«code|code» of the pair, smaller first, as the bundle wrote it.")
+    kept_fields = fields.Char("Kept by a person", readonly=True, copy=False)
 
     _pair_uniq = models.Constraint('UNIQUE(place_id, other_id)',
                                    "Two places are neighbours once.")
@@ -47,12 +56,20 @@ class PlaceLink(models.Model):
         return links
 
     def write(self, vals):
+        if not self.env.context.get(LOADING) and not self.env.context.get(MIRRORING):
+            _keep(self, vals, BUNDLE_FIELDS)
         result = super().write(vals)
         if not self.env.context.get(MIRRORING):
             self._mirror()
         return result
 
     def unlink(self):
+        if not self.env.context.get(LOADING) and not self.env.context.get(MIRRORING):
+            # An imported pair a person removes is archived, both ways round, so a bundle load
+            # cannot write it back.
+            imported = self.filtered(lambda link: link.origin == 'bundle')
+            imported.write({'active': False})
+            self -= imported
         if not self.env.context.get(MIRRORING):
             mirrors = self.search([('place_id', 'in', self.other_id.ids),
                                    ('other_id', 'in', self.place_id.ids)])
@@ -65,9 +82,11 @@ class PlaceLink(models.Model):
         """Make sure the row the other way round exists and says the same."""
         mirroring = self.with_context(**{MIRRORING: True})
         for link in self:
-            existing = mirroring.search([('place_id', '=', link.other_id.id),
-                                         ('other_id', '=', link.place_id.id)], limit=1)
-            values = {'relation': link.relation, 'source': link.source}
+            existing = mirroring.with_context(active_test=False).search(
+                [('place_id', '=', link.other_id.id), ('other_id', '=', link.place_id.id)], limit=1)
+            values = {'relation': link.relation, 'source': link.source, 'active': link.active,
+                      'origin': link.origin, 'bundle_key': link.bundle_key,
+                      'kept_fields': link.kept_fields}
             if existing:
                 existing.write(values)
             else:

@@ -4,3 +4,4 @@ from . import located
 from . import alias
 from . import link
 from . import postcode
+from . import place_load

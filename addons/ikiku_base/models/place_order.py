@@ -79,3 +79,15 @@ class PlaceNode(models.Model):
             if rows:
                 rows.sequence = KIND_ORDER['province'] + position
         return self._ikiku_apply_province_order()
+
+    @api.model
+    def _bundle_sequence(self, kind, name):
+        """A place a later bundle adds takes its place in the same order at once: the data
+        file above runs on install only, and a town the map gains next year must not wait
+        for somebody to remember it. The same three rules, in the same precedence."""
+        if kind == 'province' and name in PROVINCE_ORDER:
+            return PROVINCE_ORDER.index(name) + 1
+        if kind in ('city', 'village') and name in BIG_CITIES:
+            # The last mention wins, as it does in the loop above (شهریار is listed twice).
+            return KIND_ORDER['province'] + len(BIG_CITIES) - BIG_CITIES[::-1].index(name)
+        return KIND_ORDER.get(kind, super()._bundle_sequence(kind, name))
