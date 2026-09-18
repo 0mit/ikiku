@@ -23,6 +23,9 @@ Somewhere to put a place, once, so every model that needs one points at the same
 * A country's places arrive as a BUNDLE (tools/bundle.py): files made outside Odoo, checked,
   checksummed, and taken in with COPY -- a hundred thousand places in seconds, an update as
   its difference. Rows are the source's (origin 'bundle') or decided here (origin 'overlay').
+* Every change to the place tables is announced (NOTIFY place_graph_changed) with the ranking
+  spec published beside it, so a search service outside Odoo can hold the places in memory
+  and rank exactly as this module does (services/place_responder).
 
 Nothing here is about one country: the tree, the kinds and the graph are the same
 everywhere, and a country's own places are data.

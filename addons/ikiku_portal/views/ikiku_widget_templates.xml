@@ -122,10 +122,42 @@
     </details>
   </template>
 
-  <!-- Province first, nothing chosen for the person; the city is typed. -->
+  <!-- «کو؟», turning, with light running over it: what the page shows while it is fetching.
+       The two letters are the logo's own (ikiku-icon.svg), so waiting looks like iKiKu and not
+       like a borrowed spinner. The widget shows it only when an answer takes longer than a
+       blink (search_suggest's BUSY_AFTER), so a fast answer never flickers it. Decorative:
+       the words next to it ("هنوز دنبالِ بقیه‌ام…") are what a screen reader hears. -->
+  <template id="ku_spinner" name="کو، در حال گشتن">
+    <span class="ikiku-ku-spinner" aria-hidden="true" t-att-data-suggest-busy="busy_slot and '1'">
+      <svg viewBox="30 38 296 228" width="28" height="22" focusable="false">
+        <defs>
+          <linearGradient t-att-id="spinner_id or 'ikiku-ku-light'" gradientUnits="userSpaceOnUse"
+                          x1="0" y1="0" x2="330" y2="0">
+            <stop offset="0" stop-color="currentColor"/>
+            <stop offset="0.42" stop-color="currentColor"/>
+            <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="0.58" stop-color="currentColor"/>
+            <stop offset="1" stop-color="currentColor"/>
+            <animateTransform attributeName="gradientTransform" type="translate"
+                              values="-330 0; 330 0" dur="1.1s" repeatCount="indefinite"/>
+          </linearGradient>
+        </defs>
+        <g t-att-fill="'url(#%s)' % (spinner_id or 'ikiku-ku-light')" fill-rule="evenodd">
+          <path d="M175 48L316 48L316 89L212 89L280 157L280 199L134 199L134 158L208 158L137 86z"/>
+          <path d="M50 115 H120 V256 H58 V215 H50 A50 50 0 0 1 50 115 Z M44 165 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/>
+        </g>
+      </svg>
+    </span>
+  </template>
+
+  <!-- Province first, nothing chosen for the person; the city is typed.
+       The box asks the place responder when one is configured (place_suggest_url) and falls
+       back to Odoo's own endpoint when it does not answer; the ranking is the same in both. -->
   <template id="place_fields" name="جا">
     <label for="place_q" class="ikiku__label">کجا؟</label>
-    <div data-suggest="" data-suggest-url="/places/suggest" data-suggest-target="place_id"
+    <div data-suggest="" t-att-data-suggest-url="place_suggest_url or '/places/suggest'"
+         t-att-data-suggest-fallback="place_suggest_fallback or None"
+         data-suggest-target="place_id"
          data-suggest-min="2" data-suggest-count="{n} جا پیدا شد"
          data-suggest-waiting="هنوز دنبالِ بقیه‌ام…"
          t-att-data-suggest-kinds="ask_postcode and 'all' or 'city'">
@@ -133,6 +165,10 @@
              t-att-value="place_q" required="required" autocomplete="off"
              t-att-placeholder="ask_postcode and 'مثلاً: فلسطین، تهران' or 'مثلاً: کرج'"
              t-att-aria-invalid="errors_place and 'true'"/>
+      <t t-call="ikiku_portal.ku_spinner">
+        <t t-set="busy_slot" t-value="True"/>
+        <t t-set="spinner_id" t-value="'ikiku-ku-light-place'"/>
+      </t>
     </div>
     <input type="hidden" name="place_id" t-att-value="place_id"/>
     <p t-if="place_path" class="ikiku__hint">الان: <t t-out="place_path"/></p>

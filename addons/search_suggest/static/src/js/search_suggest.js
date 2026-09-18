@@ -13,6 +13,17 @@
  * A search that answers quickly is asked once.
  * Choosing a result fires "search-suggest:choose" on the container with the result as
  * detail; unless a listener calls preventDefault(), a result with a url is opened.
+ * Every full answer fires "search-suggest:results" with {query, count}, so a page can tell
+ * a search that found nothing from one that has not answered yet.
+ *
+ * data-suggest-fallback="/other/url" is asked instead when data-suggest-url does not answer
+ * (a network error, or anything but 200) -- for a fast search service in front of a slower
+ * one that answers the same question. Once the first has failed, the page stays on the
+ * second: a service that is down is not asked again on every key.
+ *
+ * While an answer is slower than BUSY_AFTER, the container carries search-suggest--busy
+ * and aria-busy="true", and any child marked data-suggest-busy is shown: a page brings its
+ * own sign of waiting. An answer faster than that shows nothing, so nothing flickers.
  * Without JavaScript the input is an ordinary field of its form, so nothing is lost.
  */
 (function () {
@@ -20,6 +31,7 @@
 
     const DELAY = 180;
     const QUICK_AFTER = 70;    // ms to wait for the full answer before showing a partial one
+    const BUSY_AFTER = 150;    // ms before an answer that has not come counts as "fetching"
     let counter = 0;
 
     function setup(box) {
@@ -28,10 +40,15 @@
         }
         box.dataset.suggestReady = "1";
         const input = box.querySelector("input");
-        const url = box.dataset.suggestUrl;
-        if (!input || !url) {
+        if (!input || !box.dataset.suggestUrl) {
             return;
         }
+        // Read on every question, not once: a page may add parameters (a city, the kinds of
+        // place on offer) after this runs, and the fallback replaces the first for good.
+        let usingFallback = false;
+        const endpoint = function () {
+            return usingFallback ? box.dataset.suggestFallback : box.dataset.suggestUrl;
+        };
         const id = "search-suggest-" + (++counter);
         const list = document.createElement("ul");
         list.id = id + "-list";
@@ -55,6 +72,20 @@
         let active = -1;
         let timer = null;
         let controllers = [];
+        let busyTimer = null;
+
+        function busy(on) {
+            clearTimeout(busyTimer);
+            if (on) {
+                busyTimer = setTimeout(function () {
+                    box.classList.add("search-suggest--busy");
+                    box.setAttribute("aria-busy", "true");
+                }, BUSY_AFTER);
+            } else {
+                box.classList.remove("search-suggest--busy");
+                box.removeAttribute("aria-busy");
+            }
+        }
 
         function close() {
             list.hidden = true;
@@ -134,22 +165,40 @@
         function ask(query, quick) {
             const controller = new AbortController();
             controllers.push(controller);
-            const target = url + (url.includes("?") ? "&" : "?") + "q=" + encodeURIComponent(query)
-                + (quick ? "&quick=1" : "");
-            return fetch(target, {signal: controller.signal, credentials: "same-origin",
-                                  headers: {Accept: "application/json"}})
-                .then(function (response) { return response.ok ? response.json() : {results: []}; })
-                .then(function (data) { return Array.isArray(data.results) ? data.results : []; });
+            const once = function () {
+                const url = endpoint();
+                const target = url + (url.includes("?") ? "&" : "?") + "q=" + encodeURIComponent(query)
+                    + (quick ? "&quick=1" : "");
+                return fetch(target, {signal: controller.signal, credentials: "same-origin",
+                                      headers: {Accept: "application/json"}})
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("HTTP " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) { return Array.isArray(data.results) ? data.results : []; });
+            };
+            return once().catch(function (error) {
+                // Aborted because the person typed on: not a failure of anybody's.
+                if (error.name === "AbortError" || usingFallback || !box.dataset.suggestFallback) {
+                    throw error;
+                }
+                usingFallback = true;
+                return once();
+            });
         }
 
         function fetchResults() {
             const query = input.value.trim();
             if (query.length < Number(box.dataset.suggestMin || 1)) {
+                busy(false);
                 render("", [], false);
                 close();
                 return;
             }
             if (cache.has(query)) {
+                busy(false);
                 render(query, cache.get(query), false);
                 return;
             }
@@ -157,13 +206,22 @@
             controllers = [];
             const current = function () { return input.value.trim() === query; };
             let full = false;
+            busy(true);
             ask(query, false).then(function (items) {
                 full = true;
                 cache.set(query, items);
                 if (current()) {
+                    busy(false);
                     render(query, items, false);
+                    box.dispatchEvent(new CustomEvent("search-suggest:results",
+                        {detail: {query: query, count: items.length}, bubbles: true}));
                 }
-            }).catch(function () { full = true; /* aborted or offline: the form still works */ });
+            }).catch(function () {
+                full = true;
+                if (current()) {
+                    busy(false);   // aborted or offline: the form still works without us
+                }
+            });
             setTimeout(function () {
                 if (full || !current()) {
                     return;             // it was quick enough; one question was enough

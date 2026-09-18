@@ -161,4 +161,42 @@ class TestPlaceSuggestPage(HttpCase):
         answer = self.url_open('/places/suggest?q=%s' % "تهران").json()
         self.assertTrue(answer['results'])
         for result in answer['results']:
-            self.assertEqual(set(result), {'id', 'label', 'detail', 'kind'})
+            # The place, and why it was found (the published ranking, the responder's shape):
+            # nothing about anybody who is there.
+            self.assertEqual(set(result), {'id', 'code', 'label', 'detail', 'kind', 'score', 'field', 'match'})
+
+
+@tagged('post_install', '-at_install')
+class TestPlaceBox(HttpCase):
+    """The «کجا؟» box: which door it asks, what the server accepts back,."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        portal = cls.env.ref('base.group_portal')
+        cls.env['res.users'].create({'name': "جا آزما", 'login': 'box-worker', 'password': 'box-worker-pass-1',
+                                     'group_ids': [(6, 0, [portal.id])]})
+        cls.karaj = place(cls.env, "کرج")
+
+    def post(self, url, data):
+        import re
+        token = re.search(r'name="csrf_token" value="([^"]+)"', self.url_open(url).text).group(1)
+        return self.url_open(url, data=dict(data, csrf_token=token), allow_redirects=False)
+
+    def test_the_box_asks_the_responder_and_falls_back_to_odoo(self):
+        self.authenticate('box-worker', 'box-worker-pass-1')
+        self.url_open('/join')
+        page = self.url_open('/join/where').text
+        self.assertIn('data-suggest-url="/places/suggest"', page, "no responder configured: Odoo answers")
+        self.assertNotIn('data-suggest-fallback', page)
+        self.assertIn('data-suggest-busy', page, "the کو sign of waiting is in the box")
+        self.env['ir.config_parameter'].sudo().set_param('place_graph.responder_url', '/places/q')
+        page = self.url_open('/join/where').text
+        self.assertIn('data-suggest-url="/places/q"', page)
+        self.assertIn('data-suggest-fallback="/places/suggest"', page)
+
+    def test_odoo_answers_in_the_responders_shape(self):
+        results = self.url_open('/places/suggest?q=%s&kinds=city' % "کرج").json()['results']
+        self.assertTrue(results)
+        self.assertEqual(results[0]['id'], self.karaj.id)
+        self.assertTrue({'code', 'label', 'detail', 'kind', 'score', 'field', 'match'} <= set(results[0]))

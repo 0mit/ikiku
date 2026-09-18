@@ -81,3 +81,7 @@ class PlacePostcode(models.Model):
             return row
         return self.sudo().create({'prefix': prefix, 'place_id': place.id,
                                    'source': 'learned', 'hits': 1})
+
+    def init(self):
+        super().init()
+        self.env['place.node']._place_notify_on(self._table)

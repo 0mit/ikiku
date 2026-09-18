@@ -40,17 +40,24 @@
         path.textContent = item.detail ? "الان: " + item.detail : "";
     });
 
+    // A parameter is added to the responder's URL and to the fallback's alike: whichever of
+    // the two answers, it answers the same question.
+    function addParameter(box, name, value) {
+        ["suggestUrl", "suggestFallback"].forEach(function (key) {
+            const url = box.dataset[key];
+            if (url) {
+                box.dataset[key] = url + (url.includes("?") ? "&" : "?") + name + "=" + encodeURIComponent(value);
+            }
+        });
+    }
+
     // A place is asked for inside a city the person already named: the box says which.
     document.querySelectorAll("[data-suggest-within]").forEach(function (box) {
-        const url = box.dataset.suggestUrl || "";
-        box.dataset.suggestUrl = url + (url.includes("?") ? "&" : "?")
-            + "within=" + encodeURIComponent(box.dataset.suggestWithin);
+        addParameter(box, "within", box.dataset.suggestWithin);
     });
 
     // The kinds a form may offer travel the same way, so the endpoint decides nothing on its own.
     document.querySelectorAll("[data-suggest-kinds]").forEach(function (box) {
-        const url = box.dataset.suggestUrl || "";
-        box.dataset.suggestUrl = url + (url.includes("?") ? "&" : "?")
-            + "kinds=" + encodeURIComponent(box.dataset.suggestKinds);
+        addParameter(box, "kinds", box.dataset.suggestKinds);
     });
 })();

@@ -25,6 +25,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
+from odoo.addons.place_graph.tools.tree import PICKER_KINDS
 from odoo.addons.ikiku_base.models.partner import STANDING_MAX, STANDING_PER_SUPPORTED, STANDING_VERIFIED
 from odoo.addons.ikiku_portal.controllers.auth import ikiku_sides, remember_side
 from odoo.addons.ikiku_portal.controllers.common import (
@@ -55,9 +56,15 @@ def _form_list(name):
 
 
 # What a person may say about where they live: a city, and nothing finer (بند ۷).
-CITY_KINDS = ('city', 'village', 'province')
+CITY_KINDS = PICKER_KINDS['city']
 # What a café may say: down to its street. Not a county -- cities hang off one, nobody says one.
-PLACE_KINDS = ('street', 'neighbourhood', 'district', 'city', 'village', 'province')
+PLACE_KINDS = PICKER_KINDS['all']
+# Where the «کجا؟» box asks while somebody types. The responder (services/place_responder)
+# answers from memory in milliseconds; Odoo's own endpoint answers the same question, ranked
+# the same way, and is where the box falls back when the responder does not answer. The
+# responder's public path is a system parameter, so switching it on or off is a setting.
+RESPONDER_PARAM = 'place_graph.responder_url'
+ODOO_SUGGEST_URL = '/places/suggest'
 
 class IkikuPortal(http.Controller):
 
@@ -149,7 +156,10 @@ class IkikuPortal(http.Controller):
 
     def _place_values(self, place, typed='', candidates=None, error=None, city_only=False):
         """What ikiku_portal.place_fields needs, from one place or from a failed attempt."""
+        responder = request.env['ir.config_parameter'].sudo().get_param(RESPONDER_PARAM) or ''
         return {
+            'place_suggest_url': responder or ODOO_SUGGEST_URL,
+            'place_suggest_fallback': ODOO_SUGGEST_URL if responder else '',
             'place_id': place.id if place else '',
             'place_q': typed or (place.name if place else ''),
             'place_path': place.path if place else '',

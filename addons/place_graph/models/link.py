@@ -91,3 +91,7 @@ class PlaceLink(models.Model):
                 existing.write(values)
             else:
                 mirroring.create(dict(values, place_id=link.other_id.id, other_id=link.place_id.id))
+
+    def init(self):
+        super().init()
+        self.env['place.node']._place_notify_on(self._table)

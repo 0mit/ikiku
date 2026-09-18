@@ -74,3 +74,11 @@
   .search-suggest__list[aria-busy="true"] { animation: none; }
   .search-suggest__option { animation: none; }
 }
+
+// A page's own sign of waiting (data-suggest-busy) shows only while an answer is slow.
+.search-suggest [data-suggest-busy] {
+    visibility: hidden;
+}
+.search-suggest--busy [data-suggest-busy] {
+    visibility: visible;
+}

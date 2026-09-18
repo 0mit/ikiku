@@ -3,6 +3,11 @@
 
 /places/suggest?q=&kinds=&within=&quick=
 
+The same question the place responder answers (services/place_responder), with the same answer
+shape. The page asks the responder first when one is configured, and this when it is not or
+does not answer: the ranking is search_suggest's in both, so a fallback changes the speed and
+nothing else.
+
 The tree is public knowledge and names no person (بند ۶), so this answers without a login.
 What it will not do is answer with anything but places: no count of who is there, no need,
 no business. A café's own place reaches the world through its need's card, where
@@ -14,19 +19,11 @@ is taking long enough that an empty list would be the wrong thing to show.
 from odoo import http
 from odoo.http import request
 
+from odoo.addons.place_graph.tools.tree import PICKER_KINDS as KINDS
+
 SUGGEST_LIMIT = 8
-# What a form may ask for. A person says which city they work in; a café may name the
-# street, because that is what people tell a courier and what a card turns into a
-# neighbourhood. Anything else is «all».
-KINDS = {
-    'city': ('city', 'village', 'province'),
-    'area': ('neighbourhood', 'district', 'city', 'village'),
-    # Everything a person could mean by «کجا» -- which leaves out the layers nobody says. A
-    # county is in the tree because cities hang off it, and «شهرستان دماوند» is not an answer
-    # to «where is your café»: offering it would also read oddly, since an unsaid place's path
-    # is the path of what is above it.
-    'all': ('street', 'neighbourhood', 'district', 'city', 'village', 'province'),
-}
+# What a form may ask for is place_graph's PICKER_KINDS -- the same named sets the responder
+# is handed in the published spec, so both doors offer the same places.
 
 
 class IkikuPlaces(http.Controller):
@@ -45,11 +42,15 @@ class IkikuPlaces(http.Controller):
                 place = result['record']
                 results.append({
                     'id': place.id,
+                    'code': place.code,
                     'label': place.name,
                     # The path says which of the many places with this name this one is, and
                     # the kind says what it is, so «فلسطین» the street and «فلسطین» the
                     # neighbourhood are told apart before anybody picks the wrong one.
                     'detail': place.path,
                     'kind': place.kind,
+                    'score': result['score'],
+                    'field': result['field'],
+                    'match': result['match'],
                 })
         return request.make_json_response({'results': results})

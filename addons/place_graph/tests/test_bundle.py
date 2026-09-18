@@ -1,5 +1,6 @@
 # Part of place_graph. Licensed under AGPL-3.0.
 """A bundle taken in, taken in again, and changed -- and what people decided, left alone."""
+import json
 import os
 import shutil
 import tempfile
@@ -7,7 +8,8 @@ import tempfile
 from odoo.exceptions import AccessError
 from odoo.tests import TransactionCase, tagged
 
-from odoo.addons.place_graph.tools import bundle
+from odoo.addons.place_graph.models.place import NOTIFY_CHANNEL, SPEC_PARAM
+from odoo.addons.place_graph.tools import bundle, tree
 
 PLACES = [
     # code, name, name_en, kind, parent, in_path
@@ -142,3 +144,16 @@ class TestBundle(TransactionCase):
             handle.write('zz-sneak,دزدکی,,city,zz-land,True,,,test\n')          # an unsealed edit
         with self.assertRaises(bundle.BundleError):
             self.load()
+
+    # --------------------------------------------------------------- responder
+    def test_the_responder_is_told_how_to_rank_and_when_to_reload(self):
+        spec = json.loads(self.env['ir.config_parameter'].sudo().get_param(SPEC_PARAM))
+        self.assertEqual(spec, json.loads(json.dumps(tree.spec())))
+        self.env.cr.execute("""SELECT c.relname FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+                                WHERE t.tgname = 'place_graph_notify' ORDER BY 1""")
+        self.assertEqual([row[0] for row in self.env.cr.fetchall()],
+                         ['place_alias', 'place_link', 'place_node', 'place_postcode'])
+        self.assertTrue(NOTIFY_CHANNEL)
+        # and it reads the spec through a view that shows nothing else of the parameters
+        self.env.cr.execute("SELECT value FROM place_responder_spec")
+        self.assertEqual([json.loads(row[0]) for row in self.env.cr.fetchall()], [spec])

@@ -228,3 +228,50 @@ class PlaceNode(models.Model):
                         super(PlaceNode, place).write(
                             {'kept_fields': ','.join(sorted(kept.union(touched)))})
         return super().write(vals)
+
+    # ---------------------------------------------------------------- responder
+    def init(self):
+        """What a responder outside Odoo needs from this database, kept current on every
+        install and update: the ranking spec, and a notification whenever places change.
+
+        The spec is tree.spec() -- the weights, match kinds and picker kinds this module ranks
+        with -- so a responder never carries a number of its own. The triggers send
+        NOTIFY place_graph_changed on every statement that changes a place table; Postgres
+        delivers it at COMMIT and not before, so a responder reloads only what was really
+        written, and a rolled-back import tells it nothing."""
+        super().init()
+        cr = self.env.cr
+        spec = json.dumps(tree.spec(), sort_keys=True, ensure_ascii=False)
+        cr.execute("""
+            INSERT INTO ir_config_parameter (key, value, create_uid, write_uid, create_date, write_date)
+            VALUES (%s, %s, 1, 1, now() at time zone 'UTC', now() at time zone 'UTC')
+            ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, write_date = EXCLUDED.write_date
+            WHERE ir_config_parameter.value IS DISTINCT FROM EXCLUDED.value
+        """, (SPEC_PARAM, spec))
+        # The responder reads the spec through this view and nothing else of the parameters:
+        # ir_config_parameter also holds secrets (API keys, the database secret), and a role
+        # that may read the places must not be able to read those. See
+        # services/place_responder/deploy/places_ro.sql.
+        cr.execute("""CREATE OR REPLACE VIEW place_responder_spec AS
+                      SELECT value FROM ir_config_parameter WHERE key = %s""", (SPEC_PARAM,))
+        self._place_notify_on(self._table)
+        cr.execute("SELECT pg_notify(%s, 'spec')", (NOTIFY_CHANNEL,))
+
+    @api.model
+    def _place_notify_on(self, table):
+        """NOTIFY place_graph_changed after every statement that changes `table`. Each place
+        table asks for this from its own init(), which runs once its table exists."""
+        self.env.cr.execute("""
+            CREATE OR REPLACE FUNCTION place_graph_notify() RETURNS trigger
+            LANGUAGE plpgsql AS $$
+            BEGIN
+                PERFORM pg_notify('%s', TG_TABLE_NAME);
+                RETURN NULL;
+            END $$
+        """ % NOTIFY_CHANNEL)
+        self.env.cr.execute("""
+            DROP TRIGGER IF EXISTS place_graph_notify ON {0};
+            CREATE TRIGGER place_graph_notify
+                AFTER INSERT OR UPDATE OR DELETE OR TRUNCATE ON {0}
+                FOR EACH STATEMENT EXECUTE FUNCTION place_graph_notify();
+        """.format(table))

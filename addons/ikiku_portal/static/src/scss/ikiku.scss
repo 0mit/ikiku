@@ -603,3 +603,30 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   // The suggest box is a plain block inside the form, and its list must escape the flow.
   [data-suggest] { position: relative; }
 }
+
+// «کو؟» while fetching (2026-09-18): the logo's two letters turn slowly while a light runs
+// across them (the sweep is SVG, in the ku_spinner template). Inside a suggest box it sits at
+// the inline end of the field, over the input's own padding, and search_suggest shows it only
+// when an answer is slower than a blink. With reduced motion it does not turn; it breathes.
+.ikiku-ku-spinner {
+  display: inline-grid; place-items: center; color: var(--ik-blue);
+  inline-size: 2.25rem; block-size: 2.25rem; pointer-events: none;
+}
+.ikiku-ku-spinner svg { display: block; animation: ikiku-ku-turn 1.6s cubic-bezier(.55, .1, .45, .9) infinite; }
+.search-suggest > .ikiku-ku-spinner {
+  position: absolute; inset-inline-end: .5rem; inset-block-start: 50%;
+  translate: 0 -50%;
+}
+.search-suggest:has(> .ikiku-ku-spinner) > input { padding-inline-end: 3rem; }
+@keyframes ikiku-ku-turn {
+  0% { transform: rotate(0deg); }
+  60% { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes ikiku-ku-breathe {
+  0%, 100% { opacity: .45; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ikiku-ku-spinner svg { animation: ikiku-ku-breathe 1.6s ease-in-out infinite; }
+}

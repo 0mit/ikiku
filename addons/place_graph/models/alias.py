@@ -45,6 +45,10 @@ class PlaceAlias(models.Model):
             if not (alias.name or '').strip():
                 raise ValidationError("An alias needs a name.")
 
+    def init(self):
+        super().init()
+        self.env['place.node']._place_notify_on(self._table)
+
     def write(self, vals):
         if not self.env.context.get(LOADING):
             _keep(self, vals, BUNDLE_FIELDS)
