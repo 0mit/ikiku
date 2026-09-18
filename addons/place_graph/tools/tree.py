@@ -218,8 +218,9 @@ def spec():
         'picker_default': PICKER_DEFAULT,
         'path_separator': PATH_SEPARATOR,
         'order': SUGGEST_ORDER,
-        # Equal scores: the place's own order (its kind first), then its city's, then its id.
-        'tie_break': ['sequence', 'city_sequence', 'id'],
+        # Equal scores: a place that matched itself before one answering through a finer place,
+        # then the place's own order (its kind first), then its city's, then its id.
+        'tie_break': ['matched_itself', 'sequence', 'city_sequence', 'id'],
         # A match of a kind the form does not offer answers as the nearest offered place above.
         'climb_to_offered_kind': True,
     }

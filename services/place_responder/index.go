@@ -408,7 +408,8 @@ func (ix *Index) climb(p *Place, kinds map[string]bool) *Place {
 	return nil
 }
 
-// sortResults: best score first. Equal scores keep the published order: the place's own
+// sortResults: best score first. Equal scores: a place that matched itself before one that
+// answers through a finer place (Via), then the published order: the place's own
 // sequence (its kind: a neighbourhood called «بعثت» before a street called «بعثت»), then the
 // order of the city it is in (of two neighbourhoods of that name, the one in the city more
 // people mean), then id.
@@ -417,6 +418,11 @@ func sortResults(results []Result) {
 		ra, rb := results[a], results[b]
 		if ra.Score != rb.Score {
 			return ra.Score > rb.Score
+		}
+		// A place CALLED this before one that only contains something called this: on the
+		// city form «محلات» is the city first, then the cities with a street of that name.
+		if (ra.Via == nil) != (rb.Via == nil) {
+			return ra.Via == nil
 		}
 		if ra.Place.Sequence != rb.Place.Sequence {
 			return ra.Place.Sequence < rb.Place.Sequence

@@ -795,18 +795,18 @@
   "kinds": "city",
   "results": [
    {
-    "code": "ir-tehran",
-    "score": 1.0,
-    "field": "name",
-    "match": "exact",
-    "via": "ir-rey-3"
-   },
-   {
     "code": "ir-rey",
     "score": 1.0,
     "field": "name",
     "match": "exact",
     "via": null
+   },
+   {
+    "code": "ir-tehran",
+    "score": 1.0,
+    "field": "name",
+    "match": "exact",
+    "via": "ir-rey-3"
    },
    {
     "code": "ir-lavar-e-ra-is-gholam",
@@ -858,11 +858,11 @@
     "via": null
    },
    {
-    "code": "ir-shabankareh-city",
+    "code": "ir-bandar-rig-city",
     "score": 0.85,
     "field": "name",
     "match": "phrase",
-    "via": "ir-raees-nejad-street"
+    "via": null
    }
   ]
  },
@@ -1194,13 +1194,6 @@
     "via": "ir-palestine-street-3"
    },
    {
-    "code": "ir-isfahan",
-    "score": 0.85,
-    "field": "name",
-    "match": "phrase",
-    "via": "ir-west-kakh-sa-adat-abad-street"
-   },
-   {
     "code": "ir-n1170088572",
     "score": 0.85,
     "field": "name",
@@ -1222,6 +1215,13 @@
     "via": null
    },
    {
+    "code": "ir-isfahan",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-west-kakh-sa-adat-abad-street"
+   },
+   {
     "code": "ir-chalus",
     "score": 0.85,
     "field": "name",
@@ -1236,18 +1236,18 @@
     "via": null
    },
    {
+    "code": "ir-n7288499814",
+    "score": 0.6,
+    "field": "name",
+    "match": "compact",
+    "via": null
+   },
+   {
     "code": "ir-r8199755",
     "score": 0.6,
     "field": "name",
     "match": "compact",
     "via": "ir-w112987931"
-   },
-   {
-    "code": "ir-bandar-e-anzali",
-    "score": 0.6,
-    "field": "name",
-    "match": "compact",
-    "via": "ir-w443129518"
    }
   ]
  },
@@ -1341,18 +1341,18 @@
     "via": "ir-n6264257769"
    },
    {
-    "code": "ir-pardis-4",
-    "score": 0.2,
-    "field": "name",
-    "match": "typo",
-    "via": "ir-w613132612"
-   },
-   {
     "code": "ir-karasht",
     "score": 0.2,
     "field": "name",
     "match": "typo",
     "via": null
+   },
+   {
+    "code": "ir-pardis-4",
+    "score": 0.2,
+    "field": "name",
+    "match": "typo",
+    "via": "ir-w613132612"
    },
    {
     "code": "ir-n10215155193",
@@ -1612,6 +1612,83 @@
     "field": "name",
     "match": "exact",
     "via": "ir-besat-boulevard"
+   }
+  ]
+ },
+ {
+  "q": "محلات",
+  "within": null,
+  "kinds": "city",
+  "results": [
+   {
+    "code": "ir-mahallat",
+    "score": 1.0,
+    "field": "name",
+    "match": "exact",
+    "via": null
+   },
+   {
+    "code": "ir-arak",
+    "score": 1.0,
+    "field": "name",
+    "match": "exact",
+    "via": "ir-mahallat-boulevard"
+   },
+   {
+    "code": "ir-tehran",
+    "score": 1.0,
+    "field": "name",
+    "match": "exact",
+    "via": "ir-mahallat-blvd"
+   },
+   {
+    "code": "ir-r8199755",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-mahallati"
+   },
+   {
+    "code": "ir-semnan",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-n5310343261"
+   },
+   {
+    "code": "ir-qods",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-w378719278"
+   },
+   {
+    "code": "ir-parand",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-mahallati-street"
+   },
+   {
+    "code": "ir-izadkhast",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-w538321152"
+   },
+   {
+    "code": "ir-pakdasht",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-w406671549"
+   },
+   {
+    "code": "ir-r17581038",
+    "score": 0.85,
+    "field": "name",
+    "match": "phrase",
+    "via": "ir-w178798468"
    }
   ]
  }

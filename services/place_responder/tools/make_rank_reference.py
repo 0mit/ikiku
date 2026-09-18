@@ -28,6 +28,7 @@ CASES = [
     # the operator's reports of 2026-09-18: on a form that asks for a city
     ("کاخ", None, "city"), ("فلسطین", None, "city"), ("کرشته", None, "city"), ("کیورثیه", None, "city"),
     ("فلسطین", None, "all"), ("بعثت", None, "all"), ("بعثت", None, "city"),
+    ("محلات", None, "city"),
 ]
 LIMIT = 10
 
@@ -82,7 +83,7 @@ def main():
             inside = within and (code == within or within in tree.chain(code, parent_of))
             factor = 1.0 + tree.PARENT_WEIGHT if inside else 1.0
             above = [(by_code[c]['kind'], SEQ) for c in tree.chain(code, parent_of)]
-            key = (SEQ, tree.city_sequence(by_code[code]['kind'], SEQ, above), position[code])
+            key = (via is not None, SEQ, tree.city_sequence(by_code[code]['kind'], SEQ, above), position[code])
             results.append((-round(raw * factor, 4), key, {'code': code, 'score': round(raw * factor, 4),
                                                            'field': field, 'match': match_kind,
                                                            'via': via}))
