@@ -40,6 +40,7 @@ import osmium
 import shapely
 
 import bundle  # noqa: E402  (a sibling: this runs as a script, outside Odoo)
+import tree as tree_rules  # noqa: E402
 from shapely.geometry import shape
 from shapely.strtree import STRtree
 
@@ -83,6 +84,8 @@ ALIAS_TAGS = {'old_name': 'old', 'alt_name': 'colloquial', 'official_name': 'col
               'loc_name': 'colloquial', 'name:fa': 'spelling', 'short_name': 'colloquial',
               'nat_name': 'colloquial', 'reg_name': 'colloquial'}
 SQUARE_PLACES = {'square'}
+# Names a school starts with. Matched at the START only: «قلعه مدرسه» is a village.
+SCHOOL_START = re.compile(r'^(دبستان|دبیرستان|هنرستان|مدرسه|آموزشگاه|پیش ?دبستانی|مهد ?کودک)[\s\u200c]')
 # Streets people name a place by. A residential lane is not one of them: at that size the
 # name says an address, and an address is not a place anybody else needs to find.
 STREET_CLASSES = {'trunk', 'primary', 'secondary', 'tertiary'}
@@ -365,6 +368,20 @@ def build(collector, iso, country_name, out_dir, keep_villages=True):
                 continue
             if parent is None or candidate['geom'].area < parent['geom'].area:
                 parent = candidate
+        if parent is None and not item['is_point']:
+            # Nothing larger holds it. An island that IS its county (جزیره خارک, whose
+            # province boundary the extract does not assemble) has the county's outline: the
+            # same outline one kind coarser is its parent, rather than no province at all.
+            # Only here, for a place that would otherwise be a root -- elsewhere two equal
+            # outlines are the map's business, not this tool's.
+            for index in tree.query(point):
+                candidate = ranked[index]
+                if (candidate is not item and candidate['geom'].contains(point)
+                        and candidate['geom'].area == item['geom'].area
+                        and tree_rules.FINENESS.get(candidate['kind'], 4)
+                        < tree_rules.FINENESS.get(item['kind'], 4)):
+                    parent = candidate
+                    break
         if item['key'] in province_keys:
             parent = country
         elif item['key'] in orphan_keys:
@@ -397,6 +414,25 @@ def build(collector, iso, country_name, out_dir, keep_villages=True):
             if item['parent'] is not None and item['parent']['key'] in folded_in:
                 item['parent'] = folded_in[item['parent']['key']]
         _logger.info("points and streets folded into the place of the same name: %d", len(folded_in))
+
+    # A school mapped as a settlement is a school: «دبستان دخترانه کوثر» tagged place=village
+    # inside امیدیه is not a village anybody lives in, and offering it as one put schools among
+    # the suggestions (the operator, 2026-09-18). A village point whose name BEGINS with a
+    # school word and that lies inside a city becomes a landmark of the place that holds it --
+    # its name still leads there. A settlement that merely contains the word («قلعه مدرسه»,
+    # «کردبستان») or a mapped neighbourhood called «هنرستان» is a place and stays one.
+    schools = {}
+    for item in everything:
+        if not (item['is_point'] and item['kind'] == 'village' and SCHOOL_START.match(item['name'] or '')):
+            continue
+        ancestor = item['parent']
+        while ancestor is not None and ancestor['kind'] not in ('city', 'province', 'country'):
+            ancestor = ancestor['parent']
+        if ancestor is not None and ancestor['kind'] == 'city':
+            schools[item['key']] = item
+    if schools:
+        everything = [item for item in everything if item['key'] not in schools]
+        _logger.info("schools mapped as villages, kept as landmarks: %d", len(schools))
 
     # One row per street name per place: a street is mapped in dozens of pieces, and «فلسطین»
     # is one street whichever piece of it you stand on.
@@ -511,6 +547,9 @@ def build(collector, iso, country_name, out_dir, keep_villages=True):
                 continue   # an old name only travels with the thing the place is named after
             if fold(landmark['name']) != fold(best['name']):
                 aliases.append((best, landmark['name'], landmark['kind']))
+
+    for school in schools.values():
+        aliases.append((school['parent'], school['name'], 'landmark'))
 
     write(everything, aliases, links, out_dir, country=iso)
 

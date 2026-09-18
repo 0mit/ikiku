@@ -2,21 +2,21 @@
   "country": "ir",
   "files": {
     "aliases.csv": {
-      "rows": 11477,
-      "sha256": "833ee85c3289da5c1999146ff9815c68c60cf1b5a8a1b6a8991d0d6f518ba6ba"
+      "rows": 11481,
+      "sha256": "35b2ef2d55b5cc8d401c91a3febd9b035c0a17ab4866f4481c96175447d97897"
     },
     "links.csv": {
       "rows": 16152,
       "sha256": "c3e11068fa3f318f0f59c7fdd091bb29043a1735575c02e391449fab628c617a"
     },
     "places.csv": {
-      "rows": 103415,
-      "sha256": "44f5347394a6512e503cce22d32e281ffa8a8737efadc1c46df48ff1abc79971"
+      "rows": 103410,
+      "sha256": "7f5f0de29c944f3daa1d8adebfb8dd75913d41ffa0ff298ede2348cc4ceecad1"
     }
   },
   "format": "place-bundle/1",
-  "note": "Iran from an OpenStreetMap extract of 2026-09-18 (Geofabrik asia/iran-latest.osm.pbf), by place_graph/tools/osm_import.py; converted to a bundle by bundle.py convert",
-  "sealed": "2026-09-18T00:59:54Z",
+  "note": "Iran from an OpenStreetMap extract of 2026-09-18 (Geofabrik asia/iran-latest.osm.pbf), by place_graph/tools/osm_import.py. Rebuilt the same day: جزیره خارک placed under its county, and five schools mapped as villages in امیدیه kept as landmarks instead of places.",
+  "sealed": "2026-09-18T04:12:24Z",
   "sources": [
     {
       "attribution": "© OpenStreetMap contributors",
@@ -37,6 +37,7 @@
       "transit": 0.6
     },
     "alias_weight_default": 0.6,
+    "climb_to_offered_kind": true,
     "format": "place-responder-spec/1",
     "match_kinds": {
       "compact": 0.6,
@@ -86,6 +87,12 @@
         "province"
       ]
     },
+    "tie_break": [
+      "matched_itself",
+      "sequence",
+      "city_sequence",
+      "id"
+    ],
     "typo_threshold": 0.45,
     "within_boost": 1.35
   }

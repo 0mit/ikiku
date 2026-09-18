@@ -1,6 +1,5 @@
 code,name,name_en,kind,parent,in_path,latitude,longitude,source
 ir-ir,ایران,IR,country,,False,,,osm:country-ir
-ir-r12242407,جزیره خارک,,city,,True,29.156213,50.34649,osm:r12242407
 ir-bushehr-province,استان بوشهر,Bushehr Province,province,ir-ir,True,,,osm:province-ir-18
 ir-alborz-province,استان البرز,Alborz Province,province,ir-ir,True,35.940076,50.783396,osm:r1015996
 ir-east-azerbaijan-province,استان آذربایجان شرقی,East Azerbaijan Province,province,ir-ir,True,38.076452,46.553421,osm:r2232180
@@ -1171,6 +1170,7 @@ ir-r12201052,دهستان آغاجاری,,county,ir-aghajari-county,False,30.682
 ir-r12222655,دهستان استای,,county,ir-r11015551,False,35.463368,61.062351,osm:r12222655
 ir-r12234527,دهستان درگزین شرقی,,county,ir-dargazin-county,False,35.300696,49.175538,osm:r12234527
 ir-r12234528,دهستان درگزین غربی,,county,ir-dargazin-county,False,35.296353,49.097918,osm:r12234528
+ir-r12242407,جزیره خارک,,city,ir-r6555468,True,29.156213,50.34649,osm:r12242407
 ir-dalon-village,دهستان دالون,Dalon village,county,ir-margown-county,False,31.234355,50.727953,osm:r12242854
 ir-shurm-village,دهستان شورم,Shurm village,county,ir-margown-county,False,31.248764,50.822696,osm:r12242855
 ir-haft-juy-rd,دهستان هفت جوی,Haft Juy RD,county,ir-qods-county,False,35.716395,51.062681,osm:r12246202
@@ -71578,7 +71578,6 @@ ir-n10943637433,متخصصین,,neighbourhood,ir-district-8-3,True,34.289074,47.
 ir-n10943642590,سازمانی مسکن,,neighbourhood,ir-district-5-4,True,34.371593,47.144802,osm:n10943642590
 ir-n10943642591,شهرک شهید رجایی,,neighbourhood,ir-district-5-4,True,34.368342,47.141898,osm:n10943642591
 ir-n10943651808,شهرک شهید محرابی,,neighbourhood,ir-district-6,True,34.364776,47.08712,osm:n10943651808
-ir-dabestaan-dokhtaraane-ko-sar,دبستان دخترانه کوثر,Dabestaan dokhtaraane Ko'sar,village,ir-omidieh,True,30.743242,49.709361,osm:n10965046605
 ir-n10976627880,گناباد,,village,ir-r15977730,True,36.557378,59.285885,osm:n10976627880
 ir-niyavaran,نیاوران,Niyavaran,neighbourhood,ir-miyaneh,True,37.426197,47.734039,osm:n10989739043
 ir-n10994067034,آفی,,neighbourhood,ir-r17354379,True,37.438131,46.154317,osm:n10994067034
@@ -71732,8 +71731,6 @@ ir-n13326125186,شهرک فرهنگیان,,city,ir-r17472202,True,38.429804,48.8
 ir-n13381923394,رضا آباد,,village,ir-r16339945,True,36.35292,52.862311,osm:n13381923394
 ir-n13410198962,هوت آباد,,neighbourhood,ir-ramin,True,25.284477,60.719891,osm:n13410198962
 ir-n13415231017,باشگاه تکواندو,,neighbourhood,ir-omidieh,True,30.746761,49.702222,osm:n13415231017
-ir-n13416359733,دبستان پسرانه شهید قنواتی,,village,ir-omidieh,True,30.742847,49.710802,osm:n13416359733
-ir-n13428989670,دبیرستان پسرانه شهدای نفت امیدیه,,village,ir-omidieh,True,30.746288,49.717531,osm:n13428989670
 ir-n13509502249,صف سر,,neighbourhood,ir-r20192934,True,37.263545,49.538739,osm:n13509502249
 ir-n13529227021,منطقه ۴,,neighbourhood,ir-r20192934,True,37.270557,49.554223,osm:n13529227021
 ir-n13529227022,منطقه ۲,,neighbourhood,ir-shariyati,True,37.279524,49.587968,osm:n13529227022
@@ -73200,8 +73197,6 @@ ir-n7537268872,شهرک صادقیه,,neighbourhood,ir-r8818609,True,30.268297,5
 ir-n7551745897,سه راه گنبدسبز,,neighbourhood,ir-ghale-nu,True,36.199588,58.819841,osm:n7551745897
 ir-n7572882717,یونارت,,neighbourhood,ir-r13406344,True,32.716935,51.684899,osm:n7572882717
 ir-n7579479701,قلعه میرزمان,,neighbourhood,ir-r15968694,True,32.377674,51.500951,osm:n7579479701
-ir-n7603276516,دبستان دخترانه کوثر,,village,ir-omidieh,True,30.743057,49.709482,osm:n7603276516
-ir-n7603297243,دبستان پسرانه ابن سینا,,village,ir-omidieh,True,30.743043,49.709206,osm:n7603297243
 ir-n7608129076,قلعه نوی جمشید,,village,ir-r14570207,True,36.243021,58.776009,osm:n7608129076
 ir-n7609152685,شهرک حصار,,village,ir-khate-kashmar,True,36.191409,58.78248,osm:n7609152685
 ir-n7617144150,شهرک فرهنگیان,,neighbourhood,ir-r17349180,True,38.407725,48.870578,osm:n7617144150
