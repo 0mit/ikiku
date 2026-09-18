@@ -115,12 +115,13 @@ class SearchSuggestMixin(models.AbstractModel):
         # only runs when the tighter one came back with less than the asker wanted. This is
         # what keeps a common word cheap: «تهران» is in tens of thousands of rows, and
         # nothing ranks all of them for a query that also said «دانشگاه».
-        # The quick answer is a DIFFERENT, cheaper question: which records are NAMED this.
-        # It is never allowed to end a full search, because a record named «کاخ» in another
-        # province must not hide the place in this city that people CALL «کاخ» -- and which
-        # question was asked is the only reason the two answers can differ.
+        # The quick answer is the FIRST of the attempts below and nothing else: what is
+        # called this, ranked the same way. It can miss what a wider attempt would find -- a
+        # mistyped word, letters inside a longer word -- which is why it is what a page shows
+        # while the full answer is still coming, and never what it settles on.
         if not widen:
-            attempts = [self._suggest_head_of(query) or self._suggest_any_of(words)]
+            attempts = [self._suggest_any_of(
+                words + ([compact] if compact not in words else []), how='whole')]
         else:
             # From what is called this, out to what merely contains these letters. Each is
             # wider and dearer than the last, and a wider one is only asked when the tighter
@@ -155,20 +156,6 @@ class SearchSuggestMixin(models.AbstractModel):
             if len(everything) > len(candidates):
                 results = self._suggest_rank(query, everything, limit, boost)
         return results
-
-    @api.model
-    def _suggest_head_of(self, query):
-        """The cheapest search worth doing: the fields that ARE the record's name, starting
-        with what was typed. Few rows, an index can find them, and they are the answers a
-        person is least surprised by -- which is why they are shown first and alone."""
-        text = suggest_text.spaced(query)
-        names = [name for name, weight in self._suggest_fields.items()
-                 if weight >= 1.0 and self._fields.get(name)
-                 and self._fields[name].type in ('char', 'text') and self._fields[name].store]
-        pieces = [(name, 'ilike', text + '%') for name in names]
-        if not pieces:
-            return []
-        return (['|'] * (len(pieces) - 1)) + pieces
 
     @api.model
     def _suggest_whole_word(self, piece):

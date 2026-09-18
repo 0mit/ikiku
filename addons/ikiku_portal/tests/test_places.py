@@ -149,11 +149,13 @@ class TestPlaceSuggestPage(HttpCase):
         paths = [result['detail'] for result in answer['results']]
         self.assertTrue(any(path.startswith("فلسطین") for path in paths),
                         "«کاخ» should reach فلسطین: %s" % paths)
-        # The quick answer is the one a page shows first; it is names only, and it is fast.
+        # The quick answer is the one a page shows first: the same ranking, from the tightest
+        # search, and everything in it is in the full answer too.
         quick = self.url_open('/places/suggest?q=%s&quick=1' % "تهران").json()
+        full = self.url_open('/places/suggest?q=%s' % "تهران").json()
         self.assertTrue(quick['results'])
-        self.assertTrue(all(result['label'].startswith("تهران") for result in quick['results']),
-                        quick['results'])
+        self.assertLessEqual({result['id'] for result in quick['results']},
+                             {result['id'] for result in full['results']})
 
     def test_the_endpoint_answers_places_and_nothing_else(self):
         answer = self.url_open('/places/suggest?q=%s' % "تهران").json()

@@ -81,12 +81,13 @@ class TestPlace(TransactionCase):
                                                            domain=self.ONLY_FIXTURE)
         self.assertEqual(in_mashhad[0]['record'], self.palestine_mashhad)
 
-    def test_the_quick_answer_is_the_names_and_the_full_answer_is_everything(self):
-        # The quick answer is what a page can show at once: places NAMED this. The full one
-        # also reaches the places people CALL this, which is why it is the one that decides.
-        quick = self.found("کاخ", widen=False)
-        self.assertNotIn(self.palestine, quick)
-        self.assertIn(self.palestine, self.found("کاخ"))
+    def test_the_quick_answer_is_part_of_the_full_one(self):
+        # The quick answer is the tightest search: what is CALLED this. It can miss what a
+        # wider one finds -- here a mistyped word -- which is why it is only what a page
+        # shows while the full answer is still coming.
+        self.assertIn(self.palestine, self.found("کاخ", widen=False))
+        self.assertFalse(self.found("کاخخ", widen=False))
+        self.assertIn(self.palestine, self.found("کاخخ"), "a mistyped word still reaches it")
 
     def test_a_kind_narrows_the_answer(self):
         self.assertEqual(self.found("تهران", kinds=('city',)), [self.tehran])
