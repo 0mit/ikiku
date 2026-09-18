@@ -19,7 +19,7 @@ is taking long enough that an empty list would be the wrong thing to show.
 from odoo import http
 from odoo.http import request
 
-from odoo.addons.place_graph.tools.tree import PICKER_KINDS as KINDS
+from odoo.addons.place_graph.tools.tree import KINDS as KIND_CHOICES, PICKER_KINDS as KINDS
 
 SUGGEST_LIMIT = 8
 # What a form may ask for is place_graph's PICKER_KINDS -- the same named sets the responder
@@ -36,7 +36,9 @@ class IkikuPlaces(http.Controller):
         results = []
         if query:
             inside = Place.browse(int(within)).exists() if (within or '').isdigit() else None
-            found = Place.suggest_places(query, kinds=KINDS.get(kinds, None), within=inside,
+            # A named set, or a comma list of kinds -- the same two the responder accepts.
+            asked = KINDS.get(kinds) or tuple(k for k in (kinds or '').split(',') if k in dict(KIND_CHOICES)) or None
+            found = Place.suggest_places(query, kinds=asked, within=inside,
                                          limit=SUGGEST_LIMIT, widen=not quick)
             for result in found:
                 place = result['record']

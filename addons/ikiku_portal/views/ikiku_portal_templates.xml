@@ -38,10 +38,34 @@
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
           <input t-if="edit" type="hidden" name="edit" value="1"/>
           <t t-call="ikiku_portal.place_fields"/>
+          <t t-call="ikiku_portal.area_field"/>
           <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
       </div></div>
     </t>
+  </template>
+
+  <!-- A person's neighbourhood: asked only as something they may CHOOSE to show (بند ۷ —
+       هر کس خودش تصمیم می‌گیرد). Empty, only the city is kept and shown. -->
+  <template id="area_field" name="محله، اگر بخواهید">
+    <label for="place_area_q" class="ikiku__label">محله (اختیاری)</label>
+    <p class="ikiku__hint">فقط اگه می‌خواید کسب‌وکارها ببینن کدوم محلهٔ شهرتون هستید. آدرسِ خونه نه؛ اسمِ محله کافیه.
+      خالی بذارید تا فقط شهرتون دیده بشه.</p>
+    <div data-suggest="" t-att-data-suggest-url="place_suggest_url or '/places/suggest'"
+         t-att-data-suggest-fallback="place_suggest_fallback or None"
+         data-suggest-target="place_area_id" data-suggest-min="2" data-suggest-count="{n} محله پیدا شد"
+         data-suggest-waiting="هنوز دنبالِ بقیه‌ام…" data-suggest-via="از راهِ {via}"
+         data-suggest-kinds="neighbourhood,district" t-att-data-suggest-within="area_within or None">
+      <input class="ikiku__field" id="place_area_q" name="place_area_q" type="search"
+             t-att-value="place_area_q" autocomplete="off" placeholder="مثلاً: نارمک"
+             t-att-aria-invalid="errors_area and 'true'"/>
+      <t t-call="ikiku_portal.ku_spinner">
+        <t t-set="busy_slot" t-value="True"/>
+        <t t-set="spinner_id" t-value="'ikiku-ku-light-area'"/>
+      </t>
+    </div>
+    <input type="hidden" name="place_area_id" t-att-value="place_area_id"/>
+    <p t-if="errors_area" class="ikiku__error" role="alert" t-out="errors_area"/>
   </template>
 
   <template id="join_skills" name="چه کاری بلدید">

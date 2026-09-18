@@ -58,6 +58,8 @@ def _form_list(name):
 
 # What a person may say about where they live: a city, and nothing finer (بند ۷).
 CITY_KINDS = PICKER_KINDS['city']
+# What a person may add, only if they want it shown: the part of their city, never finer.
+AREA_KINDS = ('neighbourhood', 'district')
 # What a café may say: down to its street. Not a county -- cities hang off one, nobody says one.
 PLACE_KINDS = PICKER_KINDS['all']
 # Where the «کجا؟» box asks while somebody types. The responder (services/place_responder)
@@ -187,6 +189,31 @@ class IkikuPortal(http.Controller):
             'note': "نوشته شد و چیزی پیدا نشد؛ بعد همین جا انتخاب شد.",
         })
 
+    def _area_from_post(self, post, city):
+        """(neighbourhood, error) for the optional «محله» of a person, inside `city`.
+
+        Nothing given is (None, None): only the city is kept. A name is matched among the
+        neighbourhoods and districts of that city; an address -- a house number, a post code --
+        is refused rather than read, because a neighbourhood is all that is asked."""
+        Place = request.env['place.node'].sudo()
+        city = city.place_of_kinds(CITY_KINDS) or city
+        typed = ' '.join((post.get('place_area_q') or '').split())[:80]
+        chosen = Place.browse(to_int(post.get('place_area_id')) or 0).exists()
+        inside = lambda p: p.active and p.kind in AREA_KINDS and city in p.ancestor_places()
+        if chosen and inside(chosen):
+            return chosen, None
+        if not typed:
+            return None, None
+        if any(ch.isdigit() for ch in suggest_text.normalize(typed)):
+            return None, "فقط اسمِ محله؛ پلاک و کد پستی لازم نیست."
+        found = [r for r in Place.suggest_places(typed, kinds=AREA_KINDS, within=city, limit=6)
+                 if inside(r['record'])]
+        if found and (len(found) == 1 or found[0]['score'] > found[1]['score']):
+            return found[0]['record'], None
+        if found:
+            return None, "چند محله با این اسم در %s هست؛ از پیشنهادها یکی رو انتخاب کنید." % city.name
+        return None, "این محله رو در %s پیدا نکردم. خالی بذارید تا فقط شهرتون دیده بشه." % city.name
+
     def _place_values(self, place, typed='', candidates=None, error=None, city_only=False):
         """What ikiku_portal.place_fields needs, from one place or from a failed attempt."""
         # A text that found nothing is carried to the next attempt, so when the person then
@@ -301,16 +328,32 @@ class IkikuPortal(http.Controller):
         if request.httprequest.method == 'POST':
             place, typed, candidates, error = self._place_from_post(post, city_only=True,
                                                                    previous=partner.place_id)
-            if place:
-                partner.write({'place_id': place.id, 'place_hint': typed})
+            area, area_error = (self._area_from_post(post, place) if place else (None, None))
+            if place and not area_error:
+                # The neighbourhood is kept only because the person gave it to be shown, and
+                # shown only because they gave it (بند ۷: each person decides). Empty, and only
+                # the city is kept -- a neighbourhood given earlier is let go of.
+                partner.write({'place_id': (area or place).id, 'place_hint': typed,
+                               'ikiku_show_neighbourhood': bool(area)})
                 resource = self._resource(create=True)
                 availability = self._availability(resource)
                 if availability and not self._availability_referenced(availability):
                     availability.write({'place_id': place.id})
                 return self._after_worker_save(resource, edit)
-        values = self._place_values(place, typed or partner.place_hint or '', candidates, error,
+        city = place.place_of_kinds(CITY_KINDS) if place else place
+        values = self._place_values(city or place, typed or partner.place_hint or '', candidates, error,
                                    city_only=True)
-        values.update({'has_business': 'ku' in ikiku_sides(request.env.user), 'edit': edit})
+        shown = partner.place_id if (partner.ikiku_show_neighbourhood and partner.place_id.kind in AREA_KINDS) \
+            else None
+        values.update({
+            'has_business': 'ku' in ikiku_sides(request.env.user), 'edit': edit,
+            'place_area_id': (shown.id if shown else '') if request.httprequest.method != 'POST'
+                              else (post.get('place_area_id') or ''),
+            'place_area_q': (shown.name if shown else '') if request.httprequest.method != 'POST'
+                             else (post.get('place_area_q') or ''),
+            'area_within': city.id if city else '',
+            'errors_area': area_error if request.httprequest.method == 'POST' else None,
+        })
         return self._worker_page('ikiku_portal.join_where', 2, values)
 
     @http.route('/join/skills', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)

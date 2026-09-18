@@ -210,7 +210,15 @@
       <field name="model_name">res.partner</field>
       <field name="field_name">place_public_id</field>
       <field name="visibility">public</field>
-      <field name="reason">شهرِ شخص؛ درشت‌ترین جایی که از او نشان داده می‌شود.</field>
+      <field name="reason">شهرِ شخص، یا محله‌اش اگر خودش خواسته است؛ درشت‌ترین جایی که از او نشان داده می‌شود — بند ۷.</field>
+    </record>
+    <!-- 2026-09-18: the person decides whether their neighbourhood is shown (بند ۷: هر کس
+         خودش تصمیم می‌گیرد). The choice itself is theirs and nobody else's business. -->
+    <record id="vis_res_partner_ikiku_show_neighbourhood" model="ikiku.visibility.policy">
+      <field name="model_name">res.partner</field>
+      <field name="field_name">ikiku_show_neighbourhood</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">انتخابِ خودِ شخص؛ آنچه دیده می‌شود نتیجهٔ آن است، نه خودِ انتخاب.</field>
     </record>
     <record id="vis_res_partner_place_city_id" model="ikiku.visibility.policy">
       <field name="model_name">res.partner</field>

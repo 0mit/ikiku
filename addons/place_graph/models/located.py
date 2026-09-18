@@ -55,7 +55,12 @@ class PlaceLocated(models.AbstractModel):
             record.place_city_id = place.place_of_kinds(('city', 'village'))
             record.place_city_name = record.place_city_id.name or False
             record.place_province_id = place.place_of_kinds(('province',))
-            record.place_public_id = place.place_of_kinds(record._place_public_kinds)
+            record.place_public_id = place.place_of_kinds(record._place_public_kinds_of())
+
+    def _place_public_kinds_of(self):
+        """The kinds THIS record may show publicly. The class default; a model where the
+        person decides (res.partner in iKiKu) answers per record."""
+        return self._place_public_kinds
 
     def place_distance_km(self, other):
         """Roughly how far apart two located records are, or False when either has no point."""
