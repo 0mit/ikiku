@@ -71,16 +71,16 @@ func (s *state) requestReload(reason string) {
 	}
 }
 
-// load reads the source once and swaps the new index in.
-func (s *state) load(ctx context.Context, conn *pgx.Conn) error {
+// load reads a bundle and swaps the new index in.
+func (s *state) load(ctx context.Context, _ *pgx.Conn) error {
 	started := time.Now()
-	var d *Dataset
-	var err error
-	if len(s.cfg.bundles) > 0 {
-		d, err = loadBundle(s.cfg.bundles)
-	} else {
-		d, err = loadOdoo(ctx, conn)
-	}
+	d, err := loadBundle(s.cfg.bundles)
+	return s.install(d, err, started)
+}
+
+// install builds the index from what was read and swaps it in. Nothing here holds the
+// source: for Odoo, the read transaction is over before the (long) build begins.
+func (s *state) install(d *Dataset, err error, started time.Time) error {
 	if err != nil {
 		s.mu.Lock()
 		s.lastError = err.Error()
@@ -297,13 +297,19 @@ func (s *state) loadOdooOnce(ctx context.Context) error {
 		return err
 	}
 	defer conn.Close(context.Background())
-	// One consistent picture: every table read from the same snapshot.
+	// One consistent picture: every table read from the same snapshot -- and the snapshot let
+	// go of the moment the rows are in memory. Building the index takes seconds (tens on the
+	// production VM), and a transaction held open that long holds read locks an Odoo update
+	// needs: on 2026-09-18 it made a deploy fail on a lock timeout.
+	started := time.Now()
 	tx, err := conn.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.RepeatableRead, AccessMode: pgx.ReadOnly})
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(context.Background())
-	return s.load(ctx, tx.Conn())
+	d, readErr := loadOdoo(ctx, tx.Conn())
+	tx.Rollback(context.Background())
+	conn.Close(context.Background())
+	return s.install(d, readErr, started)
 }
 
 func (s *state) odooStampOnce(ctx context.Context) (string, error) {

@@ -279,8 +279,12 @@ class PlaceNode(models.Model):
         # ir_config_parameter also holds secrets (API keys, the database secret), and a role
         # that may read the places must not be able to read those. See
         # services/place_responder/deploy/places_ro.sql.
-        cr.execute("""CREATE OR REPLACE VIEW place_responder_spec AS
-                      SELECT value FROM ir_config_parameter WHERE key = %s""", (SPEC_PARAM,))
+        # Created once: replacing a view takes an exclusive lock on it, which a reading
+        # responder can hold up past the lock timeout of a live update.
+        cr.execute("SELECT to_regclass('place_responder_spec')")
+        if not cr.fetchone()[0]:
+            cr.execute("""CREATE VIEW place_responder_spec AS
+                          SELECT value FROM ir_config_parameter WHERE key = %s""", (SPEC_PARAM,))
         self._place_notify_on(self._table)
         cr.execute("SELECT pg_notify(%s, 'spec')", (NOTIFY_CHANNEL,))
 
