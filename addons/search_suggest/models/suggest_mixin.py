@@ -22,7 +22,7 @@ _logger = logging.getLogger(__name__)
 
 SCAN_LIMIT = 5000   # below this many records in the domain, a miss in SQL is re-checked in full
 PREFIX = 3          # letters of a word kept when looking for a word that was mistyped
-CANDIDATE_LIMIT = 1500   # most rows ever read for one query, whatever the query matches
+CANDIDATE_LIMIT = 400    # most rows ever read for one query, whatever the query matches
 SHORTLIST = 60      # rows ranked in full when there are more candidates than that
 
 
@@ -242,11 +242,15 @@ class SearchSuggestMixin(models.AbstractModel):
         if len(records) <= max(SHORTLIST, limit):
             return records
         records.fetch(['suggest_index'])
-        ranked = suggest_text.rank(
-            query, ((record.id, [('suggest_index', 1.0, record.suggest_index or '')])
-                    for record in records), max(SHORTLIST, limit),
-            boost=factors.get if factors else None)
-        return records.browse([result['key'] for result in ranked])
+        keep = max(SHORTLIST, limit)
+        scored = []
+        for position, record in enumerate(records):
+            score = suggest_text.quick_score(query, record.suggest_index or '')
+            if score:
+                scored.append((-score * (factors.get(record.id, 1.0) if factors else 1.0),
+                               position, record.id))
+        scored.sort()
+        return records.browse([record_id for _score, _position, record_id in scored[:keep]])
 
     @api.model
     def _suggest_boost_factors(self, records, boost):

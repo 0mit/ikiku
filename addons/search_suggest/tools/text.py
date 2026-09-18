@@ -116,6 +116,26 @@ def match(query, text):
     return None, 0.0
 
 
+def quick_score(query, text):
+    """A cheap, generous score for narrowing a long list down to the rows worth ranking.
+
+    It asks only where the query appears: the whole text, the start of it, the start of a
+    word, anywhere. No stemming, no trigram similarity -- those are what make `match` worth
+    trusting and also what makes it too dear to run on thousands of rows. Nothing this
+    returns is ever shown: the scores a caller sees all come from `match`.
+    """
+    q, t = spaced(query), spaced(text)
+    if not q or not t:
+        return 0.0
+    if q == t:
+        return 1.0
+    if t.startswith(q):
+        return 0.9
+    if (' ' + t).find(' ' + q) >= 0:
+        return 0.8
+    return 0.4 if q in t else 0.0
+
+
 def rank(query, documents, limit=10, boost=None):
     """Rank documents for a query.
 
