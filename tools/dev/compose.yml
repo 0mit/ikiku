@@ -1,0 +1,55 @@
+# Part of iKiKu. Licensed under AGPL-3.0.
+#
+# iKiKu on your own machine, for looking at it and changing it -- not for production.
+# The same images production runs (postgres:17, odoo:19), the repository's addons mounted
+# read-only, and templates and styles reloaded from disk on every page load (--dev=xml), so an
+# edit to a .xml or .scss file shows on the next refresh.
+#
+#   docker compose -f tools/dev/compose.yml run --rm init        # once: create the database (~3 min)
+#   docker compose -f tools/dev/compose.yml up -d odoo            # then: http://localhost:8069
+#   docker compose -f tools/dev/compose.yml run --rm tests        # the test suite (~2 min)
+#
+# Sign in to the back office as admin / admin. Nothing here reaches the internet or the real site.
+name: ikiku-dev
+
+x-odoo: &odoo
+  image: odoo:19
+  depends_on: [db]
+  environment: { HOST: db, USER: odoo, PASSWORD: odoo }
+  volumes:
+    - ../../addons:/mnt/extra-addons:ro
+    - ./odoo.conf:/etc/odoo/odoo.conf:ro
+    - odoo-data:/var/lib/odoo
+
+services:
+  db:
+    image: postgres:17
+    environment: { POSTGRES_USER: odoo, POSTGRES_PASSWORD: odoo, POSTGRES_DB: postgres }
+    volumes: [db-data:/var/lib/postgresql/data]
+
+  # Once: a fresh database with every iKiKu module, Persian, and the places of Iran.
+  init:
+    <<: *odoo
+    profiles: [setup]
+    command: >
+      odoo -c /etc/odoo/odoo.conf -d ikiku -i ikiku_portal --load-language=fa_IR
+      --without-demo=all --stop-after-init
+
+  # The site. Templates and styles are read from disk on every request.
+  odoo:
+    <<: *odoo
+    ports: ["127.0.0.1:${IKIKU_PORT:-8069}:8069"]
+    command: odoo -c /etc/odoo/odoo.conf -d ikiku --dev=xml
+
+  # The tests, in a throwaway database of their own.
+  tests:
+    <<: *odoo
+    profiles: [setup]
+    command: >
+      odoo -c /etc/odoo/odoo.conf -d ikiku_test -i ikiku_portal --without-demo=all --stop-after-init
+      --test-enable --test-tags /search_suggest,/place_graph,/place_ir,/ikiku_base,/ikiku_supply,/ikiku_demand,/ikiku_match,/ikiku_coop,/ikiku_portal,/sms_otp,/sms_smsir,/sms_kavenegar
+      --db-filter=^ikiku_test$$ --http-port=8070
+
+volumes:
+  db-data:
+  odoo-data:
