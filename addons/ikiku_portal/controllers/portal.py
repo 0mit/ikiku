@@ -26,6 +26,7 @@ from odoo.http import request
 
 from odoo.addons.ikiku_base.models.jalali import to_fa_digits
 from odoo.addons.place_graph.tools.tree import PICKER_KINDS
+from odoo.addons.search_suggest.tools import text as suggest_text
 from odoo.addons.ikiku_base.models.partner import STANDING_MAX, STANDING_PER_SUPPORTED, STANDING_VERIFIED
 from odoo.addons.ikiku_portal.controllers.auth import ikiku_sides, remember_side
 from odoo.addons.ikiku_portal.controllers.common import (
@@ -65,6 +66,9 @@ PLACE_KINDS = PICKER_KINDS['all']
 # responder's public path is a system parameter, so switching it on or off is a setting.
 RESPONDER_PARAM = 'place_graph.responder_url'
 ODOO_SUGGEST_URL = '/places/suggest'
+# A text somebody typed that found nothing becomes a suggestion only if it could be a name:
+# a run of this many digits is a post code or a house number, and is never kept.
+DIGITS_RUN = 5
 
 class IkikuPortal(http.Controller):
 
@@ -118,6 +122,13 @@ class IkikuPortal(http.Controller):
         Place = request.env['place.node'].sudo()
         typed = ' '.join((post.get('place_q') or '').split())
         chosen = Place.browse(to_int(post.get('place_id')) or 0).exists()
+        # The id came from a browser, and a browser can send any id. It has to be a place the
+        # form may offer: active, and of a kind this form asks for -- a city form climbs from
+        # finer to its city, anything else that is not on offer is ignored and the text read.
+        if chosen and not chosen.active:
+            chosen = Place.browse()
+        if chosen and chosen.kind not in (CITY_KINDS if city_only else PLACE_KINDS):
+            chosen = chosen.place_of_kinds(CITY_KINDS) if city_only else Place.browse()
         if not chosen:
             code = request.env['place.postcode'].sudo().prefix_of(post.get('postcode') or '')
             if code:
@@ -152,14 +163,40 @@ class IkikuPortal(http.Controller):
             # They gave a code AND a place: that is somebody telling us which area a prefix
             # belongs to, which is the only way this table learns. The code is not kept.
             request.env['place.postcode'].sudo().learn(post.get('postcode') or '', chosen)
+        self._suggest_missed(post.get('place_missed'), chosen)
         return chosen, (typed if typed and typed != chosen.name else ''), Place.browse(), None
+
+    def _suggest_missed(self, missed, chosen):
+        """What somebody typed that found nothing, then the place they chose: offered to a
+        place editor as another name for that place. Offered, never written -- a person
+        decides whether «علیشاه عوض» is شهریار's old name or somebody's street."""
+        missed = ' '.join((missed or '').split())[:80]
+        if not missed or not chosen:
+            return
+        digits = max((len(run) for run in ''.join(ch if ch.isdigit() else ' '
+                                                  for ch in suggest_text.normalize(missed)).split()), default=0)
+        if digits >= DIGITS_RUN:
+            return
+        folded = suggest_text.spaced(missed)
+        known = [chosen.name] + chosen.alias_ids.mapped('name')
+        if any(suggest_text.spaced(name) == folded for name in known if name):
+            return
+        request.env['place.suggestion'].sudo().suggest({
+            'name': missed, 'action': 'alias', 'place_id': chosen.id, 'alias_kind': 'colloquial',
+            'origin': 'portal', 'user_id': request.env.user.id,
+            'note': "نوشته شد و چیزی پیدا نشد؛ بعد همین جا انتخاب شد.",
+        })
 
     def _place_values(self, place, typed='', candidates=None, error=None, city_only=False):
         """What ikiku_portal.place_fields needs, from one place or from a failed attempt."""
+        # A text that found nothing is carried to the next attempt, so when the person then
+        # picks a place, the two can be put side by side for an editor (_suggest_missed).
+        missed = typed if (error and typed and not candidates) else request.params.get('place_missed', '')
         responder = request.env['ir.config_parameter'].sudo().get_param(RESPONDER_PARAM) or ''
         return {
             'place_suggest_url': responder or ODOO_SUGGEST_URL,
             'place_suggest_fallback': ODOO_SUGGEST_URL if responder else '',
+            'place_missed': (missed or '')[:80],
             'place_id': place.id if place else '',
             'place_q': typed or (place.name if place else ''),
             'place_path': place.path if place else '',

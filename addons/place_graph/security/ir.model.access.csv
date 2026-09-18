@@ -7,3 +7,4 @@ access_place_link_user,place.link read,model_place_link,base.group_user,1,0,0,0
 access_place_link_editor,place.link editor,model_place_link,place_graph.group_place_editor,1,1,1,1
 access_place_postcode_user,place.postcode read,model_place_postcode,base.group_user,1,0,0,0
 access_place_postcode_editor,place.postcode editor,model_place_postcode,place_graph.group_place_editor,1,1,1,1
+access_place_suggestion_editor,place.suggestion editor,model_place_suggestion,place_graph.group_place_editor,1,1,1,1

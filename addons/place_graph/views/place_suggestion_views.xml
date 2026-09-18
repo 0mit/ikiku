@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Suggestions wait for a place editor. Ratifying writes the overlay (rows no bundle
+       touches); rejecting needs a written reason. -->
+  <record id="view_place_suggestion_list" model="ir.ui.view">
+    <field name="name">place.suggestion.list</field>
+    <field name="model">place.suggestion</field>
+    <field name="arch" type="xml">
+      <list string="Suggestions" decoration-muted="state != 'proposed'">
+        <field name="name"/>
+        <field name="action"/>
+        <field name="place_id"/>
+        <field name="times"/>
+        <field name="origin"/>
+        <field name="create_date" string="First suggested"/>
+        <field name="state" widget="badge" decoration-success="state == 'ratified'"
+               decoration-danger="state == 'rejected'" decoration-info="state == 'proposed'"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_place_suggestion_form" model="ir.ui.view">
+    <field name="name">place.suggestion.form</field>
+    <field name="model">place.suggestion</field>
+    <field name="arch" type="xml">
+      <form string="Suggestion">
+        <header>
+          <button name="action_ratify" type="object" string="Ratify" class="btn-primary"
+                  invisible="state != 'proposed'"
+                  confirm="This writes the change into the places, as a decision made here. Go on?"/>
+          <button name="action_reject" type="object" string="Reject" invisible="state != 'proposed'"/>
+          <button name="action_reopen" type="object" string="Back to waiting" invisible="state == 'proposed'"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <div class="oe_title">
+            <h1><field name="name" readonly="state != 'proposed'"/></h1>
+          </div>
+          <group>
+            <group>
+              <field name="action" readonly="state != 'proposed'"/>
+              <field name="place_id" readonly="state != 'proposed'"/>
+              <field name="alias_kind" invisible="action != 'alias'" readonly="state != 'proposed'"/>
+              <field name="place_kind" invisible="action != 'place'" readonly="state != 'proposed'"/>
+              <field name="new_parent_id" invisible="action != 'move'" readonly="state != 'proposed'"/>
+              <field name="latitude" invisible="action != 'place'" readonly="state != 'proposed'"/>
+              <field name="longitude" invisible="action != 'place'" readonly="state != 'proposed'"/>
+            </group>
+            <group>
+              <field name="origin" readonly="1"/>
+              <field name="user_id" readonly="1"/>
+              <field name="times"/>
+              <field name="decided_by" invisible="state == 'proposed'"/>
+              <field name="decided_on" invisible="state == 'proposed'"/>
+              <field name="result_place_id" invisible="not result_place_id"/>
+            </group>
+          </group>
+          <group string="Why">
+            <field name="note" nolabel="1" colspan="2"/>
+          </group>
+          <group string="Decision">
+            <field name="decision_note" nolabel="1" colspan="2"
+                   placeholder="Required to reject: why not."/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_place_suggestion_search" model="ir.ui.view">
+    <field name="name">place.suggestion.search</field>
+    <field name="model">place.suggestion</field>
+    <field name="arch" type="xml">
+      <search string="Suggestions">
+        <field name="name"/>
+        <field name="place_id"/>
+        <filter name="waiting" string="Waiting" domain="[('state', '=', 'proposed')]"/>
+        <filter name="decided" string="Decided" domain="[('state', '!=', 'proposed')]"/>
+        <separator/>
+        <filter name="from_portal" string="From the site" domain="[('origin', '=', 'portal')]"/>
+        <filter name="from_import" string="From a source" domain="[('origin', '=', 'import')]"/>
+        <filter name="group_action" string="Suggestion" context="{'group_by': 'action'}"/>
+      </search>
+    </field>
+  </record>
+
+  <record id="action_place_suggestion" model="ir.actions.act_window">
+    <field name="name">Suggestions</field>
+    <field name="res_model">place.suggestion</field>
+    <field name="view_mode">list,form</field>
+    <field name="context">{'search_default_waiting': 1}</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Nothing waiting.</p>
+      <p>When somebody types a place the search does not know and then picks another, what
+         they typed waits here as another name for what they picked. Nothing reaches the places
+         until an editor ratifies it.</p>
+    </field>
+  </record>
+
+  <menuitem id="menu_place_suggestion" parent="menu_place_root" action="action_place_suggestion"
+            sequence="20"/>
+</odoo>

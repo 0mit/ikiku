@@ -168,7 +168,8 @@ class TestPlaceSuggestPage(HttpCase):
 
 @tagged('post_install', '-at_install')
 class TestPlaceBox(HttpCase):
-    """The «کجا؟» box: which door it asks, what the server accepts back,."""
+    """The «کجا؟» box: which door it asks, what the server accepts back, and what it learns
+    from a search that found nothing."""
 
     @classmethod
     def setUpClass(cls):
@@ -200,3 +201,28 @@ class TestPlaceBox(HttpCase):
         self.assertTrue(results)
         self.assertEqual(results[0]['id'], self.karaj.id)
         self.assertTrue({'code', 'label', 'detail', 'kind', 'score', 'field', 'match'} <= set(results[0]))
+
+    def test_an_archived_place_sent_back_is_not_accepted(self):
+        self.authenticate('box-worker', 'box-worker-pass-1')
+        self.url_open('/join')
+        gone = self.env['place.node'].sudo().create({'name': "ویرانه", 'code': 'test-box-gone', 'kind': 'city',
+                                                     'active': False})
+        response = self.post('/join/where', {'place_id': str(gone.id), 'place_q': ''})
+        self.assertEqual(response.status_code, 200, "the id is ignored and the empty text is asked again")
+        self.assertFalse(self.env['res.users'].search([('login', '=', 'box-worker')]).partner_id.place_id)
+
+    def test_a_search_that_found_nothing_is_offered_to_an_editor(self):
+        self.authenticate('box-worker', 'box-worker-pass-1')
+        self.url_open('/join')
+        Suggestion = self.env['place.suggestion'].sudo()
+        self.post('/join/where', {'place_id': str(self.karaj.id), 'place_q': "کرج",
+                                  'place_missed': "مهرشهر قدیم"})
+        offered = Suggestion.search([('place_id', '=', self.karaj.id), ('name', '=', "مهرشهر قدیم")])
+        self.assertEqual((offered.action, offered.origin, offered.state), ('alias', 'portal', 'proposed'))
+        self.assertFalse(self.karaj.alias_ids.filtered(lambda a: a.name == "مهرشهر قدیم"),
+                         "offered, not written: an editor decides")
+        # A post code is never kept, not even as a suggestion.
+        self.post('/join/where', {'place_id': str(self.karaj.id), 'place_q': "کرج",
+                                  'place_missed': "۳۱۵۸۷۶۵۴۳۲"})
+        self.assertFalse(Suggestion.search([('name', 'like', '3158')]))
+        self.assertFalse(Suggestion.search([('name', 'like', '۳۱۵۸')]))

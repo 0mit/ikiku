@@ -157,7 +157,7 @@
     <label for="place_q" class="ikiku__label">کجا؟</label>
     <div data-suggest="" t-att-data-suggest-url="place_suggest_url or '/places/suggest'"
          t-att-data-suggest-fallback="place_suggest_fallback or None"
-         data-suggest-target="place_id"
+         data-suggest-target="place_id" data-suggest-missed="place_missed"
          data-suggest-min="2" data-suggest-count="{n} جا پیدا شد"
          data-suggest-waiting="هنوز دنبالِ بقیه‌ام…"
          t-att-data-suggest-kinds="ask_postcode and 'all' or 'city'">
@@ -170,6 +170,9 @@
         <t t-set="spinner_id" t-value="'ikiku-ku-light-place'"/>
       </t>
     </div>
+    <!-- The last text that found nothing: if a place is picked after it, an editor is asked
+         whether it is another name for that place. Never a post code (see _suggest_missed). -->
+    <input type="hidden" name="place_missed" t-att-value="place_missed"/>
     <input type="hidden" name="place_id" t-att-value="place_id"/>
     <p t-if="place_path" class="ikiku__hint">الان: <t t-out="place_path"/></p>
     <p t-if="not ask_postcode" class="ikiku__hint">شهر کافیه. آدرسِ خونه رو نمی‌خوایم.</p>

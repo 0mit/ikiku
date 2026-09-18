@@ -5,7 +5,7 @@ import os
 import shutil
 import tempfile
 
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 from odoo.tests import TransactionCase, tagged
 
 from odoo.addons.place_graph.models.place import NOTIFY_CHANNEL, SPEC_PARAM
@@ -157,3 +157,53 @@ class TestBundle(TransactionCase):
         # and it reads the spec through a view that shows nothing else of the parameters
         self.env.cr.execute("SELECT value FROM place_responder_spec")
         self.assertEqual([json.loads(row[0]) for row in self.env.cr.fetchall()], [spec])
+
+
+@tagged('post_install', '-at_install')
+class TestSuggestion(TransactionCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        Place = cls.env['place.node']
+        cls.city = Place.create({'name': "شهریار", 'code': 'test-sg-shahriar', 'kind': 'city'})
+        cls.Suggestion = cls.env['place.suggestion']
+
+    def test_the_same_suggestion_is_counted_not_repeated(self):
+        first = self.Suggestion.suggest({'name': "علیشاه عوض", 'place_id': self.city.id, 'origin': 'portal'})
+        again = self.Suggestion.suggest({'name': "علیشاه  عوض", 'place_id': self.city.id, 'origin': 'portal'})
+        self.assertEqual(first, again)
+        self.assertEqual(first.times, 2)
+
+    def test_nothing_changes_until_an_editor_ratifies(self):
+        suggestion = self.Suggestion.suggest({'name': "علیشاه عوض", 'place_id': self.city.id,
+                                              'alias_kind': 'old', 'origin': 'portal'})
+        self.assertFalse(self.city.alias_ids)
+        suggestion.action_ratify()
+        alias = self.city.alias_ids
+        self.assertEqual((alias.name, alias.kind, alias.origin), ("علیشاه عوض", 'old', 'overlay'))
+        self.assertEqual(suggestion.state, 'ratified')
+        self.assertEqual(suggestion.decided_by, self.env.user)
+        found = [r['record'] for r in self.env['place.node'].suggest_places(
+            "علیشاه عوض", domain=[('code', 'like', 'test-sg-%')])]
+        self.assertEqual(found[:1], [self.city])
+
+    def test_a_missing_place_is_added_as_the_overlay(self):
+        suggestion = self.Suggestion.create({'name': "شهرک نو", 'action': 'place', 'place_id': self.city.id,
+                                             'place_kind': 'neighbourhood'})
+        suggestion.action_ratify()
+        added = suggestion.result_place_id
+        self.assertEqual((added.name, added.parent_id, added.origin), ("شهرک نو", self.city, 'overlay'))
+
+    def test_a_rejection_says_why(self):
+        suggestion = self.Suggestion.suggest({'name': "خیابان ما پلاک ۳", 'place_id': self.city.id})
+        with self.assertRaises(UserError):
+            suggestion.action_reject()
+        suggestion.decision_note = "An address, not a name of the place."
+        suggestion.action_reject()
+        self.assertEqual(suggestion.state, 'rejected')
+        self.assertFalse(self.city.alias_ids)
+
+    def test_a_post_code_suggestion_keeps_five_digits_only(self):
+        with self.assertRaises(Exception):
+            self.Suggestion.create({'name': "1416753955", 'action': 'postcode', 'place_id': self.city.id})

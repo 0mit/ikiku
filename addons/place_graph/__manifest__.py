@@ -23,6 +23,8 @@ Somewhere to put a place, once, so every model that needs one points at the same
 * A country's places arrive as a BUNDLE (tools/bundle.py): files made outside Odoo, checked,
   checksummed, and taken in with COPY -- a hundred thousand places in seconds, an update as
   its difference. Rows are the source's (origin 'bundle') or decided here (origin 'overlay').
+* People suggest what the map is missing; a place editor ratifies or rejects, with a reason.
+  What is ratified is the overlay, and no bundle ever overwrites or retires it.
 * Every change to the place tables is announced (NOTIFY place_graph_changed) with the ranking
   spec published beside it, so a search service outside Odoo can hold the places in memory
   and rank exactly as this module does (services/place_responder).
@@ -40,6 +42,7 @@ everywhere, and a country's own places are data.
         'security/place_groups.xml',
         'security/ir.model.access.csv',
         'views/place_views.xml',
+        'views/place_suggestion_views.xml',
     ],
     'installable': True,
 }

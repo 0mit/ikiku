@@ -60,4 +60,19 @@
     document.querySelectorAll("[data-suggest-kinds]").forEach(function (box) {
         addParameter(box, "kinds", box.dataset.suggestKinds);
     });
+
+    // A search that found nothing is remembered in the form (data-suggest-missed names the
+    // field). If the person then picks a place, the server asks an editor whether what they
+    // first typed is another name for it -- the way «علیشاه عوض» reaches شهریار. The server
+    // decides what is kept; a post code never is.
+    document.addEventListener("search-suggest:results", function (event) {
+        const box = event.target.closest("[data-suggest-missed]");
+        if (!box || event.detail.count || event.detail.query.length < 3) {
+            return;
+        }
+        const field = box.parentElement.querySelector('input[name="' + box.dataset.suggestMissed + '"]');
+        if (field) {
+            field.value = event.detail.query;
+        }
+    });
 })();
