@@ -155,3 +155,13 @@ class TestPlace(TransactionCase):
         self.tehran.sequence, self.mashhad.sequence = 43, 42
         found = [r['record'] for r in self.env['place.node'].suggest_places("فلسطین", domain=self.ONLY_FIXTURE)]
         self.assertEqual(found[:2], [self.palestine_mashhad, self.palestine])
+
+    def test_a_neighbourhood_comes_before_a_street_of_the_same_name_whatever_the_city(self):
+        # The operator, 2026-09-18: «بعثت» meant the neighbourhoods; streets called that in a
+        # bigger city had jumped ahead of them when the city's order was put first.
+        self.tehran.sequence, self.mashhad.sequence = 41, 42
+        street = self.env['place.node'].create({'name': "فلسطین", 'code': 'test-ir-te-tehran-street',
+                                                'kind': 'street', 'parent_id': self.tehran.id, 'sequence': 190})
+        self.palestine.sequence = self.palestine_mashhad.sequence = 150
+        found = [r['record'] for r in self.env['place.node'].suggest_places("فلسطین", domain=self.ONLY_FIXTURE)]
+        self.assertLess(found.index(self.palestine_mashhad), found.index(street))

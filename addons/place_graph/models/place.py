@@ -230,8 +230,8 @@ class PlaceNode(models.Model):
             if not have or answer['score'] > have['score'] or (
                     answer['score'] == have['score'] and 'via' in have and 'via' not in answer):
                 answers[target.id] = answer
-        ordered = sorted(answers.values(), key=lambda r: (-r['score'], r['record']._city_sequence(),
-                                                          r['record'].sequence, r['record'].id))
+        ordered = sorted(answers.values(), key=lambda r: (-r['score'], r['record'].sequence,
+                                                          r['record']._city_sequence(), r['record'].id))
         return ordered[:limit]
 
     def _city_sequence(self):

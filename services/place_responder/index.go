@@ -400,27 +400,29 @@ func (ix *Index) climb(p *Place, kinds map[string]bool) *Place {
 		return nil
 	}
 	for _, a := range ancestors(p, ix.byID) {
-		if a.Active && kinds[a.Kind] {
+		// never further up than a city: a province says nothing about where a street is
+		if a.Active && kinds[a.Kind] && finenessOf(a.Kind) >= finenessOf("city") {
 			return a
 		}
 	}
 	return nil
 }
 
-// sortResults: best score first. Equal scores keep the published order: the order of the
-// city the place is in (so «فلسطین» in Tehran comes before the one in Rasht, by the same
-// big-cities data that orders the cities themselves), then the place's own sequence, then id.
+// sortResults: best score first. Equal scores keep the published order: the place's own
+// sequence (its kind: a neighbourhood called «بعثت» before a street called «بعثت»), then the
+// order of the city it is in (of two neighbourhoods of that name, the one in the city more
+// people mean), then id.
 func sortResults(results []Result) {
 	sort.Slice(results, func(a, b int) bool {
 		ra, rb := results[a], results[b]
 		if ra.Score != rb.Score {
 			return ra.Score > rb.Score
 		}
-		if ra.Place.CitySequence != rb.Place.CitySequence {
-			return ra.Place.CitySequence < rb.Place.CitySequence
-		}
 		if ra.Place.Sequence != rb.Place.Sequence {
 			return ra.Place.Sequence < rb.Place.Sequence
+		}
+		if ra.Place.CitySequence != rb.Place.CitySequence {
+			return ra.Place.CitySequence < rb.Place.CitySequence
 		}
 		return ra.Place.ID < rb.Place.ID
 	})
