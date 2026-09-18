@@ -60,11 +60,15 @@ loaded, from where, how old, how long it took) and `POST /reload`. `SIGHUP` also
 
 ## What it costs
 
-On the Iran bundle (103,415 places): about 110 MiB of live heap, a 2–6 s build that happens
-beside the index in use (so nobody waits), and 5 ms a search on one core across a deliberately
-heavy query mix. Answers are cached per data generation. Run it with `GOMAXPROCS=1` and
-`GOMEMLIMIT=300MiB`; `deploy/compose.places.yml` also caps the container at 400 MB and half a
-core.
+On the Iran bundle (103,415 places): about 110 MiB of live heap on a workstation, and 5 ms a search on
+one core across a deliberately heavy query mix. Answers are cached per data generation.
+
+On the production VM (one slower core, measured 2026-09-18): a load takes 15–20 s beside the
+index in use, answers take 1.5–11 ms before the cache, and memory settles at 300–420 MiB with a
+reload peaking at about 820 MB. `deploy/compose.places.yml` therefore runs it with
+`GOMAXPROCS=1`, `GOGC=50` and `GOMEMLIMIT=650MiB`, caps the container at 1 GB, and gives it a
+quarter of Odoo's CPU weight rather than a hard CPU cap. A cap of half a core made a load take
+56 s and every answer twice as slow, even on an idle machine.
 
 ## Building and deploying
 

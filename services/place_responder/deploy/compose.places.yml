@@ -5,6 +5,11 @@
 # It reaches Postgres on the compose network as `db`, answers on loopback only, and nginx
 # puts /places/q in front of it. The limits are the point: this machine has one core and
 # 7.8 GiB shared with Odoo and Postgres, and during a reload two indexes are briefly alive.
+# CPU is a WEIGHT, not a cap: a cap of half a core (tried 2026-09-18) made a load take 56 s
+# and every answer twice as slow even when the machine was idle; a quarter of Odoo's weight
+# lets it use an idle core fully and yields to Odoo whenever both want it.
+# The secret is read as the container's user: /opt/ikiku/secrets/places_dsn is 600 and
+# owned by 65534:65534.
 services:
   places:
     image: ikiku/place-responder:${PLACES_VERSION:?set PLACES_VERSION to the image tag}
@@ -17,14 +22,17 @@ services:
       PLACES_LANG: fa_IR
       PLACES_POLL: 10m
       GOMAXPROCS: "1"
-      GOMEMLIMIT: 300MiB
+      GOMEMLIMIT: 650MiB
+      # Collect at half the live heap rather than all of it: the index is long-lived and the
+      # garbage is a reload's scratch, so a tighter heap costs little CPU and a lot less memory.
+      GOGC: "50"
     volumes:
       - /opt/ikiku/secrets/places_dsn:/run/places/places_dsn:ro,z
     ports:
       - "127.0.0.1:8070:8070"
       - "127.0.0.1:8071:8071"
-    mem_limit: 400m
-    cpus: 0.5
+    mem_limit: 1g
+    cpu_shares: 256
     read_only: true
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]

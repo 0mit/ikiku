@@ -25,7 +25,7 @@ order, and as measured on a copy built the old way:
   creates the view `place_responder_spec`;
 - place_ir's first sync against the existing rows finds 2 changed places (the two with no
   point, whose 0.0 becomes NULL) and re-derives 568 search indexes. That took 4.4 s on
-  a workstation; expect under a minute on one core;
+  a workstation; it took 11.7 s on the production host on 2026-09-18 (the whole update 90 s);
 - adds «پیشنهادها» (Places → Suggestions) for place editors.
 
 ## 2. The read-only role
@@ -35,6 +35,7 @@ order, and as measured on a copy built the old way:
         -f - < /opt/ikiku/src/services/place_responder/deploy/places_ro.sql
     printf 'postgres://places_ro:%s@db:5432/ikiku?sslmode=disable\n' "$(cat /tmp/pw)" \
         > /opt/ikiku/secrets/places_dsn && chmod 600 /opt/ikiku/secrets/places_dsn && rm /tmp/pw
+    chown 65534:65534 /opt/ikiku/secrets/places_dsn    # the container's user reads it
 
 The role may read the four place tables, `res_lang` and the spec view, and may LISTEN. It
 cannot read partners, and it cannot read `ir_config_parameter`, which holds the SMS keys and
