@@ -210,15 +210,51 @@
       <field name="model_name">res.partner</field>
       <field name="field_name">place_public_id</field>
       <field name="visibility">public</field>
-      <field name="reason">شهرِ شخص، یا محله‌اش اگر خودش خواسته است؛ درشت‌ترین جایی که از او نشان داده می‌شود — بند ۷.</field>
+      <field name="reason">شهرِ شخص، یا محله‌اش اگر خودش انتخاب کرده است؛ درشت‌ترین جایی که از او نشان داده می‌شود — بند ۷.</field>
     </record>
-    <!-- 2026-09-18: the person decides whether their neighbourhood is shown (بند ۷: هر کس
-         خودش تصمیم می‌گیرد). The choice itself is theirs and nobody else's business. -->
-    <record id="vis_res_partner_ikiku_show_neighbourhood" model="ikiku.visibility.policy">
+    <!-- 2026-09-18: how much of their place a person or a café shows is their own choice,
+         city by default (بند ۷: هر کس خودش تصمیم می‌گیرد). The choice itself is theirs. -->
+    <record id="vis_res_partner_place_visibility" model="ikiku.visibility.policy">
       <field name="model_name">res.partner</field>
-      <field name="field_name">ikiku_show_neighbourhood</field>
+      <field name="field_name">place_visibility</field>
       <field name="visibility">restricted</field>
-      <field name="reason">انتخابِ خودِ شخص؛ آنچه دیده می‌شود نتیجهٔ آن است، نه خودِ انتخاب.</field>
+      <field name="reason">انتخابِ خودِ شخص؛ آنچه دیده می‌شود نتیجهٔ آن است (place_public_id)، نه خودِ انتخاب.</field>
+    </record>
+    <record id="vis_ikiku_business_place_visibility" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">place_visibility</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">انتخابِ دارنده؛ نتیجه‌اش place_public_id است.</field>
+    </record>
+    <record id="vis_ikiku_business_name_public" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">name_public</field>
+      <field name="visibility">restricted</field>
+      <field name="reason">انتخابِ دارنده؛ نتیجه‌اش public_name است.</field>
+    </record>
+    <record id="vis_ikiku_business_public_name" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.business</field>
+      <field name="field_name">public_name</field>
+      <field name="visibility">public</field>
+      <field name="reason">نامِ کافه فقط اگر دارنده خواسته باشد؛ وگرنه خالی است.</field>
+    </record>
+    <record id="vis_ikiku_demand_business_public_name" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.demand</field>
+      <field name="field_name">business_public_name</field>
+      <field name="visibility">public</field>
+      <field name="reason">نامِ کافهٔ این نیاز، فقط اگر دارنده خواسته باشد.</field>
+    </record>
+    <record id="vis_ikiku_photo_image" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.photo</field>
+      <field name="field_name">image</field>
+      <field name="visibility">public</field>
+      <field name="reason">فقط پس از تأییدِ یکی از همکارانِ ایکیکو؛ تنها درِ بیرونش /ikiku/photo است که پیش از هر چیز is_public را می‌سنجد. اطلاعاتِ مکانِ داخلِ فایل هنگامِ بارگذاری پاک می‌شود.</field>
+    </record>
+    <record id="vis_ikiku_photo_is_public" model="ikiku.visibility.policy">
+      <field name="model_name">ikiku.photo</field>
+      <field name="field_name">is_public</field>
+      <field name="visibility">public</field>
+      <field name="reason">اینکه عکس تأیید شده است.</field>
     </record>
     <record id="vis_res_partner_place_city_id" model="ikiku.visibility.policy">
       <field name="model_name">res.partner</field>
@@ -254,7 +290,7 @@
       <field name="model_name">ikiku.business</field>
       <field name="field_name">place_public_id</field>
       <field name="visibility">public</field>
-      <field name="reason">محله یا منطقهٔ کسب‌وکار؛ همان اندازه که روی کارت دیده می‌شود.</field>
+      <field name="reason">شهرِ کسب‌وکار، یا محله‌اش اگر دارنده انتخاب کرده است؛ هرگز خیابان.</field>
     </record>
     <record id="vis_ikiku_business_place_city_id" model="ikiku.visibility.policy">
       <field name="model_name">ikiku.business</field>

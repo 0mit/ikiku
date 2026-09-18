@@ -150,20 +150,25 @@
     </span>
   </template>
 
-  <!-- Province first, nothing chosen for the person; the city is typed.
-       The box asks the place responder when one is configured (place_suggest_url) and falls
-       back to Odoo's own endpoint when it does not answer; the ranking is the same in both. -->
+  <!-- «کجا؟». Two uses (operator, 2026-09-18): the ONE place of a person or a business,
+       its neighbourhood or its city where the tree knows no neighbourhood (place_mode
+       'area'), and where the work of a need is, down to its street ('all'). The box asks
+       the place responder when one is configured and Odoo when it does not answer. -->
   <template id="place_fields" name="جا">
-    <label for="place_q" class="ikiku__label">کجا؟</label>
+    <t t-set="area_mode" t-value="place_mode == 'area'"/>
+    <label for="place_q" class="ikiku__label">
+      <t t-if="area_mode">محله‌تون کجاست؟</t><t t-else="">کجا؟</t>
+    </label>
+    <p t-if="area_mode" class="ikiku__hint">اسمِ محله کافیه؛ آدرسِ دقیق نمی‌خوایم. اگه شهرتون محله نداره، اسمِ شهر رو بنویسید.</p>
     <div data-suggest="" t-att-data-suggest-url="place_suggest_url or '/places/suggest'"
          t-att-data-suggest-fallback="place_suggest_fallback or None"
          data-suggest-target="place_id" data-suggest-missed="place_missed"
          data-suggest-min="2" data-suggest-count="{n} جا پیدا شد"
          data-suggest-waiting="هنوز دنبالِ بقیه‌ام…" data-suggest-via="از راهِ {via}"
-         t-att-data-suggest-kinds="ask_postcode and 'all' or 'city'">
+         t-att-data-suggest-kinds="'area' if area_mode else 'all'">
       <input class="ikiku__field ikiku__field--big" id="place_q" name="place_q" type="search"
              t-att-value="place_q" required="required" autocomplete="off"
-             t-att-placeholder="ask_postcode and 'مثلاً: فلسطین، تهران' or 'مثلاً: کرج'"
+             t-att-placeholder="'مثلاً: نارمک، تهران' if area_mode else 'مثلاً: فلسطین، تهران'"
              t-att-aria-invalid="errors_place and 'true'"/>
       <t t-call="ikiku_portal.ku_spinner">
         <t t-set="busy_slot" t-value="True"/>
@@ -175,7 +180,6 @@
     <input type="hidden" name="place_missed" t-att-value="place_missed"/>
     <input type="hidden" name="place_id" t-att-value="place_id"/>
     <p t-if="place_path" class="ikiku__hint">الان: <t t-out="place_path"/></p>
-    <p t-if="not ask_postcode" class="ikiku__hint">شهر کافیه. آدرسِ خونه رو نمی‌خوایم.</p>
 
     <!-- The text matched more than one place: the person says which, and the form works
          without JavaScript because this is an ordinary group of radio buttons. -->
@@ -197,6 +201,30 @@
         خودِ کد پستی جایی ذخیره نمیشه.</p>
     </t>
     <p t-if="errors_place" class="ikiku__error" role="alert" t-out="errors_place"/>
+    <t t-if="area_mode" t-call="ikiku_portal.visibility_field"/>
+  </template>
+
+  <!-- How much of the place the world sees: the owner's choice, the city unless they say
+       otherwise (بند ۷: هر کس خودش تصمیم می‌گیرد، و پیش‌فرض احتیاط است). An ordinary pair
+       of radio buttons, so it works without JavaScript. -->
+  <template id="visibility_field" name="چه چیزی دیده شود">
+    <fieldset class="ikiku__choices">
+      <legend class="ikiku__label">بقیه چی ببینن؟</legend>
+      <label class="ikiku__choice">
+        <input type="radio" name="place_visibility" value="city"
+               t-att-checked="place_visibility != 'neighbourhood' and 'checked'"/>
+        <span>فقط شهر <small class="ikiku__muted">(پیش‌فرض)</small></span>
+      </label>
+      <label class="ikiku__choice">
+        <input type="radio" name="place_visibility" value="neighbourhood"
+               t-att-checked="place_visibility == 'neighbourhood' and 'checked'"/>
+        <span>محله هم دیده بشه</span>
+      </label>
+      <p class="ikiku__hint">
+        <t t-if="visibility_owner == 'business'">نیازهای مجموعه هم همین‌قدر نشون داده می‌شن. خیابون هیچ‌وقت نشون داده نمی‌شه.</t>
+        <t t-else="">محله‌تون رو ما نگه می‌داریم، ولی فقط اگه اینجا بگید به بقیه نشون داده می‌شه.</t>
+      </p>
+    </fieldset>
   </template>
 
 </odoo>

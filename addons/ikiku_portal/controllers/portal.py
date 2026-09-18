@@ -16,6 +16,7 @@ The worker screens double as edit screens: ?edit=1 comes back to /me.
 One account may hold both sides (operator, 2026-09-16). The person's own place (استان و
 شهر on /join/where) and a café's place are kept apart; either page offers the other side.
 """
+import base64
 from datetime import date
 
 from werkzeug.exceptions import Forbidden
@@ -58,8 +59,11 @@ def _form_list(name):
 
 # What a person may say about where they live: a city, and nothing finer (بند ۷).
 CITY_KINDS = PICKER_KINDS['city']
-# What a person may add, only if they want it shown: the part of their city, never finer.
+# The one place a person or a café gives (operator, 2026-09-18): the part of the city they are
+# in, or the city itself where the tree knows no part of it. Never a street, never an address.
 AREA_KINDS = ('neighbourhood', 'district')
+AREA_PICK = PICKER_KINDS['area']
+VISIBILITIES = ('city', 'neighbourhood')
 # What a café may say: down to its street. Not a county -- cities hang off one, nobody says one.
 PLACE_KINDS = PICKER_KINDS['all']
 # Where the «کجا؟» box asks while somebody types. The responder (services/place_responder)
@@ -110,7 +114,7 @@ class IkikuPortal(http.Controller):
     # around them (place_graph); a post code is read as its first five digits and never kept.
     PLACE_CANDIDATES = 6
 
-    def _place_from_post(self, post, city_only=False, previous=None):
+    def _place_from_post(self, post, mode='all', previous=None):
         """(place, hint, candidates, error) for what was typed, picked or read off a code.
 
         Four ways in, in the order a person is most likely to have used them:
@@ -118,36 +122,39 @@ class IkikuPortal(http.Controller):
           - they wrote a post code, whose first five digits name an area;
           - they wrote a name that matches one place well enough to be the answer;
           - they wrote a name that matches several, and are asked which.
-        `city_only` climbs from whatever they picked to its city: a person says which city
-        they work in, and nothing finer about where they live is asked for or kept.
+
+        mode 'area' is the one place of a person or a café (operator, 2026-09-18): a
+        neighbourhood, or a city or village only where the tree knows no neighbourhood in it.
+        A street climbs to its neighbourhood; a city that has neighbourhoods asks which one.
+        mode 'all' is where the work of a need is, down to its street.
         """
         Place = request.env['place.node'].sudo()
+        kinds = AREA_PICK if mode == 'area' else PLACE_KINDS
         typed = ' '.join((post.get('place_q') or '').split())
         chosen = Place.browse(to_int(post.get('place_id')) or 0).exists()
         # The id came from a browser, and a browser can send any id. It has to be a place the
-        # form may offer: active, and of a kind this form asks for -- a city form climbs from
-        # finer to its city, anything else that is not on offer is ignored and the text read.
+        # form may offer: active, and of a kind this form asks for -- finer climbs to the
+        # nearest offered place above it, anything else is ignored and the text read.
         if chosen and not chosen.active:
             chosen = Place.browse()
-        if chosen and chosen.kind not in (CITY_KINDS if city_only else PLACE_KINDS):
-            chosen = chosen.place_of_kinds(CITY_KINDS) if city_only else Place.browse()
-        if not chosen:
+        if chosen and chosen.kind not in kinds:
+            chosen = chosen.place_of_kinds(kinds) if mode == 'area' and chosen.kind == 'street' else Place.browse()
+        if not chosen and mode != 'area':
             code = request.env['place.postcode'].sudo().prefix_of(post.get('postcode') or '')
             if code:
                 chosen = request.env['place.postcode'].sudo().place_for_code(post.get('postcode'))
                 if not chosen:
                     return None, typed, Place.browse(), "این کد پستی رو نمی‌شناسم؛ اسمِ جا رو بنویسید."
         if not chosen and typed:
-            within = (previous or Place.browse()).place_of_kinds(('city', 'village')) if previous else None
-            found = Place.suggest_places(typed, kinds=CITY_KINDS if city_only else PLACE_KINDS,
-                                         within=within, limit=self.PLACE_CANDIDATES)
+            if mode == 'area' and any(ch.isdigit() for ch in suggest_text.normalize(typed)) \
+                    and not any(ch.isalpha() and not ch.isdigit() for ch in suggest_text.normalize(typed)):
+                return None, typed, Place.browse(), "اسمِ محله رو بنویسید؛ کد پستی و پلاک لازم نیست."
+            within = previous.place_of_kinds(CITY_KINDS) if previous else None
+            found = Place.suggest_places(typed, kinds=kinds, within=within, limit=self.PLACE_CANDIDATES)
             places, scores = [], []
             for result in found:
-                place = result['record']
-                if city_only:
-                    place = place.place_of_kinds(CITY_KINDS) or place
-                if place not in places:          # several streets in one city are that city
-                    places.append(place)
+                if result['record'] not in places:
+                    places.append(result['record'])
                     scores.append(result['score'])
             if len(places) == 1 or (places and scores[0] > scores[1]):
                 chosen = places[0]
@@ -156,17 +163,26 @@ class IkikuPortal(http.Controller):
                     "چندتا جا با این اسم هست؛ کدومش؟"
             else:
                 return None, typed, Place.browse(), \
-                    "این جا رو پیدا نکردم. اسمِ شهر رو بنویسید؛ محله رو بعداً می‌تونید اضافه کنید."
+                    ("این محله رو پیدا نکردم. اسمِ محله یا خیابونِ اصلیِ نزدیکتون رو بنویسید."
+                     if mode == 'area' else
+                     "این جا رو پیدا نکردم. اسمِ محله یا شهر رو بنویسید.")
         if not chosen:
-            return None, typed, Place.browse(), "بنویسید کجا."
-        if city_only:
-            chosen = chosen.place_of_kinds(CITY_KINDS) or chosen
-        else:
+            return None, typed, Place.browse(), ("محله‌تون کجاست؟" if mode == 'area' else "بنویسید کجا.")
+        if mode == 'area' and chosen.kind in CITY_KINDS and self._has_areas(chosen):
+            # A city whose neighbourhoods the tree knows: the one place asked for is a neighbourhood.
+            return None, typed, Place.browse(), \
+                "کدوم محلهٔ %s؟ اسمِ محله رو بنویسید و از پیشنهادها انتخاب کنید." % chosen.name
+        if mode != 'area':
             # They gave a code AND a place: that is somebody telling us which area a prefix
             # belongs to, which is the only way this table learns. The code is not kept.
             request.env['place.postcode'].sudo().learn(post.get('postcode') or '', chosen)
         self._suggest_missed(post.get('place_missed'), chosen)
         return chosen, (typed if typed and typed != chosen.name else ''), Place.browse(), None
+
+    def _has_areas(self, city):
+        """Whether the tree knows any neighbourhood or district inside `city`."""
+        return bool(request.env['place.node'].sudo().search_count(
+            [('parent_path', '=like', city.parent_path + '%'), ('kind', 'in', AREA_KINDS)], limit=1))
 
     def _suggest_missed(self, missed, chosen):
         """What somebody typed that found nothing, then the place they chose: offered to a
@@ -189,32 +205,7 @@ class IkikuPortal(http.Controller):
             'note': "نوشته شد و چیزی پیدا نشد؛ بعد همین جا انتخاب شد.",
         })
 
-    def _area_from_post(self, post, city):
-        """(neighbourhood, error) for the optional «محله» of a person, inside `city`.
-
-        Nothing given is (None, None): only the city is kept. A name is matched among the
-        neighbourhoods and districts of that city; an address -- a house number, a post code --
-        is refused rather than read, because a neighbourhood is all that is asked."""
-        Place = request.env['place.node'].sudo()
-        city = city.place_of_kinds(CITY_KINDS) or city
-        typed = ' '.join((post.get('place_area_q') or '').split())[:80]
-        chosen = Place.browse(to_int(post.get('place_area_id')) or 0).exists()
-        inside = lambda p: p.active and p.kind in AREA_KINDS and city in p.ancestor_places()
-        if chosen and inside(chosen):
-            return chosen, None
-        if not typed:
-            return None, None
-        if any(ch.isdigit() for ch in suggest_text.normalize(typed)):
-            return None, "فقط اسمِ محله؛ پلاک و کد پستی لازم نیست."
-        found = [r for r in Place.suggest_places(typed, kinds=AREA_KINDS, within=city, limit=6)
-                 if inside(r['record'])]
-        if found and (len(found) == 1 or found[0]['score'] > found[1]['score']):
-            return found[0]['record'], None
-        if found:
-            return None, "چند محله با این اسم در %s هست؛ از پیشنهادها یکی رو انتخاب کنید." % city.name
-        return None, "این محله رو در %s پیدا نکردم. خالی بذارید تا فقط شهرتون دیده بشه." % city.name
-
-    def _place_values(self, place, typed='', candidates=None, error=None, city_only=False):
+    def _place_values(self, place, typed='', candidates=None, error=None, mode='all', visibility=None):
         """What ikiku_portal.place_fields needs, from one place or from a failed attempt."""
         # A text that found nothing is carried to the next attempt, so when the person then
         # picks a place, the two can be put side by side for an editor (_suggest_missed).
@@ -228,7 +219,9 @@ class IkikuPortal(http.Controller):
             'place_q': typed or (place.name if place else ''),
             'place_path': place.path if place else '',
             'place_candidates': candidates or request.env['place.node'].browse(),
-            'ask_postcode': not city_only,
+            'ask_postcode': mode == 'all',
+            'place_mode': mode,
+            'place_visibility': visibility or 'city',
             'errors_place': error,
         }
 
@@ -323,37 +316,27 @@ class IkikuPortal(http.Controller):
 
     @http.route('/join/where', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
     def join_where(self, edit=None, **post):
+        """One place -- the person's neighbourhood -- and how much of it the world sees: their
+        city unless they choose their neighbourhood (operator, 2026-09-18; بند ۷)."""
         partner = self._partner()
         place, typed, candidates, error = partner.place_id, '', None, None
+        visibility = partner.place_visibility or 'city'
         if request.httprequest.method == 'POST':
-            place, typed, candidates, error = self._place_from_post(post, city_only=True,
-                                                                   previous=partner.place_id)
-            area, area_error = (self._area_from_post(post, place) if place else (None, None))
-            if place and not area_error:
-                # The neighbourhood is kept only because the person gave it to be shown, and
-                # shown only because they gave it (بند ۷: each person decides). Empty, and only
-                # the city is kept -- a neighbourhood given earlier is let go of.
-                partner.write({'place_id': (area or place).id, 'place_hint': typed,
-                               'ikiku_show_neighbourhood': bool(area)})
+            visibility = post.get('place_visibility') if post.get('place_visibility') in VISIBILITIES else 'city'
+            place, typed, candidates, error = self._place_from_post(post, mode='area', previous=partner.place_id)
+            if place:
+                partner.write({'place_id': place.id, 'place_hint': typed, 'place_visibility': visibility})
                 resource = self._resource(create=True)
                 availability = self._availability(resource)
                 if availability and not self._availability_referenced(availability):
-                    availability.write({'place_id': place.id})
+                    # Where they look for work is their city: the availability is seen by the
+                    # other side, and the neighbourhood was given for the person's own face.
+                    availability.write({'place_id': (place.place_of_kinds(CITY_KINDS) or place).id})
                 return self._after_worker_save(resource, edit)
-        city = place.place_of_kinds(CITY_KINDS) if place else place
-        values = self._place_values(city or place, typed or partner.place_hint or '', candidates, error,
-                                   city_only=True)
-        shown = partner.place_id if (partner.ikiku_show_neighbourhood and partner.place_id.kind in AREA_KINDS) \
-            else None
-        values.update({
-            'has_business': 'ku' in ikiku_sides(request.env.user), 'edit': edit,
-            'place_area_id': (shown.id if shown else '') if request.httprequest.method != 'POST'
-                              else (post.get('place_area_id') or ''),
-            'place_area_q': (shown.name if shown else '') if request.httprequest.method != 'POST'
-                             else (post.get('place_area_q') or ''),
-            'area_within': city.id if city else '',
-            'errors_area': area_error if request.httprequest.method == 'POST' else None,
-        })
+        values = self._place_values(place, typed or partner.place_hint or '', candidates, error,
+                                    mode='area', visibility=visibility)
+        values.update({'has_business': 'ku' in ikiku_sides(request.env.user), 'edit': edit,
+                       'visibility_owner': 'person'})
         return self._worker_page('ikiku_portal.join_where', 2, values)
 
     @http.route('/join/skills', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
@@ -474,7 +457,172 @@ class IkikuPortal(http.Controller):
             'first_visit': kw.get('saved') == '1',
             'sides': ikiku_sides(request.env.user),
             'number': self._number(partner),
+            'queue': [dict(self._workplace_card(entry.business_id), position=to_fa_digits(entry.position),
+                           number=to_fa_digits(entry.sequence)) for entry in self._queue_of(partner)],
+            'photo_count': to_fa_digits(request.env['ikiku.photo'].sudo().search_count([('partner_id', '=', partner.id)])),
+            'visibility_text': self._visibility_text(partner),
+            'note': {'joined': "به صف اضافه شدید.", 'left': "از صف بیرون اومدید."}.get(kw.get('done')),
         })
+
+    def _visibility_text(self, record):
+        """What the world sees of this place, said plainly."""
+        if not record.place_id:
+            return "هنوز جایی نگفتید"
+        if record.place_public_id == record.place_id and record.place_id.kind in AREA_KINDS:
+            return "برای همه: محله هم"
+        return "برای همه: فقط شهر (%s)" % (record.place_public_id.name or record.place_city_name or '')
+
+    # ---------------------------------------------------- queue and photos
+    # A person may wait for a café that is not hiring now (operator, 2026-09-18): only cafés
+    # whose holder's identity is verified are listed, and a card shows only what the café chose
+    # to make public -- its name if it said so, its city or neighbourhood as it chose, and the
+    # photos a person here approved.
+    CAFE_LIST_LIMIT = 60
+
+    def _workplace_card(self, business, mine=None):
+        """What a worker may see of a café, as plain values: nothing a template could follow
+        back to the holder or to a field the café kept private."""
+        Favorite = request.env['ikiku.favorite'].sudo()
+        kind = dict(business._fields['kind'].selection).get(business.kind, "مجموعه").replace('/', ' یا ')
+        return {
+            'id': business.id,
+            'title': business.public_name or "یک %s در %s" % (kind, business.place_public_id.name or "شهری که نگفته"),
+            'named': bool(business.public_name),
+            'place': business.place_public_id.path or '',
+            'photos': business.photo_ids.filtered('is_public').ids[:3],
+            'waiting': to_fa_digits(Favorite.search_count([('business_id', '=', business.id)])),
+            'mine': mine,
+            'hiring': business.ikiku_has_open_need(),
+        }
+
+    def _queue_of(self, partner):
+        Favorite = request.env['ikiku.favorite'].sudo()
+        return Favorite.search([('partner_id', '=', partner.id)], order='joined_on, id')
+
+    @http.route('/workplaces', type='http', auth='user', website=True, sitemap=False)
+    def workplaces(self, city=None, everywhere=None, **kw):
+        resource = self._resource()
+        if not resource:
+            return request.redirect('/join')
+        partner = self._partner()
+        Business = request.env['ikiku.business'].sudo()
+        domain = [('state', '!=', 'suspended'), ('is_verified', '=', True),
+                  ('partner_id', '!=', partner.commercial_partner_id.id)]
+        home = partner.place_city_id
+        wanted = Business.env['place.node'].browse(to_int(city) or 0).exists() or home
+        if wanted and not everywhere:
+            domain.append(('place_city_id', '=', wanted.id))
+        mine = {entry.business_id.id: entry for entry in self._queue_of(partner)}
+        cards = []
+        for business in Business.search(domain, order='public_name, id', limit=self.CAFE_LIST_LIMIT * 2):
+            if business.ikiku_has_open_need():
+                continue            # hiring now: it is on /jobs, not in a queue
+            entry = mine.get(business.id)
+            cards.append(self._workplace_card(business, {'position': to_fa_digits(entry.position),
+                                                    'number': to_fa_digits(entry.sequence)} if entry else None))
+            if len(cards) >= self.CAFE_LIST_LIMIT:
+                break
+        return request.render('ikiku_portal.workplaces', {
+            'cards': cards, 'city': wanted if not everywhere else None, 'home': home,
+            'everywhere': bool(everywhere), 'note': {'joined': "به صف اضافه شدید.", 'left': "از صف بیرون اومدید."}.get(kw.get('done')),
+        })
+
+    @http.route('/workplaces/<int:business_id>/queue', type='http', auth='user', methods=['POST'], website=True,
+                sitemap=False)
+    def workplace_queue(self, business_id, action='join', **kw):
+        resource = self._resource()
+        if not resource:
+            return request.redirect('/join')
+        partner = self._partner()
+        business = request.env['ikiku.business'].sudo().browse(business_id).exists()
+        if not business or not business.is_verified or business.state == 'suspended':
+            return request.not_found()
+        Favorite = request.env['ikiku.favorite'].sudo()
+        if action == 'leave':
+            Favorite.search([('partner_id', '=', partner.id), ('business_id', '=', business.id)]).ikiku_leave()
+            done = 'left'
+        else:
+            try:
+                Favorite.ikiku_join(partner, business)
+            except UserError:
+                return request.redirect('/workplaces')
+            done = 'joined'
+        back = kw.get('back') if kw.get('back') in ('/me', '/workplaces') else '/workplaces'
+        return request.redirect('%s?done=%s' % (back, done))
+
+    # Photos wait for a person here before anybody else sees them (operator, 2026-09-18).
+    def _photo_rows(self, photos):
+        states = {'pending': "در انتظارِ بررسی", 'approved': "تأیید شد؛ همه می‌بینن", 'rejected': "رد شد"}
+        return [{'id': photo.id, 'state': photo.state, 'label': states[photo.state],
+                 'reason': photo.reject_reason or ''} for photo in photos]
+
+    def _photo_upload(self, partner=None, business=None):
+        upload = request.httprequest.files.get('photo')
+        if not upload or not upload.filename:
+            return "یه عکس انتخاب کنید."
+        try:
+            request.env['ikiku.photo'].ikiku_add(upload.read(), partner=partner, business=business)
+        except UserError as failure:
+            return str(failure.args[0] if failure.args else failure)
+        return None
+
+    @http.route('/me/photos', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
+    def my_photos(self, **post):
+        partner = self._partner()
+        error = None
+        if request.httprequest.method == 'POST':
+            error = self._photo_upload(partner=partner)
+            if not error:
+                return request.redirect('/me/photos?done=sent')
+        photos = request.env['ikiku.photo'].sudo().search([('partner_id', '=', partner.id)])
+        return request.render('ikiku_portal.photos', {
+            'photos': self._photo_rows(photos), 'error': error, 'owner': 'person', 'back': '/me',
+            'action': '/me/photos', 'sent': post.get('done') == 'sent'})
+
+    @http.route('/business/photos', type='http', auth='user', methods=['GET', 'POST'], website=True, sitemap=False)
+    def business_photos(self, business=None, **post):
+        biz = self._business(business)
+        if not biz:
+            return request.redirect('/business')
+        error = None
+        if request.httprequest.method == 'POST':
+            error = self._photo_upload(business=biz)
+            if not error:
+                return request.redirect('/business/photos?business=%d&done=sent' % biz.id)
+        return request.render('ikiku_portal.photos', {
+            'photos': self._photo_rows(biz.photo_ids), 'error': error, 'owner': 'business', 'business': biz,
+            'back': '/business', 'action': '/business/photos?business=%d' % biz.id,
+            'sent': post.get('done') == 'sent'})
+
+    @http.route('/photos/<int:photo_id>/remove', type='http', auth='user', methods=['POST'], website=True,
+                sitemap=False)
+    def remove_photo(self, photo_id, **kw):
+        photo = request.env['ikiku.photo'].sudo().browse(photo_id).exists()
+        if photo and self._owns_photo(photo):
+            back = '/me/photos' if photo.partner_id else '/business/photos?business=%d' % photo.business_id.id
+            photo.unlink()
+            return request.redirect(back)
+        return request.not_found()
+
+    def _owns_photo(self, photo):
+        partner = request.env.user.partner_id.commercial_partner_id
+        return (photo.partner_id and photo.partner_id.commercial_partner_id == partner) or \
+            (photo.business_id and photo.business_id in self._businesses())
+
+    @http.route('/ikiku/photo/<int:photo_id>', type='http', auth='public', website=True, sitemap=False)
+    def photo(self, photo_id, **kw):
+        """The one door a photo leaves by: an approved one to anybody, any other only to its
+        owner or to staff. Its visibility row points here."""
+        photo = request.env['ikiku.photo'].sudo().browse(photo_id).exists()
+        if not photo or not photo.image:
+            return request.not_found()
+        staff = not request.env.user._is_public() and request.env.user.has_group('ikiku_base.group_ikiku_staff')
+        if not photo.is_public and not (not request.env.user._is_public() and self._owns_photo(photo)) and not staff:
+            return request.not_found()
+        return request.make_response(base64.b64decode(photo.image), headers=[
+            ('Content-Type', 'image/jpeg'),
+            ('Cache-Control', 'public, max-age=86400' if photo.is_public else 'private, no-store'),
+            ('X-Content-Type-Options', 'nosniff')])
 
     # ------------------------------------------------------------- businesses
     def _businesses(self):
@@ -537,6 +685,15 @@ class IkikuPortal(http.Controller):
         return request.render('ikiku_portal.business_home', {
             'businesses': [{
                 'business': business,
+                'visibility_text': self._visibility_text(business),
+                'queue': [{'position': to_fa_digits(entry.position), 'number': to_fa_digits(entry.sequence),
+                           'name': entry.partner_id.name,
+                           'place': entry.partner_id.place_public_id.path or '',
+                           'photo': entry.partner_id.ikiku_approved_photo_id()}
+                          for entry in request.env['ikiku.favorite'].sudo().search(
+                              [('business_id', '=', business.id)], order='sequence')],
+                'photo_count': to_fa_digits(len(business.photo_ids)) if business.photo_ids else 0,
+                'queue_count': to_fa_digits(request.env['ikiku.favorite'].sudo().search_count([('business_id', '=', business.id)])),
                 'needs': [{'demand': d, 'seats': to_fa_digits(d.seats),
                            'dates': dates_text(d.date_start, d.date_end, today),
                            'is_open': d.state in ('open', 'proposed'),
@@ -545,7 +702,8 @@ class IkikuPortal(http.Controller):
             } for business in businesses],
             'note': {'filled': "درخواست بسته شد: همکار پیدا کردید.",
                      'cancelled': "درخواست لغو شد. دلیلی که نوشتید ثبت شد.",
-                     'changed': "تغییرها ثبت شد."}.get(kw.get('done')),
+                     'changed': "تغییرها ثبت شد.",
+                     'where': "جا و آنچه دیده می‌شود ثبت شد."}.get(kw.get('done')),
             'sides': ikiku_sides(request.env.user),
             'number': self._number(self._partner()),
         })
@@ -579,13 +737,39 @@ class IkikuPortal(http.Controller):
                 made = self._partner()._ikiku_grant_role('ku', business_name=name, another=bool(businesses))
                 remember_side('ku')
                 self._keep_draft({'business_id': made.id})
-                return request.redirect('/business/need/who')
+                # Next: where the café is, and what of it the world may see (operator, 2026-09-18).
+                return request.redirect('/business/where?business=%d&first=1' % made.id)
             error = "اسمِ کافه یا رستوران رو اینجا بنویسید."
         else:
             name = business.name if business else ''
         return request.render('ikiku_portal.business_name', {
             'business': business, 'name': name, 'error': error, 'another': bool(businesses) and not business,
             'has_resource': 'ki' in ikiku_sides(request.env.user)})
+
+    @http.route('/business/where', type='http', auth='user', methods=['GET', 'POST'], website=True,
+                sitemap=False)
+    def business_where(self, business=None, first=None, **post):
+        """The café's one place -- its neighbourhood -- how much of it the world sees (its city
+        unless the holder chooses its neighbourhood), and whether its name is shown at all
+        (not unless the holder says so). Operator, 2026-09-18."""
+        biz = self._business(business)
+        if not biz:
+            return request.redirect('/business')
+        place, typed, candidates, error = biz.place_id, '', None, None
+        visibility, name_public = biz.place_visibility or 'city', biz.name_public
+        if request.httprequest.method == 'POST':
+            visibility = post.get('place_visibility') if post.get('place_visibility') in VISIBILITIES else 'city'
+            name_public = post.get('name_public') == 'yes'
+            place, typed, candidates, error = self._place_from_post(post, mode='area', previous=biz.place_id)
+            if place:
+                biz.write({'place_id': place.id, 'place_hint': typed, 'place_visibility': visibility,
+                           'name_public': name_public})
+                return request.redirect('/business/need/who' if first else '/business?done=where')
+        values = self._place_values(place, typed or biz.place_hint or '', candidates, error,
+                                    mode='area', visibility=visibility)
+        values.update({'business': biz, 'first': first, 'name_public': name_public,
+                       'visibility_owner': 'business'})
+        return request.render('ikiku_portal.business_where', values)
 
     @http.route('/business/need/who', type='http', auth='user', methods=['GET', 'POST'], website=True,
                 sitemap=False)

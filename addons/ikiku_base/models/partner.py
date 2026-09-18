@@ -37,16 +37,12 @@ MOBILE_BY_TOOLS = "شمارهٔ ورود فقط با کدِ پیامک یا اب
 
 class ResPartner(models.Model):
     _inherit = ['res.partner', 'ikiku.publishable', 'place.located']
-    # A person's public face stops at their city unless THEY say otherwise: a neighbourhood is
-    # nearly an address, and بند ۷ keeps an address out of public reach -- «هر کس خودش تصمیم
-    # می‌گیرد کجای این مرز بایستد، و پیش‌فرضِ ما احتیاط است». The operator chose, 2026-09-18,
-    # that a person may give their neighbourhood to be shown; nobody else decides it for them.
-    _place_public_kinds = ('city', 'village', 'province')
-    _place_public_kinds_shown = ('neighbourhood', 'district', 'city', 'village', 'province')
+    # A person's public face is their city unless THEY choose their neighbourhood (place_visibility
+    # of place.located, default city): a neighbourhood is nearly an address, and بند ۷ keeps an
+    # address out of public reach -- «هر کس خودش تصمیم می‌گیرد کجای این مرز بایستد، و پیش‌فرضِ ما
+    # احتیاط است». This line is the ceiling: never finer than a neighbourhood.
+    _place_public_kinds = ('neighbourhood', 'district', 'city', 'village', 'province')
 
-    ikiku_show_neighbourhood = fields.Boolean(
-        "محله‌ام دیده شود", default=False, copy=False,
-        help="خودِ شخص خواسته محله‌اش دیده شود. بدونِ آن، فقط شهرش عمومی است — بند ۷.")
     ikiku_mobile = fields.Char("موبایل (لنگرِ هویت)", index=True, copy=False)
     # بند ۷: mail tracks `phone`, which would copy every number into the chatter.
     phone = fields.Char(tracking=False)
@@ -195,11 +191,3 @@ class ResPartner(models.Model):
     def _onchange_ikiku_mobile(self):
         if self.ikiku_mobile:
             self.ikiku_mobile = self.normalise_mobile(self.ikiku_mobile)
-
-    def _place_public_kinds_of(self):
-        self.ensure_one()
-        return self._place_public_kinds_shown if self.ikiku_show_neighbourhood else self._place_public_kinds
-
-    @api.depends('place_id', 'place_id.parent_id', 'place_id.kind', 'ikiku_show_neighbourhood')
-    def _compute_place_parts(self):
-        return super()._compute_place_parts()

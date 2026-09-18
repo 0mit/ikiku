@@ -630,3 +630,28 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
 @media (prefers-reduced-motion: reduce) {
   .ikiku-ku-spinner svg { animation: ikiku-ku-breathe 1.6s ease-in-out infinite; }
 }
+
+// Queue, workplaces and photos (2026-09-18).
+.ikiku {
+  &__queue { margin-block: 1.5rem; }
+  &__queue-row { display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  &__queue-row p { margin-block: .25rem 0; }
+  &__queue-list { padding-inline-start: 1.25rem; display: grid; gap: .5rem; }
+  &__queue-person { display: flex; align-items: center; gap: .6rem; }
+  &__avatar { inline-size: 2.5rem; block-size: 2.5rem; border-radius: 50%; object-fit: cover; }
+  &__workplaces { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+  &__workplace h2 { margin-block: .5rem .25rem; }
+  &__photos { display: flex; gap: .35rem; overflow-x: auto; }
+  &__photos img { block-size: 7rem; border-radius: 8px; object-fit: cover; }
+  &__photo-grid { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); margin-block: 1rem; }
+  &__photo { margin: 0; display: grid; gap: .35rem; }
+  &__photo img { inline-size: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+  &__photo-state { font-size: .85rem; }
+  &__photo-state--pending { color: var(--ik-muted, #5b616b); }
+  &__photo-state--approved { color: #1b7a3d; }
+  &__photo-state--rejected { color: var(--ik-error, #b3261e); }
+}
+.ikiku__file { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; cursor: pointer; }
+.ikiku__file-name { color: var(--ik-muted, #5b616b); font-size: .9rem; }
+.ikiku__file-input { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; overflow: hidden; }
+.ikiku__file-input:focus-visible + * , .ikiku__file:focus-within .ikiku__secondary { outline: 2px solid var(--ik-blue); outline-offset: 2px; }

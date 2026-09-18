@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Who is waiting for which café, in the order they came. Read-only: a place in a queue
+       is the person's, and only they join or leave it. -->
+  <record id="view_favorite_list" model="ir.ui.view">
+    <field name="name">ikiku.favorite.list</field>
+    <field name="model">ikiku.favorite</field>
+    <field name="arch" type="xml">
+      <list string="صفِ انتظار" create="0" edit="0" default_group_by="business_id">
+        <field name="business_id"/>
+        <field name="sequence"/>
+        <field name="partner_id"/>
+        <field name="joined_on"/>
+      </list>
+    </field>
+  </record>
+  <record id="action_favorite" model="ir.actions.act_window">
+    <field name="name">صفِ انتظارِ کافه‌ها</field>
+    <field name="res_model">ikiku.favorite</field>
+    <field name="view_mode">list</field>
+  </record>
+  <menuitem id="menu_ikiku_favorite" name="صفِ انتظار" parent="ikiku_base.menu_ikiku_root"
+            action="action_favorite" sequence="9"/>
+</odoo>

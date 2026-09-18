@@ -14,7 +14,8 @@ class IkikuBusiness(models.Model):
     _name = 'ikiku.business'
     _description = "کسب‌وکار"
     _inherit = ['mail.thread', 'ikiku.publishable', 'place.located']
-    # A café is a place of business: its neighbourhood is public, its street is not.
+    # A café is a place of business: at most its neighbourhood is public, never its street,
+    # and only if its holder chooses so (place_visibility, default city -- operator, 2026-09-18).
     _place_public_kinds = ('neighbourhood', 'district', 'city', 'village', 'province')
     _order = 'name'
 
@@ -27,6 +28,13 @@ class IkikuBusiness(models.Model):
     name = fields.Char("نام کسب‌وکار", required=True, tracking=True,
                        help="همان نامی که روی سردر است.")
     slug = fields.Char("نشانیِ عمومی", copy=False, index=True)
+    # Whether the world may know which café this is (operator, 2026-09-18): the holder decides,
+    # and until they do the name stays private, as it always was. `public_name` is the name
+    # when shown and nothing when not, so a page reads one field and cannot get it wrong.
+    name_public = fields.Boolean("نام برای همه دیده شود", default=False, tracking=True,
+                                 help="پیش‌فرض خاموش: تا دارنده نخواهد، نامِ کافه عمومی نیست.")
+    public_name = fields.Char("نامِ عمومی", compute='_compute_public_name', store=True)
+    photo_ids = fields.One2many('ikiku.photo', 'business_id', string="عکس‌ها")
     # The café's own place. Until 2026-09-16 these were related to the holder's partner, so a
     # holder who also looks for work (operator, 2026-09-16) moved the café by saying where they
     # live, and a staff edit of the café moved the person. The columns and values are kept.
@@ -52,6 +60,17 @@ class IkikuBusiness(models.Model):
     overlay_ids = fields.One2many('ikiku.spec.overlay', 'business_id', string="لایه‌های محلی")
 
     # One person may hold several businesses (operator, 2026-09-16): no UNIQUE(partner_id).
+
+    @api.depends('name', 'name_public')
+    def _compute_public_name(self):
+        for business in self:
+            business.public_name = business.name if business.name_public else False
+
+    def ikiku_has_open_need(self):
+        """Whether it is looking for people right now -- the opposite of «not free now»."""
+        self.ensure_one()
+        return bool(self.env['ikiku.demand'].sudo().search_count(
+            [('business_id', '=', self.id), ('state', 'in', ('open', 'proposed'))], limit=1))
 
     @api.model_create_multi
     def create(self, vals_list):

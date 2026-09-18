@@ -16,14 +16,26 @@
               <field name="place_id" options="{'no_create': True}"/>
               <field name="place_path" readonly="1"/>
               <field name="place_hint" readonly="1" invisible="not place_hint"/>
-              <field name="place_id" options="{'no_create': True}"/>
-              <field name="place_path" readonly="1"/>
+              <field name="place_visibility" widget="radio"/>
               <field name="place_public_id" readonly="1"/>
               <field name="province_id"/><field name="city"/>
+              <field name="name_public"/>
+              <field name="public_name" readonly="1" invisible="not name_public"/>
               <field name="is_verified" readonly="1"/><field name="slug" readonly="1"/>
             </group>
           </group>
           <notebook>
+            <page string="عکس‌ها" name="photos">
+              <field name="photo_ids" mode="kanban" readonly="1">
+                <kanban>
+                  <field name="state"/>
+                  <templates><t t-name="card">
+                    <field name="image" widget="image" options="{'size': [0, 120]}"/>
+                    <field name="state" widget="badge"/>
+                  </t></templates>
+                </kanban>
+              </field>
+            </page>
             <page string="جایگاه‌های شغلی">
               <field name="position_ids">
                 <list editable="bottom">

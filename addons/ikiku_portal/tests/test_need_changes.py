@@ -188,8 +188,14 @@ class TestSeveralBusinesses(HttpCase):
         page = self.url_open('/business/name?new=1').text
         self.assertIn("اسمِ کافه یا رستورانِ دیگه‌تون چیه؟", page)
         done = self.post('/business/name?new=1', {'name': "رستوران لیمو"})
-        self.assertTrue(self.location(done).endswith('/business/need/who'))
-        return self.businesses()[1]
+        # A new business says where it is next (operator, 2026-09-18), then goes on to its need.
+        self.assertIn('/business/where?business=', self.location(done))
+        second = self.businesses()[1]
+        area = self.env['place.node'].sudo().search([('code', '=', 'ir-jahanshar')])
+        went = self.post('/business/where?business=%d&first=1' % second.id,
+                         {'business': str(second.id), 'first': '1', 'place_id': str(area.id)})
+        self.assertTrue(self.location(went).endswith('/business/need/who'))
+        return second
 
     def walk_need(self, city):
         self.post('/business/need/who', {'node_id': str(self.node.id)})

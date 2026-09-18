@@ -36,3 +36,15 @@
         });
     });
 })();
+
+// The photo picker (2026-09-18): say which file was chosen, in the page's own words.
+document.addEventListener("change", function (event) {
+    const input = event.target;
+    if (!input.matches || !input.matches(".ikiku__file-input")) {
+        return;
+    }
+    const name = input.form && input.form.querySelector("[data-ikiku-file-name]");
+    if (name) {
+        name.textContent = input.files && input.files.length ? input.files[0].name : "هنوز عکسی انتخاب نشده";
+    }
+});

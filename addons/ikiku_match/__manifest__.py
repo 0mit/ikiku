@@ -4,7 +4,7 @@
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Human Resources',
-    'version': '19.0.0.1.4',
+    'version': '19.0.0.1.5',
     'license': 'AGPL-3',
     'depends': ['ikiku_supply', 'ikiku_demand', 'project'],
     'data': [
@@ -14,6 +14,7 @@
         'data/ikiku_cron.xml',
         'views/ikiku_demand_close_views.xml',
         'views/ikiku_match_views.xml',
+        'views/ikiku_favorite_views.xml',
         'views/ikiku_match_menus.xml',
     ],
     'installable': True,

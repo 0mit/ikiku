@@ -19,6 +19,8 @@ PUBLIC_DISPLAY = [
     # Where the work is, as fine as this record may say it: place_public_id is the
     # neighbourhood of a need whose place is a street (place.located decides, not this line).
     ('place', 'place_public_id', lambda d: d.place_public_id.path or ''),
+    # The business's name, only when its holder chose to show it (public_name is empty otherwise).
+    ('business', 'business_public_name', lambda d: d.business_public_name or ''),
     ('date_start_fa', 'date_start', lambda d: d.date_start_fa),
     ('date_end_fa', 'date_end', lambda d: d.date_end_fa),
 ]

@@ -31,41 +31,17 @@
     <t t-call="website.layout">
       <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
         <t t-call="ikiku_portal.step_head"/>
-        <h1 class="ikiku__question">کدوم استان و کدوم شهر؟</h1>
-        <p class="ikiku__lead">آدرسِ خونه رو نمی‌خوایم. فقط شهر.</p>
-        <p t-if="has_business" class="ikiku__lead">اینجا شهرِ خودتونه که توش دنبالِ کار می‌گردید. شهرِ مجموعه‌تون عوض نمیشه.</p>
+        <h1 class="ikiku__question">کدوم محله؟</h1>
+        <p class="ikiku__lead">آدرسِ خونه رو نمی‌خوایم؛ فقط محله. خودتون انتخاب می‌کنید بقیه چقدرش رو ببینن.</p>
+        <p t-if="has_business" class="ikiku__lead">اینجا جای خودتونه که توش دنبالِ کار می‌گردید. جای مجموعه‌تون عوض نمی‌شه.</p>
         <form method="post" class="ikiku__form" data-ikiku-form="">
           <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
           <input t-if="edit" type="hidden" name="edit" value="1"/>
           <t t-call="ikiku_portal.place_fields"/>
-          <t t-call="ikiku_portal.area_field"/>
           <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
       </div></div>
     </t>
-  </template>
-
-  <!-- A person's neighbourhood: asked only as something they may CHOOSE to show (بند ۷ —
-       هر کس خودش تصمیم می‌گیرد). Empty, only the city is kept and shown. -->
-  <template id="area_field" name="محله، اگر بخواهید">
-    <label for="place_area_q" class="ikiku__label">محله (اختیاری)</label>
-    <p class="ikiku__hint">فقط اگه می‌خواید کسب‌وکارها ببینن کدوم محلهٔ شهرتون هستید. آدرسِ خونه نه؛ اسمِ محله کافیه.
-      خالی بذارید تا فقط شهرتون دیده بشه.</p>
-    <div data-suggest="" t-att-data-suggest-url="place_suggest_url or '/places/suggest'"
-         t-att-data-suggest-fallback="place_suggest_fallback or None"
-         data-suggest-target="place_area_id" data-suggest-min="2" data-suggest-count="{n} محله پیدا شد"
-         data-suggest-waiting="هنوز دنبالِ بقیه‌ام…" data-suggest-via="از راهِ {via}"
-         data-suggest-kinds="neighbourhood,district" t-att-data-suggest-within="area_within or None">
-      <input class="ikiku__field" id="place_area_q" name="place_area_q" type="search"
-             t-att-value="place_area_q" autocomplete="off" placeholder="مثلاً: نارمک"
-             t-att-aria-invalid="errors_area and 'true'"/>
-      <t t-call="ikiku_portal.ku_spinner">
-        <t t-set="busy_slot" t-value="True"/>
-        <t t-set="spinner_id" t-value="'ikiku-ku-light-area'"/>
-      </t>
-    </div>
-    <input type="hidden" name="place_area_id" t-att-value="place_area_id"/>
-    <p t-if="errors_area" class="ikiku__error" role="alert" t-out="errors_area"/>
   </template>
 
   <template id="join_skills" name="چه کاری بلدید">
@@ -227,9 +203,13 @@
 
         <dl class="ikiku__summary">
           <div><dt>اسم</dt><dd t-out="partner.name"/><a href="/join/name?edit=1">عوض کنید</a></div>
-          <div><dt>استان و شهر</dt>
-            <dd><t t-out="partner.ikiku_province_id.name"/><t t-if="partner.ikiku_city">، <t t-out="partner.ikiku_city"/></t></dd>
+          <div><dt>محله</dt>
+            <dd><t t-out="partner.place_path or 'هنوز نگفتید'"/>
+              <small class="ikiku__muted"> · <t t-out="visibility_text"/></small></dd>
             <a href="/join/where?edit=1">عوض کنید</a></div>
+          <div><dt>عکس‌ها</dt>
+            <dd><t t-if="photo_count"><t t-out="photo_count"/> عکس</t><t t-else="">هنوز عکسی نذاشتید</t></dd>
+            <a href="/me/photos">عکس‌ها</a></div>
           <div><dt>کارهایی که بلدید</dt>
             <dd t-out="skills_text or 'هنوز نگفتید'"/>
             <a href="/join/skills?edit=1">اضافه کنید</a></div>
@@ -251,6 +231,30 @@
         </section>
 
         <t t-call="ikiku_portal.my_number"/>
+
+        <!-- The queues this person waits in, in the order they joined (operator, 2026-09-18). -->
+        <section class="ikiku__queue">
+          <h2 class="ikiku__subhead">صف‌هایی که توشون هستید</h2>
+          <p t-if="note" class="ikiku__status" role="status" t-out="note"/>
+          <t t-if="queue">
+            <t t-foreach="queue" t-as="q">
+              <div class="ikiku__card ikiku__queue-row">
+                <div>
+                  <strong t-out="q['title']"/>
+                  <p class="ikiku__muted"><t t-out="q['place']"/> · نفرِ <t t-out="q['position']"/> در صف (نوبتِ شمارهٔ <t t-out="q['number']"/>)</p>
+                  <p t-if="q['hiring']" class="ikiku__status">الان همکار می‌خوان. <a href="/jobs">کارهای باز رو ببینید</a></p>
+                </div>
+                <form t-att-action="'/workplaces/%d/queue' % q['id']" method="post">
+                  <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                  <input type="hidden" name="action" value="leave"/><input type="hidden" name="back" value="/me"/>
+                  <button class="ikiku__secondary" type="submit">بیرون اومدن از صف</button>
+                </form>
+              </div>
+            </t>
+          </t>
+          <p t-else="" class="ikiku__lead">هنوز تو صفِ جایی نیستید.</p>
+          <p><a class="ikiku__secondary" href="/workplaces">جاهایی که الان همکار نمی‌خوان و می‌شه منتظرشون موند</a></p>
+        </section>
 
         <section>
           <h2 class="ikiku__subhead">قرارهای کارِ من</h2>
@@ -288,7 +292,7 @@
                  placeholder="مثلاً: کافه نارنج" autocomplete="organization" required="required"
                  t-att-aria-invalid="error and 'true'"/>
           <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
-          <p class="ikiku__lead">اسمِ مجموعه‌تون تو فهرستِ «کارهای باز» نمیاد.</p>
+          <p class="ikiku__lead">اسمِ مجموعه‌تون فقط وقتی به بقیه نشون داده می‌شه که خودتون بخواید؛ قدمِ بعد می‌پرسیم.</p>
           <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
         </form>
       </div></div>
@@ -476,6 +480,18 @@
               <h2 class="ikiku__subhead" t-out="biz.name"/>
               <a t-att-href="'/business/name?business=%d' % biz.id">عوض کردنِ اسم</a>
             </div>
+            <dl class="ikiku__summary">
+              <div><dt>جا</dt>
+                <dd><t t-out="biz.place_path or 'هنوز نگفتید'"/>
+                  <small class="ikiku__muted"> · <t t-out="row['visibility_text']"/></small></dd>
+                <a t-att-href="'/business/where?business=%d' % biz.id">عوض کنید</a></div>
+              <div><dt>اسم برای همه</dt>
+                <dd t-if="biz.name_public">نشون داده می‌شه</dd><dd t-else="">نشون داده نمی‌شه</dd>
+                <a t-att-href="'/business/where?business=%d' % biz.id">عوض کنید</a></div>
+              <div><dt>عکس‌ها</dt>
+                <dd><t t-if="row['photo_count']"><t t-out="row['photo_count']"/> عکس</t><t t-else="">هنوز عکسی نذاشتید</t></dd>
+                <a t-att-href="'/business/photos?business=%d' % biz.id">عکس‌ها</a></div>
+            </dl>
             <a class="ikiku__go ikiku__go--block" t-att-href="'/business/need/new?business=%d' % biz.id">
               <t t-if="len(businesses) &gt; 1">همکارِ تازه برای <t t-out="biz.name"/></t>
               <t t-else="">همکارِ تازه می‌خوام</t>
@@ -496,6 +512,22 @@
               </t>
             </div>
             <p t-else="" class="ikiku__lead">هنوز درخواستی ندارید.</p>
+            <!-- Who has been waiting for this business, in the order they came. -->
+            <div class="ikiku__queue">
+              <h3 class="ikiku__subhead">صفِ انتظار<t t-if="row['queue']">: <t t-out="row['queue_count']"/> نفر</t></h3>
+              <t t-if="row['queue']">
+                <ol class="ikiku__queue-list">
+                  <t t-foreach="row['queue']" t-as="q">
+                    <li class="ikiku__queue-person">
+                      <img t-if="q['photo']" t-att-src="'/ikiku/photo/%d' % q['photo']" alt="" class="ikiku__avatar"/>
+                      <span><strong t-out="q['name']"/><small class="ikiku__muted"> · <t t-out="q['place']"/> · نوبتِ <t t-out="q['number']"/></small></span>
+                    </li>
+                  </t>
+                </ol>
+                <p class="ikiku__hint">اینا وقتی همکار نمی‌خواستید منتظرتون موندن، به همین ترتیب. وقتی درخواستِ تازه بدید، خودشون می‌بینن.</p>
+              </t>
+              <p t-else="" class="ikiku__hint">هنوز کسی منتظرِ مجموعه‌تون نیست. کسایی که کار می‌خوان، مجموعه‌هایی رو که الان همکار نمی‌خوان می‌بینن و می‌تونن منتظرشون بمونن.</p>
+            </div>
           </section>
         </t>
         <p class="ikiku__lead ikiku__biz-add">یه کافه یا رستورانِ دیگه هم دارید؟ <a href="/business/name?new=1">اضافه‌ش کنید</a></p>
@@ -506,6 +538,124 @@
           <a href="/help/niroo">راهنما</a>
           <a href="/web/session/logout?redirect=/">خروج</a>
         </p>
+      </div></div>
+    </t>
+  </template>
+
+  <!-- The business's one place, what of it the world sees, and whether its name is public
+       (operator, 2026-09-18). Both choices start closed. -->
+  <template id="business_where" name="جای مجموعه">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step"><t t-if="first">قدمِ بعد</t><t t-else="">عوض کردن</t></p>
+        <h1 class="ikiku__question">جای <t t-out="business.name"/> کجاست؟</h1>
+        <p class="ikiku__lead">فقط محله؛ خیابون و پلاک نه. خودتون انتخاب می‌کنید بقیه چقدرش رو ببینن.</p>
+        <form method="post" class="ikiku__form" data-ikiku-form="">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <input type="hidden" name="business" t-att-value="business.id"/>
+          <input t-if="first" type="hidden" name="first" value="1"/>
+          <t t-call="ikiku_portal.place_fields"/>
+          <fieldset class="ikiku__choices">
+            <legend class="ikiku__label">اسمِ مجموعه برای همه دیده بشه؟</legend>
+            <label class="ikiku__choice">
+              <input type="radio" name="name_public" value="no" t-att-checked="not name_public and 'checked'"/>
+              <span>نه <small class="ikiku__muted">(پیش‌فرض)</small></span>
+            </label>
+            <label class="ikiku__choice">
+              <input type="radio" name="name_public" value="yes" t-att-checked="name_public and 'checked'"/>
+              <span>آره، «<t t-out="business.name"/>» نشون داده بشه</span>
+            </label>
+            <p class="ikiku__hint">اگه نه، روی درخواست‌ها و فهرست فقط نوع و جای مجموعه دیده می‌شه.</p>
+          </fieldset>
+          <button class="ikiku__go ikiku__go--block" type="submit">ادامه</button>
+        </form>
+      </div></div>
+    </t>
+  </template>
+
+  <!-- Workplaces that are not hiring now, which a person may wait for (operator, 2026-09-18).
+       Only those whose holder's identity is verified; only what each chose to make public. -->
+  <template id="workplaces" name="منتظرِ یک مجموعه بمونید">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell">
+        <p class="ikiku__step"><a href="/me">صفحه‌ی من</a></p>
+        <h1 class="ikiku__question">جاهایی که الان همکار نمی‌خوان</h1>
+        <p class="ikiku__lead">اگه دوست دارید یه روز اینجا کار کنید، تو صفشون بمونید. نوبتِ شما همون لحظه‌ای که می‌پیوندید ثبت می‌شه و به کسِ دیگه‌ای داده نمی‌شه.</p>
+        <p class="ikiku__hint">وقتی تو صفِ یه مجموعه هستید، اون مجموعه اسم و شهرتون رو می‌بینه. فقط مجموعه‌هایی اینجان که هویتِ صاحبشون تأیید شده.</p>
+        <p t-if="note" class="ikiku__status" role="status" t-out="note"/>
+        <p class="ikiku__links">
+          <t t-if="city and not everywhere">فقط <t t-out="city.name"/> · <a href="/workplaces?everywhere=1">همه‌ی شهرها</a></t>
+          <t t-elif="home"><a href="/workplaces">فقط <t t-out="home.name"/></a></t>
+        </p>
+        <t t-if="cards">
+          <div class="ikiku__workplaces">
+            <t t-foreach="cards" t-as="c">
+              <article class="ikiku__card ikiku__workplace">
+                <div t-if="c['photos']" class="ikiku__photos">
+                  <t t-foreach="c['photos']" t-as="pid"><img t-att-src="'/ikiku/photo/%d' % pid" alt="" loading="lazy"/></t>
+                </div>
+                <h2 class="ikiku__subhead" t-out="c['title']"/>
+                <p class="ikiku__muted"><t t-out="c['place']"/> · <t t-out="c['waiting']"/> نفر منتظر</p>
+                <form t-att-action="'/workplaces/%d/queue' % c['id']" method="post">
+                  <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                  <t t-if="c['mine']">
+                    <p class="ikiku__status">شما نفرِ <t t-out="c['mine']['position']"/> هستید (نوبتِ شمارهٔ <t t-out="c['mine']['number']"/>).</p>
+                    <input type="hidden" name="action" value="leave"/>
+                    <button class="ikiku__secondary" type="submit">بیرون اومدن از صف</button>
+                  </t>
+                  <t t-else="">
+                    <input type="hidden" name="action" value="join"/>
+                    <button class="ikiku__go" type="submit">منتظرشون می‌مونم</button>
+                  </t>
+                </form>
+              </article>
+            </t>
+          </div>
+        </t>
+        <p t-else="" class="ikiku__lead">فعلاً اینجا جایی نیست. <t t-if="city and not everywhere"><a href="/workplaces?everywhere=1">همه‌ی شهرها رو ببینید</a></t></p>
+      </div></div>
+    </t>
+  </template>
+
+  <!-- Photos of a person or a business: nobody else sees one until a person here approves it. -->
+  <template id="photos" name="عکس‌ها">
+    <t t-call="website.layout">
+      <div class="ikiku"><div class="ikiku__shell ikiku__shell--narrow">
+        <p class="ikiku__step"><a t-att-href="back">برگشت</a></p>
+        <h1 class="ikiku__question"><t t-if="owner == 'business'">عکس‌های <t t-out="business.name"/></t><t t-else="">عکس‌های شما</t></h1>
+        <p class="ikiku__lead">هر عکس اول به یکی از همکارانِ ایکیکو نشون داده می‌شه؛ بعد از تأیید، همه می‌بیننش.</p>
+        <p class="ikiku__hint">اطلاعاتِ مکانی که گوشی توی عکس می‌ذاره پاک می‌شه.
+          <t t-if="owner == 'business'">اگه نمی‌خواید مجموعه‌تون شناخته بشه، عکسِ سردر یا تابلو نذارید.</t>
+          <t t-else="">عکسی بذارید که فقط خودتون توش باشید.</t></p>
+        <p t-if="sent" class="ikiku__status" role="status">فرستاده شد. بعد از بررسی خبرش همین‌جاست.</p>
+        <div t-if="photos" class="ikiku__photo-grid">
+          <t t-foreach="photos" t-as="ph">
+            <figure class="ikiku__photo">
+              <img t-att-src="'/ikiku/photo/%d' % ph['id']" alt="" loading="lazy"/>
+              <figcaption t-att-class="'ikiku__photo-state ikiku__photo-state--%s' % ph['state']">
+                <t t-out="ph['label']"/><t t-if="ph['reason']">: <t t-out="ph['reason']"/></t>
+              </figcaption>
+              <form t-att-action="'/photos/%d/remove' % ph['id']" method="post">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <button class="ikiku__secondary" type="submit">برداشتن</button>
+              </form>
+            </figure>
+          </t>
+        </div>
+        <form t-att-action="action" method="post" enctype="multipart/form-data" class="ikiku__form">
+          <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+          <p class="ikiku__label">عکسِ تازه</p>
+          <!-- The browser's own file button speaks the browser's language; this one speaks ours.
+               The input stays in the page (visually hidden), so keyboard and screen readers reach it. -->
+          <label class="ikiku__file" for="photo">
+            <span class="ikiku__secondary">انتخابِ عکس</span>
+            <span class="ikiku__file-name" data-ikiku-file-name="">هنوز عکسی انتخاب نشده</span>
+          </label>
+          <input class="ikiku__file-input" id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp"
+                 required="required" t-att-aria-invalid="error and 'true'"/>
+          <p t-if="error" class="ikiku__error" role="alert" t-out="error"/>
+          <button class="ikiku__go ikiku__go--block" type="submit">فرستادن برای بررسی</button>
+        </form>
       </div></div>
     </t>
   </template>

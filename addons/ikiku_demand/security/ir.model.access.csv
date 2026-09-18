@@ -5,3 +5,4 @@ access_position_portal,position holder,model_ikiku_position,ikiku_base.group_iki
 access_position_staff,position staff,model_ikiku_position,ikiku_base.group_ikiku_staff,1,1,1,0
 access_demand_portal,demand holder,model_ikiku_demand,ikiku_base.group_ikiku_business,1,0,0,0
 access_demand_staff,demand staff,model_ikiku_demand,ikiku_base.group_ikiku_staff,1,1,1,0
+access_photo_staff,photo staff,model_ikiku_photo,ikiku_base.group_ikiku_staff,1,1,1,1

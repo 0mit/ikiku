@@ -186,7 +186,7 @@ class TestTwoSidesPages(TwoSidesData, OtpSetup, HttpCase):
         self.assertFalse(self.env['ikiku.business'].search([('partner_id', '=', self.person.partner_id.id)]))
         name_page = self.url_open('/business/name').text
         self.assertIn("صفحه‌ی کاری‌تون سرِ جاشه", name_page)
-        self.assertTrue(self.location(self.post('/business/name', {'name': "کافه سارا"})).endswith('/business/need/who'))
+        self.assertIn('/business/where?business=', self.location(self.post('/business/name', {'name': "کافه سارا"})))
         self.assertTrue(self.person.has_group('ikiku_base.group_ikiku_business'))
         for url in ('/me', '/business'):
             self.assertIn('ikiku__switch', self.url_open(url).text, url)
@@ -226,8 +226,9 @@ class TestTwoSidesPages(TwoSidesData, OtpSetup, HttpCase):
         cafe.write({'place_id': self.tehran.id})
         self.authenticate('two-sides', 'two-sides-pass-1')
         page = self.url_open('/join/where?edit=1').text
-        self.assertIn("شهرِ مجموعه‌تون عوض نمیشه", page)
-        self.post('/join/where?edit=1', {'place_id': str(self.karaj.id), 'edit': '1'})
+        self.assertIn("جای مجموعه‌تون عوض نمی‌شه", page)
+        jahanshahr = self.env['place.node'].sudo().search([('code', '=', 'ir-jahanshar')])
+        self.post('/join/where?edit=1', {'place_id': str(jahanshahr.id), 'edit': '1'})
         self.assertEqual(self.person.partner_id.ikiku_city, "کرج")
         self.assertEqual((cafe.place_id, cafe.city), (self.tehran, "تهران"))
 

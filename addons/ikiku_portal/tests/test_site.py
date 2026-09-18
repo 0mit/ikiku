@@ -12,7 +12,9 @@ def place(env, name, kind='city'):
     return found
 
 PUBLIC_KEYS = {'position', 'seats', 'work_type', 'province', 'city', 'place',
-               'date_start_fa', 'date_end_fa'}
+               'date_start_fa', 'date_end_fa',
+               # the workplace's name, empty unless its holder chose to show it (2026-09-18)
+               'business'}
 # Links into the public standard (the role's page and its skills), never values of the need itself.
 STANDARD_KEYS = {'position_url', 'skills', 'more_skills'}
 

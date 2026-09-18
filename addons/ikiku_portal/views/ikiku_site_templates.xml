@@ -134,6 +134,7 @@
           </div>
           <h3><a t-if="job.get('position_url')" t-att-href="job['position_url']" t-out="job['position']"/>
             <t t-else="" t-out="job['position']"/></h3>
+          <p t-if="job.get('business')" class="ikiku__job-business" t-out="job['business']"/>
           <!-- «دانشگاه تهران · منطقه ۶ · تهران» when the need names a neighbourhood, the city
                and province when it names no more than that. `place` is place_public_id's path,
                so a card can never say the street even when the café told us one. -->

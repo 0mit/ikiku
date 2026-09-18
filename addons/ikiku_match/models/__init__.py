@@ -4,3 +4,4 @@ from . import ikiku_dispute
 from . import ikiku_business
 from . import ikiku_demand
 from . import ikiku_demand_cancel
+from . import ikiku_favorite

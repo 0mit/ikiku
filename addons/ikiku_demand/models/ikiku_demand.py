@@ -15,7 +15,8 @@ class IkikuDemand(models.Model):
     _name = 'ikiku.demand'
     _description = "اعلام نیاز"
     _inherit = ['mail.thread', 'place.located']
-    # A need names a place; a card shows the neighbourhood it is in, never the street.
+    # A need names a place; a card shows at most the neighbourhood it is in, never the street,
+    # and only as much as its business chose to show (_place_visibility_of).
     _place_public_kinds = ('neighbourhood', 'district', 'city', 'village', 'province')
     _order = 'date_start'
 
@@ -37,6 +38,8 @@ class IkikuDemand(models.Model):
     province_id = fields.Many2one('place.node', related='place_province_id', store=True,
                                   string="استان", readonly=True)
     city = fields.Char(related='place_city_name', store=True, string="شهر", readonly=True)
+    business_public_name = fields.Char(related='business_id.public_name', store=True,
+                                       string="نامِ عمومیِ کسب‌وکار", readonly=True)
     season_factor = fields.Float("ضریب فصل", compute='_compute_season_factor', store=True)
     note = fields.Text("توضیح")
     state = fields.Selection([
@@ -93,3 +96,11 @@ class IkikuDemand(models.Model):
 
     def action_open(self):
         self.write({'state': 'open'})
+
+    def _place_visibility_of(self):
+        # A need shows as much of its place as its business chose to show of the café's own.
+        return self.business_id.place_visibility or 'city'
+
+    @api.depends('place_id', 'place_id.parent_id', 'place_id.kind', 'business_id.place_visibility')
+    def _compute_place_parts(self):
+        return super()._compute_place_parts()

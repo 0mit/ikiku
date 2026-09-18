@@ -11,3 +11,4 @@ from . import test_two_sides
 from . import test_phone_link
 from . import test_need_changes
 from . import test_standard
+from . import test_queue_photos

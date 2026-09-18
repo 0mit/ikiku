@@ -41,8 +41,12 @@ class TestPlacesOnRecords(TransactionCase):
             'business_id': cls.business.id, 'position_id': position.id,
             'place_id': cls.palestine.id, 'seats': 1, 'state': 'open'})
 
-    def test_a_cafe_on_a_street_is_public_as_its_neighbourhood(self):
+    def test_a_cafe_on_a_street_is_public_as_its_city_or_its_neighbourhood_never_its_street(self):
         self.assertEqual(self.need.place_id, self.palestine)
+        # By default a business shows its city (operator, 2026-09-18) ...
+        self.assertEqual(self.need.place_public_id, self.tehran)
+        # ... and its neighbourhood only when its holder chooses so; the street never.
+        self.business.place_visibility = 'neighbourhood'
         self.assertEqual(self.need.place_public_id, self.university)
         self.assertEqual(self.need.city, "تهران")
         self.assertEqual(self.need.province_id.name, "استان تهران")
@@ -54,7 +58,7 @@ class TestPlacesOnRecords(TransactionCase):
 
     def test_a_person_is_placed_no_finer_than_their_city(self):
         partner = self.env['res.partner'].create({'name': "کارجو", 'place_id': self.palestine.id})
-        # A person's record may hold a fine place, and what it shows is the city.
+        # A person's record may hold a fine place, and what it shows is the city unless they choose.
         self.assertEqual(partner.place_public_id, self.tehran)
         self.assertEqual(partner.ikiku_city, "تهران")
 
@@ -178,6 +182,7 @@ class TestPlaceBox(HttpCase):
         cls.env['res.users'].create({'name': "جا آزما", 'login': 'box-worker', 'password': 'box-worker-pass-1',
                                      'group_ids': [(6, 0, [portal.id])]})
         cls.karaj = place(cls.env, "کرج")
+        cls.jahanshahr = place(cls.env, "جهانشهر", 'neighbourhood')
 
     def post(self, url, data):
         import re
@@ -215,22 +220,23 @@ class TestPlaceBox(HttpCase):
         self.authenticate('box-worker', 'box-worker-pass-1')
         self.url_open('/join')
         Suggestion = self.env['place.suggestion'].sudo()
-        self.post('/join/where', {'place_id': str(self.karaj.id), 'place_q': "کرج",
+        self.post('/join/where', {'place_id': str(self.jahanshahr.id), 'place_q': "جهانشهر",
                                   'place_missed': "مهرشهر قدیم"})
-        offered = Suggestion.search([('place_id', '=', self.karaj.id), ('name', '=', "مهرشهر قدیم")])
+        offered = Suggestion.search([('place_id', '=', self.jahanshahr.id), ('name', '=', "مهرشهر قدیم")])
         self.assertEqual((offered.action, offered.origin, offered.state), ('alias', 'portal', 'proposed'))
-        self.assertFalse(self.karaj.alias_ids.filtered(lambda a: a.name == "مهرشهر قدیم"),
+        self.assertFalse(self.jahanshahr.alias_ids.filtered(lambda a: a.name == "مهرشهر قدیم"),
                          "offered, not written: an editor decides")
         # A post code is never kept, not even as a suggestion.
-        self.post('/join/where', {'place_id': str(self.karaj.id), 'place_q': "کرج",
+        self.post('/join/where', {'place_id': str(self.jahanshahr.id), 'place_q': "جهانشهر",
                                   'place_missed': "۳۱۵۸۷۶۵۴۳۲"})
         self.assertFalse(Suggestion.search([('name', 'like', '3158')]))
         self.assertFalse(Suggestion.search([('name', 'like', '۳۱۵۸')]))
 
 
 @tagged('post_install', '-at_install')
-class TestPersonNeighbourhood(HttpCase):
-    """A person's neighbourhood is public only if THEY give it (بند ۷; the operator, 2026-09-18)."""
+class TestOnePlaceAndWhatIsShown(HttpCase):
+    """One neighbourhood from a person or a business; they choose whether the world sees it or
+    only their city, the city by default (operator, 2026-09-18; بند ۷)."""
 
     @classmethod
     def setUpClass(cls):
@@ -241,9 +247,6 @@ class TestPersonNeighbourhood(HttpCase):
                                                 'group_ids': [(6, 0, [portal.id])]})
         cls.tehran = place(cls.env, "تهران")
         cls.university = place(cls.env, "دانشگاه تهران", 'neighbourhood')
-        cls.mashhad = place(cls.env, "مشهد")
-        cls.elsewhere = cls.env['place.node'].sudo().search(
-            [('kind', '=', 'neighbourhood'), ('parent_path', '=like', cls.mashhad.parent_path + '%')], limit=1)
 
     def post(self, data):
         import re
@@ -253,46 +256,44 @@ class TestPersonNeighbourhood(HttpCase):
     def partner(self):
         return self.user.partner_id.sudo()
 
-    def test_a_neighbourhood_given_is_shown_and_one_not_given_is_not(self):
+    def test_the_neighbourhood_is_kept_and_the_city_is_what_is_shown_unless_chosen(self):
         self.authenticate('area-worker', 'area-worker-pass-1')
         self.url_open('/join')
-        self.assertIn('name="place_area_q"', self.url_open('/join/where').text, "the choice is offered")
-        # Given: kept and shown.
-        self.assertEqual(self.post({'place_id': str(self.tehran.id), 'place_q': "تهران",
-                                    'place_area_id': str(self.university.id)}).status_code, 303)
+        page = self.url_open('/join/where').text
+        self.assertIn('name="place_visibility"', page)
+        self.assertNotIn('name="place_area_q"', page, "one box, not two")
+        self.assertEqual(self.post({'place_id': str(self.university.id)}).status_code, 303)
         partner = self.partner()
-        self.assertEqual((partner.place_id, partner.ikiku_show_neighbourhood), (self.university, True))
-        self.assertEqual(partner.place_public_id, self.university)
-        self.assertEqual(partner.ikiku_city, "تهران")
-        # Left empty: only the city is kept, and the neighbourhood given before is let go of.
-        self.assertEqual(self.post({'place_id': str(self.tehran.id), 'place_q': "تهران"}).status_code, 303)
+        self.assertEqual((partner.place_id, partner.place_visibility), (self.university, 'city'))
+        self.assertEqual(partner.place_public_id, self.tehran, "by default the world sees the city")
+        self.assertEqual(self.post({'place_id': str(self.university.id), 'place_visibility': 'neighbourhood'}).status_code, 303)
         partner.invalidate_recordset()
-        self.assertEqual((partner.place_id, partner.ikiku_show_neighbourhood), (self.tehran, False))
-        self.assertEqual(partner.place_public_id, self.tehran)
+        self.assertEqual(partner.place_public_id, self.university, "chosen: the neighbourhood")
 
-    def test_a_neighbourhood_outside_the_city_or_an_address_is_refused(self):
+    def test_a_city_with_neighbourhoods_asks_which_and_an_address_is_refused(self):
         self.authenticate('area-worker', 'area-worker-pass-1')
         self.url_open('/join')
-        if self.elsewhere:
-            refused = self.post({'place_id': str(self.tehran.id), 'place_q': "تهران",
-                                 'place_area_id': str(self.elsewhere.id), 'place_area_q': "نامعلوم‌آباد"})
-            self.assertEqual(refused.status_code, 200)
-            self.assertFalse(self.partner().place_id, "nothing is saved while the answer is wrong")
-        address = self.post({'place_id': str(self.tehran.id), 'place_q': "تهران",
-                             'place_area_q': "خیابان آزادی پلاک ۱۲"})
-        self.assertEqual(address.status_code, 200)
-        self.assertIn("پلاک و کد پستی لازم نیست", address.text)
-        self.assertFalse(self.partner().ikiku_show_neighbourhood)
+        which = self.post({'place_id': str(self.tehran.id), 'place_q': "تهران"})
+        self.assertEqual(which.status_code, 200)
+        self.assertIn("کدوم محلهٔ تهران", which.text)
+        address = self.post({'place_q': "۱۴۱۶۷۵۳۹۵۵"})
+        self.assertIn("کد پستی و پلاک لازم نیست", address.text)
+        self.assertFalse(self.partner().place_id)
 
 
 @tagged('post_install', '-at_install')
-class TestPersonPublicFace(TransactionCase):
+class TestPublicFaces(TransactionCase):
 
-    def test_the_public_face_follows_the_persons_choice(self):
+    def test_the_public_face_follows_the_owners_choice(self):
         university = place(self.env, "دانشگاه تهران", 'neighbourhood')
         partner = self.env['res.partner'].create({'name': "آزما", 'place_id': university.id})
         self.assertEqual(partner.place_public_id, place(self.env, "تهران"), "by default: the city")
-        partner.ikiku_show_neighbourhood = True
-        self.assertEqual(partner.place_public_id, university, "chosen: the neighbourhood")
-        partner.ikiku_show_neighbourhood = False
-        self.assertEqual(partner.place_public_id.kind, 'city')
+        partner.place_visibility = 'neighbourhood'
+        self.assertEqual(partner.place_public_id, university)
+        owner = self.env['res.partner'].create({'name': "صاحب"})
+        cafe = self.env['ikiku.business'].create({'name': "کافهٔ پنهان", 'partner_id': owner.id,
+                                                  'place_id': university.id})
+        self.assertEqual((cafe.place_public_id.kind, cafe.public_name), ('city', False),
+                         "a business shows its city and no name until its holder chooses")
+        cafe.write({'place_visibility': 'neighbourhood', 'name_public': True})
+        self.assertEqual((cafe.place_public_id, cafe.public_name), (university, "کافهٔ پنهان"))

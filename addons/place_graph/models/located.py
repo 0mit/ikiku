@@ -21,6 +21,16 @@ row that nearly fits.
 """
 from odoo import api, fields, models
 
+# How much of its place a record shows, chosen per record. «city» is the default everywhere:
+# the owner of the record widens it to their neighbourhood, nobody else does. The model's own
+# _place_public_kinds is still the ceiling -- a choice can make a face coarser, never finer
+# than the model allows.
+PLACE_VISIBILITY = [('city', "فقط شهر"), ('neighbourhood', "محله")]
+VISIBLE_KINDS = {
+    'city': ('city', 'village', 'county', 'province', 'country'),
+    'neighbourhood': ('neighbourhood', 'district', 'city', 'village', 'county', 'province', 'country'),
+}
+
 
 class PlaceLocated(models.AbstractModel):
     _name = 'place.located'
@@ -32,6 +42,9 @@ class PlaceLocated(models.AbstractModel):
                            'county', 'province', 'country')
 
     place_id = fields.Many2one('place.node', string="جا", index=True, ondelete='restrict')
+    place_visibility = fields.Selection(
+        PLACE_VISIBILITY, string="چه چیزی از جا دیده شود", default='city', required=True,
+        help="پیش‌فرض فقط شهر است؛ صاحبِ رکورد می‌تواند محله را هم نشان دهد.")
     place_hint = fields.Char(
         "جا، همان‌طور که نوشته شد",
         help="اگر جای گفته‌شده در درختِ جاها نبود، همان‌طور که نوشته شده می‌ماند.")
@@ -48,7 +61,7 @@ class PlaceLocated(models.AbstractModel):
         'place.node', string="جا، برای نمایشِ عمومی", compute='_compute_place_parts', store=True,
         help="درشت‌ترین جایی که این مدل اجازه دارد عمومی نشان دهد؛ از همین درخت خوانده می‌شود.")
 
-    @api.depends('place_id', 'place_id.parent_id', 'place_id.kind')
+    @api.depends('place_id', 'place_id.parent_id', 'place_id.kind', 'place_visibility')
     def _compute_place_parts(self):
         for record in self:
             place = record.place_id
@@ -58,9 +71,15 @@ class PlaceLocated(models.AbstractModel):
             record.place_public_id = place.place_of_kinds(record._place_public_kinds_of())
 
     def _place_public_kinds_of(self):
-        """The kinds THIS record may show publicly. The class default; a model where the
-        person decides (res.partner in iKiKu) answers per record."""
-        return self._place_public_kinds
+        """The kinds THIS record may show publicly: what its owner chose (place_visibility),
+        never finer than the model allows (_place_public_kinds)."""
+        wanted = VISIBLE_KINDS.get(self._place_visibility_of(), VISIBLE_KINDS['city'])
+        return tuple(kind for kind in self._place_public_kinds if kind in wanted)
+
+    def _place_visibility_of(self):
+        """Whose choice decides this record's face. Its own; a model that belongs to another
+        (a need to its business) answers with the owner's."""
+        return self.place_visibility
 
     def place_distance_km(self, other):
         """Roughly how far apart two located records are, or False when either has no point."""

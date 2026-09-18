@@ -31,6 +31,8 @@ class TestFlows(HttpCase):
                                                  'password': 'flow-owner-pass-1', 'group_ids': [(6, 0, [portal.id])]})
         cls.tehran = place(cls.env, "تهران")
         cls.karaj = place(cls.env, "کرج")
+        cls.jahanshahr = place(cls.env, "جهانشهر", 'neighbourhood')
+        cls.university = place(cls.env, "دانشگاه تهران", 'neighbourhood')
         cls.full = cls.env.ref('ikiku_base.work_type_full_time')
         cls.shift = cls.env.ref('ikiku_base.work_type_per_shift')
 
@@ -48,11 +50,16 @@ class TestFlows(HttpCase):
         self.goes_to(self.url_open('/join', allow_redirects=False), '/join/where')
         nowhere = self.post('/join/where', {'place_q': "ژژژژ"})
         self.assertEqual(nowhere.status_code, 200)
-        self.assertIn("این جا رو پیدا نکردم", nowhere.text)
+        self.assertIn("این محله رو پیدا نکردم", nowhere.text)
         self.assertIn('value="ژژژژ"', nowhere.text, "what was typed stays")
-        # A city typed by name, with nothing picked: the server finds it and moves on.
-        self.goes_to(self.post('/join/where', {'place_q': "کرج"}), '/join/skills')
+        # A city that has neighbourhoods asks which one (operator, 2026-09-18: one neighbourhood).
+        which = self.post('/join/where', {'place_id': str(self.karaj.id), 'place_q': "کرج"})
+        self.assertIn("کدوم محلهٔ کرج", which.text)
+        # A neighbourhood picked from the suggestions: saved, and the city is read off the tree.
+        self.goes_to(self.post('/join/where', {'place_id': str(self.jahanshahr.id), 'place_q': "جهانشهر"}),
+                     '/join/skills')
         self.assertEqual(self.worker.partner_id.ikiku_city, "کرج")
+        self.assertEqual(self.worker.partner_id.place_visibility, 'city', "the city is shown unless they choose")
         tiles = self.url_open('/join/skills').text
         self.assertIn(self.env.ref('ikiku_base.spec_dishwashing').plain_label, tiles)
         self.assertNotIn("شیفت صبح", tiles, "shifts are not skills")
@@ -76,13 +83,24 @@ class TestFlows(HttpCase):
         me = self.url_open('/me').text
         self.assertIn("ثبت شد. تیمِ ایکیکو نگاهش می‌کنه", me)
         self.assertIn("بدون پایان", me)
-        self.goes_to(self.post('/join/where?edit=1', {'place_id': str(self.tehran.id),
-                                                      'edit': '1'}), '/me')
+        self.goes_to(self.post('/join/where?edit=1', {'place_id': str(self.university.id),
+                                                      'place_visibility': 'neighbourhood', 'edit': '1'}), '/me')
+        self.assertEqual(self.worker.partner_id.place_public_id, self.university)
 
     def test_a_business_asks_for_people_in_five_taps(self):
         self.authenticate('flow-owner', 'flow-owner-pass-1')
         self.goes_to(self.url_open('/business', allow_redirects=False), '/business/name')
-        self.goes_to(self.post('/business/name', {'name': "کافه نارنج"}), '/business/need/who')
+        named = self.post('/business/name', {'name': "کافه نارنج"})
+        self.assertEqual(named.status_code, 303)
+        self.assertIn('/business/where?business=', named.headers['Location'])
+        cafe = self.env['ikiku.business'].search([('name', '=', "کافه نارنج")])
+        where = self.url_open(named.headers['Location']).text
+        self.assertIn('name="name_public"', where)
+        self.goes_to(self.post('/business/where?business=%d&first=1' % cafe.id,
+                               {'business': str(cafe.id), 'first': '1', 'place_id': str(self.jahanshahr.id),
+                                'place_visibility': 'neighbourhood', 'name_public': 'yes'}), '/business/need/who')
+        self.assertEqual((cafe.place_id, cafe.place_public_id, cafe.public_name),
+                         (self.jahanshahr, self.jahanshahr, "کافه نارنج"))
         waiter = self.env.ref('ikiku_base.spec_waiter')
         self.assertIn("یکی رو انتخاب کنید.", self.post('/business/need/who', {}).text)
         self.url_open('/ku?node=%d' % waiter.id)
