@@ -55,6 +55,7 @@ type answer struct {
 	Field  string      `json:"field"`
 	Match  string      `json:"match"`
 	Boost  float64     `json:"boost,omitempty"`
+	Via    string      `json:"via,omitempty"` // the name of the finer place that matched
 	Point  *[2]float64 `json:"point,omitempty"`
 }
 
@@ -142,6 +143,9 @@ func (s *server) suggest(w http.ResponseWriter, r *http.Request) {
 			Score: found.Score, Field: found.Field, Match: found.Match}
 		if found.Boost != 1 {
 			a.Boost = found.Boost
+		}
+		if found.Via != nil {
+			a.Via = name(found.Via.Names, ix.Lang)
 		}
 		if p.HasPoint {
 			a.Point = &[2]float64{p.Lat, p.Lon}

@@ -51,6 +51,7 @@ func TestRankingMatchesPython(t *testing.T) {
 			Score float64 `json:"score"`
 			Field string  `json:"field"`
 			Match string  `json:"match"`
+			Via   *string `json:"via"`
 		} `json:"results"`
 	}
 	if err := json.Unmarshal(raw, &cases); err != nil {
@@ -65,7 +66,15 @@ func TestRankingMatchesPython(t *testing.T) {
 		}
 		for i := 0; i < len(got) && i < len(c.Results); i++ {
 			g, w := got[i], c.Results[i]
-			if g.Place.Code != w.Code || g.Score != w.Score || g.Field != w.Field || g.Match != w.Match {
+			via := ""
+			if g.Via != nil {
+				via = g.Via.Code
+			}
+			wantVia := ""
+			if w.Via != nil {
+				wantVia = *w.Via
+			}
+			if g.Place.Code != w.Code || g.Score != w.Score || g.Field != w.Field || g.Match != w.Match || via != wantVia {
 				t.Errorf("%q #%d: got %s %v %s/%s, Python %s %v %s/%s", c.Q, i+1,
 					g.Place.Code, g.Score, g.Field, g.Match, w.Code, w.Score, w.Field, w.Match)
 			}

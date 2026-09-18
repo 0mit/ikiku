@@ -53,4 +53,7 @@ class IkikuPlaces(http.Controller):
                     'field': result['field'],
                     'match': result['match'],
                 })
+                if result.get('via'):
+                    # Found through a finer place the form does not offer: say which.
+                    results[-1]['via'] = result['via'].name
         return request.make_json_response({'results': results})

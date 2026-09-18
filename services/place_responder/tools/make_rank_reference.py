@@ -25,6 +25,9 @@ CASES = [
     ("تهرن", None, "all"), ("اصفهن", None, "city"), ("karaj", None, "all"), ("ولیعصر", None, "all"),
     ("دانشگاه تهران", None, "all"), ("ری", None, "city"), ("قم", None, "all"), ("خيابان كاخ", None, "all"),
     ("شهرک غرب", None, "area"), ("باغ", None, "all"),
+    # the operator's reports of 2026-09-18: on a form that asks for a city
+    ("کاخ", None, "city"), ("فلسطین", None, "city"), ("کرشته", None, "city"), ("کیورثیه", None, "city"),
+    ("فلسطین", None, "all"),
 ]
 LIMIT = 10
 
@@ -41,24 +44,52 @@ def main():
         neighbours.setdefault(link['place'], []).append(link['other'])
         neighbours.setdefault(link['other'], []).append(link['place'])
     documents = []
-    for row in rows:
+    position = {}
+    for index, row in enumerate(rows):
         above = tree.chain(row['code'], parent_of)
         texts = tree.suggest_texts([row['name']], row['name_en'], row['code'], aliases.get(row['code'], []),
                                    [by_code[c]['name'] for c in above],
                                    [by_code[c]['name'] for c in neighbours.get(row['code'], [])])
-        documents.append((row['code'], row['kind'], set(above) | {row['code']}, texts))
+        documents.append((row['code'], row['kind'], above, texts))
+        position[row['code']] = index
+    SEQ = 100   # a bundle carries no sequence: every place starts at 100
     out = []
     for query, within, kinds in CASES:
         started = time.time()
         allowed = set(tree.PICKER_KINDS[kinds]) if kinds else None
-        docs = [(code, texts) for code, kind, _up, texts in documents if not allowed or kind in allowed]
-        inside = {code for code, _kind, up, _texts in documents if within and within in up}
-        boost = (lambda key: 1.0 + tree.PARENT_WEIGHT if key in inside else 1.0) if within else None
-        ranked = text.rank(query, docs, LIMIT, boost=boost)
-        out.append({'q': query, 'within': within, 'kinds': kinds,
-                    'results': [{'code': r['key'], 'score': r['score'], 'field': r['field'],
-                                 'match': r['match']} for r in ranked]})
-        print("%-16s %5.1fs  %s" % (query, time.time() - started, [r['key'] for r in ranked[:3]]))
+        # text.rank's own loop, kept unrounded: the best weight x value per place, the first
+        # text in the place's list winning a tie -- then the climb, then the boost and rounding.
+        best = {}
+        for code, kind, above, texts in documents:
+            top = None
+            for field, weight, value in texts:
+                match_kind, match_value = text.match(query, value)
+                if match_kind and (top is None or weight * match_value > top[0]):
+                    top = (weight * match_value, field, match_kind)
+            if not top:
+                continue
+            step = tree.climb(kind, [(by_code[c]['kind'], True) for c in above], allowed)
+            if step is None:
+                continue
+            target, via = (code, None) if step == 'self' else (above[step], code)
+            have = best.get(target)
+            if (have is None or top[0] > have[0]
+                    or (top[0] == have[0] and have[3] is not None
+                        and (via is None or position[via] < position[have[3]]))):
+                best[target] = (top[0], top[1], top[2], via)
+        results = []
+        for code, (raw, field, match_kind, via) in best.items():
+            inside = within and (code == within or within in tree.chain(code, parent_of))
+            factor = 1.0 + tree.PARENT_WEIGHT if inside else 1.0
+            above = [(by_code[c]['kind'], SEQ) for c in tree.chain(code, parent_of)]
+            key = (tree.city_sequence(by_code[code]['kind'], SEQ, above), SEQ, position[code])
+            results.append((-round(raw * factor, 4), key, {'code': code, 'score': round(raw * factor, 4),
+                                                           'field': field, 'match': match_kind,
+                                                           'via': via}))
+        results.sort(key=lambda item: (item[0], item[1]))
+        ranked = [item[2] for item in results[:LIMIT]]
+        out.append({'q': query, 'within': within, 'kinds': kinds, 'results': ranked})
+        print("%-16s %5.1fs  %s" % (query, time.time() - started, [r['code'] for r in ranked[:3]]))
     path = os.path.join(HERE, '..', 'testdata', 'rank_reference.json')
     with open(path, 'w', encoding='utf-8') as handle:
         json.dump(out, handle, ensure_ascii=False, indent=1)

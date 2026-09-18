@@ -148,7 +148,11 @@ class SearchSuggestMixin(models.AbstractModel):
             attempts.append(self._suggest_any_of(everything, how='anywhere'))
         candidates, results = self.browse(), []
         for attempt in attempts:
-            found = self.search(domain + attempt, order=order, limit=CANDIDATE_LIMIT)
+            # A wider attempt ADDS to what the tighter ones found, never replaces it: its own
+            # 400 rows are the first 400 in the published order, and a tight match that sorts
+            # late -- a street called «کاخ», behind every village and neighbourhood that merely
+            # begins with it -- must not be pushed out by rows that match worse.
+            found = candidates | self.search(domain + attempt, order=order, limit=CANDIDATE_LIMIT)
             if len(found) <= len(candidates):
                 continue
             candidates = found

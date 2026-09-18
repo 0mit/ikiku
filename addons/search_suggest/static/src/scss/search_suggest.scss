@@ -82,3 +82,7 @@
 .search-suggest--busy [data-suggest-busy] {
     visibility: visible;
 }
+.search-suggest__via {
+    font-size: .8rem;
+    opacity: .75;
+}

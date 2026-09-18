@@ -103,6 +103,9 @@ func buildIndex(d *Dataset, lang string, generation uint64) *Index {
 		ix.byID[p.ID] = p
 		ix.byCode[p.Code] = p
 	}
+	for i := range d.Places {
+		d.Places[i].CitySequence = citySequence(&d.Places[i], ix.byID)
+	}
 	aliases := map[int64][]Alias{}
 	for _, a := range d.Aliases {
 		aliases[a.Place] = append(aliases[a.Place], a)
@@ -288,6 +291,7 @@ type Result struct {
 	Field string
 	Match string
 	Boost float64
+	Via   *Place // the finer place that matched, when the form does not offer its kind
 }
 
 // Options narrows and lifts a search.
@@ -327,9 +331,6 @@ func (ix *Index) Search(raw string, opt Options) []Result {
 			continue
 		}
 		for _, p := range ix.postings[t] {
-			if opt.Kinds != nil && !opt.Kinds[ix.docs[p.doc].kind] {
-				continue
-			}
 			score := ix.weights[p.weight] * m.Value
 			if s.seen[p.doc] != s.epoch {
 				s.seen[p.doc] = s.epoch
@@ -340,15 +341,46 @@ func (ix *Index) Search(raw string, opt Options) []Result {
 			}
 		}
 	}
-	results := make([]Result, 0, len(s.hit))
+	// A place the form does not offer answers as the nearest place above it that the form
+	// does: «کاخ» is a street in Tehran, and on a form that asks for a city it means تهران. The
+	// score is the street's; the answer says which place it came through (tree.climb in
+	// place_graph does the same for Odoo).
+	type best struct {
+		raw          float64
+		field, match string
+		via          *Place
+	}
+	found := map[*Place]*best{}
+	order := make([]*Place, 0, len(s.hit))
 	for _, doc := range s.hit {
-		place := ix.docs[doc].place
+		matched := ix.docs[doc].place
+		target, via := matched, (*Place)(nil)
+		if opt.Kinds != nil && !opt.Kinds[matched.Kind] {
+			target, via = ix.climb(matched, opt.Kinds), matched
+			if target == nil {
+				continue
+			}
+		}
+		b := best{s.score[doc], fieldNames[s.field[doc]], s.kind[doc], via}
+		have, ok := found[target]
+		switch {
+		case !ok:
+			found[target] = &b
+			order = append(order, target)
+		case b.raw > have.raw,
+			b.raw == have.raw && have.via != nil && (b.via == nil || b.via.ID < have.via.ID):
+			*have = b
+		}
+	}
+	results := make([]Result, 0, len(order))
+	for _, place := range order {
+		b := found[place]
 		factor := 1.0
 		if opt.Within != 0 && ix.isWithin(place, opt.Within) {
 			factor = ix.Spec.WithinBoost
 		}
-		results = append(results, Result{Place: place, Score: round4(s.score[doc] * factor),
-			Field: fieldNames[s.field[doc]], Match: s.kind[doc], Boost: factor})
+		results = append(results, Result{Place: place, Score: round4(b.raw * factor),
+			Field: b.field, Match: b.match, Boost: factor, Via: b.via})
 	}
 	sortResults(results)
 	if len(results) > opt.Limit {
@@ -357,12 +389,35 @@ func (ix *Index) Search(raw string, opt Options) []Result {
 	return results
 }
 
-// sortResults: best score first; equal scores keep the published order, (sequence, id).
+// climb is tree.climb: the nearest active place above `p` of a kind in `kinds` -- only for a
+// place FINER than anything offered; a county on a city form is not an answer at all.
+func (ix *Index) climb(p *Place, kinds map[string]bool) *Place {
+	finest := 0
+	for k := range kinds {
+		finest = max(finest, finenessOf(k))
+	}
+	if finenessOf(p.Kind) <= finest {
+		return nil
+	}
+	for _, a := range ancestors(p, ix.byID) {
+		if a.Active && kinds[a.Kind] {
+			return a
+		}
+	}
+	return nil
+}
+
+// sortResults: best score first. Equal scores keep the published order: the order of the
+// city the place is in (so «فلسطین» in Tehran comes before the one in Rasht, by the same
+// big-cities data that orders the cities themselves), then the place's own sequence, then id.
 func sortResults(results []Result) {
 	sort.Slice(results, func(a, b int) bool {
 		ra, rb := results[a], results[b]
 		if ra.Score != rb.Score {
 			return ra.Score > rb.Score
+		}
+		if ra.Place.CitySequence != rb.Place.CitySequence {
+			return ra.Place.CitySequence < rb.Place.CitySequence
 		}
 		if ra.Place.Sequence != rb.Place.Sequence {
 			return ra.Place.Sequence < rb.Place.Sequence
@@ -566,4 +621,18 @@ func clip[T any](list []T) []T {
 	out := make([]T, len(list))
 	copy(out, list)
 	return out
+}
+
+// citySequence is tree.city_sequence: the sequence of the city or village a place is (or is
+// in), and the place's own sequence when there is none above it.
+func citySequence(p *Place, byID map[int64]*Place) int {
+	if p.Kind == "city" || p.Kind == "village" {
+		return p.Sequence
+	}
+	for _, a := range ancestors(p, byID) {
+		if a.Kind == "city" || a.Kind == "village" {
+			return a.Sequence
+		}
+	}
+	return p.Sequence
 }

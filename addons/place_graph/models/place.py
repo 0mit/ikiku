@@ -204,13 +204,40 @@ class PlaceNode(models.Model):
         same-named places elsewhere, which is what someone typing «فلسطین» in Tehran means.
         `domain` narrows what may be answered at all -- one country, one city, one kind.
         `widen=False` is the quick answer a page shows while the full one is still coming."""
-        domain = list(domain or []) + ([('kind', 'in', list(kinds))] if kinds else [])
+        # Kinds are NOT a filter of what may match, only of what may be answered: a finer place
+        # that matches answers as the nearest offered place above it (tree.climb), and says
+        # which place it came through. So «کرشته», a neighbourhood, answers شهریار on a form
+        # that asks for a city.
+        allowed = set(kinds) if kinds else None
         boost = None
         if within:
             within_id = within if isinstance(within, int) else within.id
             boost = [([('id', 'child_of', within_id)], 1.0 + PARENT_WEIGHT)]
-        return self.suggest(query, domain=domain, limit=limit, order=SUGGEST_ORDER, boost=boost,
-                            widen=widen)
+        found = self.suggest(query, domain=list(domain or []), limit=max(limit * 4, 40) if allowed else limit,
+                             order=SUGGEST_ORDER, boost=boost, widen=widen)
+        answers = {}
+        for result in found:
+            place = result['record']
+            above = place.ancestor_places()
+            step = tree.climb(place.kind, [(a.kind, a.active) for a in above], allowed)
+            if step is None:
+                continue
+            target = place if step == 'self' else above[step]
+            answer = dict(result, record=target)
+            if step != 'self':
+                answer['via'] = place
+            have = answers.get(target.id)
+            if not have or answer['score'] > have['score'] or (
+                    answer['score'] == have['score'] and 'via' in have and 'via' not in answer):
+                answers[target.id] = answer
+        ordered = sorted(answers.values(), key=lambda r: (-r['score'], r['record']._city_sequence(),
+                                                          r['record'].sequence, r['record'].id))
+        return ordered[:limit]
+
+    def _city_sequence(self):
+        self.ensure_one()
+        return tree.city_sequence(self.kind, self.sequence,
+                                  [(a.kind, a.sequence) for a in self.ancestor_places()])
 
     # ------------------------------------------------------------------ overlay
     def write(self, vals):

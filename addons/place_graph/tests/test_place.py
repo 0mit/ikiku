@@ -131,3 +131,27 @@ class TestPlace(TransactionCase):
 
     def test_a_post_code_that_is_not_known_answers_nothing(self):
         self.assertFalse(self.env['place.postcode'].place_for_code("9999999999"))
+
+    def test_a_finer_match_answers_as_the_city_on_a_form_that_asks_for_one(self):
+        # The operator, 2026-09-18: «کرشته» and «کاخ» found nothing on the worker's city form,
+        # because the places they name are a neighbourhood and a street.
+        found = self.env['place.node'].suggest_places("کاخ", kinds=('city', 'village', 'province'),
+                                                       domain=self.ONLY_FIXTURE)
+        self.assertEqual(found[0]['record'], self.tehran)
+        self.assertEqual(found[0]['via'], self.palestine, "and it says which place it came through")
+
+    def test_a_county_is_not_lifted_to_its_province(self):
+        # Coarser than what the form offers is simply not an answer: nothing answers THROUGH
+        # the county (the province still answers on its own name, «تهران»).
+        found = self.env['place.node'].suggest_places(
+            "شهرستان تهران", kinds=('city', 'village', 'province'), domain=self.ONLY_FIXTURE)
+        self.assertNotIn(self.county, [r['record'] for r in found])
+        self.assertFalse([r for r in found if r.get('via') == self.county])
+
+    def test_equal_scores_fall_to_the_order_of_the_city(self):
+        self.tehran.sequence, self.mashhad.sequence = 41, 42
+        found = [r['record'] for r in self.env['place.node'].suggest_places("فلسطین", domain=self.ONLY_FIXTURE)]
+        self.assertEqual(found[:2], [self.palestine, self.palestine_mashhad])
+        self.tehran.sequence, self.mashhad.sequence = 43, 42
+        found = [r['record'] for r in self.env['place.node'].suggest_places("فلسطین", domain=self.ONLY_FIXTURE)]
+        self.assertEqual(found[:2], [self.palestine_mashhad, self.palestine])

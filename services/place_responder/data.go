@@ -28,18 +28,19 @@ import (
 )
 
 type Place struct {
-	ID       int64
-	Code     string
-	Names    names // per language; "" holds the source value
-	NameEn   string
-	Kind     string
-	Parent   int64
-	InPath   bool
-	Active   bool
-	Sequence int
-	Path     string // as the source stored it; computed for a bundle
-	Lat, Lon float64
-	HasPoint bool
+	ID           int64
+	Code         string
+	Names        names // per language; "" holds the source value
+	NameEn       string
+	Kind         string
+	Parent       int64
+	InPath       bool
+	Active       bool
+	Sequence     int
+	CitySequence int    // of the city it is in; the first tie-break (see sortResults)
+	Path         string // as the source stored it; computed for a bundle
+	Lat, Lon     float64
+	HasPoint     bool
 }
 
 type Alias struct {

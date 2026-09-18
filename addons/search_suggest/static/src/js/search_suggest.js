@@ -6,7 +6,7 @@
  *     <input type="search" name="q" autocomplete="off"/>
  *   </div>
  *
- * The URL answers GET ?q=… with {"results": [{"id", "label", "detail"?, "url"?}]}, and
+ * The URL answers GET ?q=… with {"results": [{"id", "label", "detail"?, "via"?, "url"?}]}, and
  * &quick=1 with the tightest, cheapest search only. The full answer is asked for first; if it
  * has not arrived within QUICK_AFTER milliseconds, the quick one is asked for too and shown
  * in the meantime, so a slow search puts something true on the screen instead of nothing.
@@ -113,6 +113,14 @@
                     detail.className = "search-suggest__detail";
                     detail.textContent = item.detail;
                     option.append(detail);
+                }
+                // Found through something finer than the page offers («کرشته» for شهریار):
+                // data-suggest-via="… {via} …" says so, so nobody wonders why this answered.
+                if (item.via && box.dataset.suggestVia) {
+                    const via = document.createElement("small");
+                    via.className = "search-suggest__via";
+                    via.textContent = box.dataset.suggestVia.replace("{via}", item.via);
+                    option.append(via);
                 }
                 option.addEventListener("mousedown", function (event) {
                     event.preventDefault();   // keep focus in the input

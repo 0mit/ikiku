@@ -151,6 +151,36 @@ def _folded(value):
     return text.spaced(value), text.compact(value)
 
 
+CITY_KINDS = ('city', 'village')
+
+
+def city_sequence(kind, sequence, ancestors):
+    """The first tie-break of equal scores: the sequence of the city or village a place is, or
+    is in -- so «فلسطین» in Tehran comes before the one in Rasht, by the same big-cities data
+    that orders the cities themselves. A place with no city above it keeps its own sequence.
+
+    ancestors: (kind, sequence) of every place above, nearest first."""
+    if kind in CITY_KINDS:
+        return sequence
+    return next((seq for k, seq in ancestors if k in CITY_KINDS), sequence)
+
+
+def climb(kind, ancestors, allowed):
+    """Where a match answers on a form that offers only `allowed` kinds: the place itself if
+    its kind is offered, else the index (into ancestors, nearest first) of the nearest place
+    above it that is -- «کاخ» is a street in Tehran and on a form asking for a city it means
+    تهران. None when nothing above it is offered, or when the place is not finer than what is.
+    Returns 'self' or an int or None."""
+    if not allowed or kind in allowed:
+        return 'self'
+    # Only what is FINER than anything the form offers climbs. A county is coarser than a city:
+    # on a form that offers cities it is simply not an answer, and lifting it to its province
+    # would put provinces above every city of the same name.
+    if FINENESS.get(kind, 4) <= max(FINENESS.get(k, 4) for k in allowed):
+        return None
+    return next((i for i, (k, active) in enumerate(ancestors) if active and k in allowed), None)
+
+
 def chain(key, parent_of):
     """The keys above `key`, nearest first, stopping at a cycle or at MAX_DEPTH steps more
     than any real tree has -- a malformed file must not hang a loader."""
@@ -182,4 +212,8 @@ def spec():
         'picker_default': PICKER_DEFAULT,
         'path_separator': PATH_SEPARATOR,
         'order': SUGGEST_ORDER,
+        # Equal scores: the city's order first (city_sequence), then the place's, then its id.
+        'tie_break': ['city_sequence', 'sequence', 'id'],
+        # A match of a kind the form does not offer answers as the nearest offered place above.
+        'climb_to_offered_kind': True,
     }
