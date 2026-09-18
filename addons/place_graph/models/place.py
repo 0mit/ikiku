@@ -296,9 +296,14 @@ class PlaceNode(models.Model):
                 RETURN NULL;
             END $$
         """ % NOTIFY_CHANNEL)
-        self.env.cr.execute("""
-            DROP TRIGGER IF EXISTS place_graph_notify ON {0};
-            CREATE TRIGGER place_graph_notify
-                AFTER INSERT OR UPDATE OR DELETE OR TRUNCATE ON {0}
-                FOR EACH STATEMENT EXECUTE FUNCTION place_graph_notify();
-        """.format(table))
+        # Only when missing: CREATE TRIGGER takes an exclusive lock on the table, and on a live
+        # site the lock may not come in time (it did not, on 2026-09-18, with the site serving
+        # and the responder reading). Once the trigger is there, an update touches nothing.
+        self.env.cr.execute("""SELECT 1 FROM pg_trigger WHERE tgname = 'place_graph_notify'
+                               AND tgrelid = %s::regclass""", (table,))
+        if not self.env.cr.fetchone():
+            self.env.cr.execute("""
+                CREATE TRIGGER place_graph_notify
+                    AFTER INSERT OR UPDATE OR DELETE OR TRUNCATE ON {0}
+                    FOR EACH STATEMENT EXECUTE FUNCTION place_graph_notify();
+            """.format(table))
