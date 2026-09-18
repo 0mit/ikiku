@@ -23,6 +23,7 @@ _logger = logging.getLogger(__name__)
 SCAN_LIMIT = 5000   # below this many records in the domain, a miss in SQL is re-checked in full
 PREFIX = 3          # letters of a word kept when looking for a word that was mistyped
 CANDIDATE_LIMIT = 400    # most rows ever read for one query, whatever the query matches
+WHOLE_WORD_MIN = 3  # shorter than this, «called exactly this» is not what anybody means yet
 SHORTLIST = 60      # rows ranked in full when there are more candidates than that
 
 
@@ -120,17 +121,22 @@ class SearchSuggestMixin(models.AbstractModel):
         # mistyped word, letters inside a longer word -- which is why it is what a page shows
         # while the full answer is still coming, and never what it settles on.
         if not widen:
-            attempts = [self._suggest_any_of(
-                words + ([compact] if compact not in words else []), how='whole')]
+            quick = words + ([compact] if compact not in words else [])
+            attempts = [self._suggest_any_of(quick, how='whole' if len(compact) >= WHOLE_WORD_MIN
+                                            else 'start')]
         else:
             # From what is called this, out to what merely contains these letters. Each is
             # wider and dearer than the last, and a wider one is only asked when the tighter
             # came back with less than the asker wanted.
             attempts = []
             everything = words + ([compact] if compact not in words else [])
-            if len(words) > 1:
-                attempts.append(self._suggest_all_of(words, how='whole'))
-            attempts.append(self._suggest_any_of(everything, how='whole'))
+            # A word of one or two letters is somebody mid-way through typing, not somebody
+            # naming a place: «ته» is the start of «تهران» far more often than it is the whole
+            # name of «ته رود», so for a query that short the first attempt is skipped.
+            if len(compact) >= WHOLE_WORD_MIN:
+                if len(words) > 1:
+                    attempts.append(self._suggest_all_of(words, how='whole'))
+                attempts.append(self._suggest_any_of(everything, how='whole'))
             if len(words) > 1:
                 attempts.append(self._suggest_all_of(words, how='start'))
             attempts.append(self._suggest_any_of(everything, how='start'))

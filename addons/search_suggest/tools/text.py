@@ -133,6 +133,15 @@ def quick_score(query, text):
         return 0.9
     if (' ' + t).find(' ' + q) >= 0:
         return 0.8
+    # The words apart, not as one phrase. «اندیشه شهریار» is one place whose own name is
+    # «اندیشه» and whose county is «شهریار», so the two words are never next to each other in
+    # anything written about it -- and a narrowing that wanted them adjacent found nothing.
+    query_words = q.split()
+    if len(query_words) > 1:
+        padded = ' ' + t
+        found = sum(1 for word in query_words if padded.find(' ' + word) >= 0)
+        if found:
+            return 0.3 + 0.4 * found / len(query_words)
     return 0.4 if q in t else 0.0
 
 
