@@ -4,7 +4,7 @@
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Website',
-    'version': '19.0.0.1.3',
+    'version': '19.0.0.1.4',
     'license': 'AGPL-3',
     'depends': ['ikiku_match', 'ikiku_coop', 'website', 'portal', 'auth_signup',
                 'sms_otp', 'sms_kavenegar', 'sms_smsir'],

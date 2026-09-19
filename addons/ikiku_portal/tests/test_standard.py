@@ -89,6 +89,16 @@ class TestStandard(HttpCase):
         self.assertIn('/roles/waiter', self.url_open('/knowledge/isco-08/5131').text)
         self.assertIn('/knowledge/isced-f-2013/053', self.url_open('/knowledge/isced-f-2013/05').text)
         self.assertEqual(self.url_open('/knowledge/nope/05').status_code, 404)
+        # every page that shows translated titles carries its source's notice (ILO, UNESCO)
+        ilo = "should not be considered an official ILO translation"
+        unesco = "CC BY-SA 3.0 IGO"
+        self.assertIn(ilo, waiter.text)
+        self.assertIn(unesco, espresso)
+        self.assertIn(unesco, physics)
+        self.assertIn(ilo, self.url_open('/knowledge/isco-08/5131').text)
+        index = self.url_open('/knowledge').text
+        self.assertIn(ilo, index)
+        self.assertIn(unesco, index)
         self.assertIn('/roles/barista', self.url_open('/roles?q=باریسته').text, "works without JavaScript")
 
     def test_suggest_endpoint(self):

@@ -127,6 +127,7 @@ main:has(.ikiku), main .ikiku { background: #F6F8FB; }
   &__question { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: .25rem; }
   &__help { color: var(--ik-ink-2); font-size: .98rem; margin-bottom: 1.5rem; }
   &__muted { color: var(--ik-ink-2); font-size: .88rem; }
+  &__notice { margin-top: 1rem; line-height: 1.6; p { margin: .25rem 0; } }
   &__withheld { color: var(--ik-copper); font-size: .85rem; }
   &__link { font-weight: 700; }
 

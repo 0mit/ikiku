@@ -43,6 +43,10 @@ class IkikuKnowledgeScheme(models.Model):
     name_en = fields.Char("English name")
     publisher = fields.Char("ناشر")
     url = fields.Char("نشانیِ منبع")
+    notice = fields.Text("یادداشتِ منبع و ترجمه",
+                         help="به فارسی، زیرِ هر صفحه‌ای که عنوان‌های این طبقه‌بندی را نشان می‌دهد.")
+    notice_en = fields.Text("Source and translation notice",
+                            help="The wording the publisher's licence or permission requires, verbatim.")
     kind = fields.Selection([('field', "رشته‌های دانش و آموزش"), ('occupation', "مشاغل")],
                             string="چه چیزی را رده‌بندی می‌کند", required=True)
     class_ids = fields.One2many('ikiku.knowledge.class', 'scheme_id', string="رده‌ها")

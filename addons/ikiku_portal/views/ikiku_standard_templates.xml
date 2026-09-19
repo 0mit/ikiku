@@ -70,6 +70,17 @@
     </t>
   </template>
 
+  <!-- The source and translation notice of each classification whose titles a page shows. The
+       wording is data (ikiku.knowledge.scheme notice / notice_en), as the licence or the
+       publisher's permission requires it; the English is shown verbatim. -->
+  <template id="standard_notice" name="یادداشتِ منبعِ طبقه‌بندی">
+    <aside t-foreach="notice_schemes" t-as="notice_scheme" t-if="notice_scheme.notice or notice_scheme.notice_en"
+           class="ikiku__notice ikiku__muted">
+      <p t-if="notice_scheme.notice"><small t-out="notice_scheme.notice"/></p>
+      <p t-if="notice_scheme.notice_en" dir="ltr" lang="en"><small t-out="notice_scheme.notice_en"/></p>
+    </aside>
+  </template>
+
   <template id="standard_role" name="یک کار">
     <t t-set="additional_title" t-value="label"/>
     <t t-call="website.layout">
@@ -102,6 +113,7 @@
               <small class="ikiku__muted"> · ISCO-08 <bdi dir="ltr" t-out="klass.code"/></small>
             </li>
           </ul>
+          <t t-call="ikiku_portal.standard_notice"><t t-set="notice_schemes" t-value="occupations.mapped('scheme_id')"/></t>
         </section>
 
         <div class="ikiku__actions">
@@ -136,6 +148,7 @@
               <p t-if="link.note" class="ikiku__muted" t-out="link.note"/>
             </li>
           </ul>
+          <t t-call="ikiku_portal.standard_notice"><t t-set="notice_schemes" t-value="links.mapped('class_id.scheme_id')"/></t>
         </section>
 
         <section t-if="roles">
@@ -181,6 +194,7 @@
               <small t-if="top['count']" class="ikiku__muted"> · <t t-out="top['count_fa']"/> <t t-out="row['noun']"/></small>
             </li>
           </ul>
+          <t t-call="ikiku_portal.standard_notice"><t t-set="notice_schemes" t-value="row['scheme']"/></t>
         </section>
       </div></div>
     </t>
@@ -218,6 +232,7 @@
             </li>
           </ul>
         </section>
+        <t t-call="ikiku_portal.standard_notice"><t t-set="notice_schemes" t-value="klass.scheme_id"/></t>
         <p class="ikiku__links"><a href="/roles">همه‌ی کارها</a> <a href="/knowledge">درختِ دانش</a></p>
       </div></div>
     </t>
