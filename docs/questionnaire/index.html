@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>پرسش‌نامهٔ تجربهٔ ایکیکو</title>
+<!--
+  One page, no server, no external resource, no tracker: the rules the site itself keeps.
+  The questions are NOT in this file. They are read from ../handover/roshan-ux-questionnaire.fa.md, the one
+  copy, so the page and the document cannot disagree. Answers stay in this browser (localStorage) until the
+  person exports them as a capsule: docs/ux/answers.fa.md, front matter in the shape of
+  docs/handover/HANDOVER-RESULT-TEMPLATE.fa.md, every answer asserted-by-human with the minute it was written.
+-->
+<style>
+  :root{
+    --ground:#F3F5F8; --sheet:#FFFFFF; --ink:#14191B; --ink-2:#55606A; --rule:#D6DCE4;
+    --blue:#2461C9; --blue-ink:#FFFFFF; --soft:#E8EFFB; --warn-bg:#FBF1DC; --warn-ink:#6B4A06;
+    --done:#1E7A4C;
+  }
+  @media (prefers-color-scheme:dark){ :root{
+    --ground:#0F1215; --sheet:#171B20; --ink:#E8ECEF; --ink-2:#9AA4AE; --rule:#2B323A;
+    --blue:#7FAAF0; --blue-ink:#0F1215; --soft:#1A2433; --warn-bg:#2C2412; --warn-ink:#E6C77A;
+    --done:#6CCB98;
+  }}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ground);color:var(--ink);
+       font-family:Vazirmatn,"Vazirmatn FD",Tahoma,"Noto Sans Arabic",sans-serif;font-size:17px;line-height:1.9}
+  main{max-width:760px;margin:0 auto;padding:16px 16px 140px}
+  h1{font-size:1.5rem;line-height:1.5;margin:16px 0 8px}
+  h2{font-size:1.2rem;margin:40px 0 8px;padding-block-start:16px;border-block-start:2px solid var(--blue)}
+  p,li{color:var(--ink)} .muted{color:var(--ink-2);font-size:.93rem}
+  code{direction:ltr;unicode-bidi:embed;background:var(--soft);padding:1px 5px;border-radius:4px;font-size:.88em}
+  a{color:var(--blue)}
+  .note{background:var(--soft);border-radius:10px;padding:10px 14px;margin:10px 0}
+  .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;padding:10px 14px;margin:12px 0}
+  .q{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:14px;margin:14px 0}
+  .q.filled{border-inline-start:5px solid var(--done)}
+  .q label.text{display:block;font-weight:600}
+  .q .num{color:var(--blue);margin-inline-end:6px}
+  textarea,input[type=text]{width:100%;font:inherit;color:inherit;background:var(--ground);border:1px solid var(--rule);
+       border-radius:10px;padding:10px 12px;margin-block-start:10px}
+  textarea{min-height:92px;resize:vertical}
+  textarea:focus,input:focus,button:focus-visible,select:focus{outline:3px solid var(--blue);outline-offset:1px}
+  .kinds{display:flex;flex-wrap:wrap;gap:6px;margin-block-start:10px}
+  .kinds label{border:1px solid var(--rule);border-radius:999px;padding:6px 14px;min-height:44px;display:inline-flex;
+       align-items:center;cursor:pointer;font-size:.93rem;background:var(--ground)}
+  .kinds input{position:absolute;opacity:0;pointer-events:none}
+  .kinds input:checked + span{font-weight:700}
+  .kinds label:has(input:checked){background:var(--blue);color:var(--blue-ink);border-color:var(--blue)}
+  .kinds label:has(input:focus-visible){outline:3px solid var(--blue);outline-offset:2px}
+  nav.sections{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav.sections a{border:1px solid var(--rule);border-radius:8px;padding:6px 10px;text-decoration:none;font-size:.9rem;
+       background:var(--sheet);min-height:44px;display:inline-flex;align-items:center}
+  .bar{position:fixed;inset-inline:0;inset-block-end:0;background:var(--sheet);border-block-start:1px solid var(--rule);
+       padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .bar .in{max-width:760px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .bar .count{flex:1 1 140px;font-size:.93rem}
+  progress{width:100%;height:8px;accent-color:var(--blue)}
+  button{font:inherit;min-height:44px;border-radius:10px;border:1px solid var(--rule);background:var(--ground);
+       color:inherit;padding:6px 14px;cursor:pointer}
+  button.main{background:var(--blue);color:var(--blue-ink);border-color:var(--blue);font-weight:700}
+  button.danger{color:#B3261E}
+  #status{min-height:1.9em}
+  details.more{flex:0 0 auto} details.more[open]{flex:1 0 100%}
+  details.more summary{min-height:44px;display:inline-flex;align-items:center;padding:0 12px;cursor:pointer;border:1px solid var(--rule);border-radius:10px;list-style:none}
+  details.more summary::-webkit-details-marker{display:none}
+  details.more .in{margin-block-start:8px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">پرسش‌نامهٔ تجربهٔ ایکیکو</h1>
+  <p class="muted" id="lead"></p>
+
+  <div class="note">
+    پاسخ‌ها <strong>فقط در همین مرورگر</strong> می‌مانند و به هیچ جایی فرستاده نمی‌شوند؛ این صفحه نه سرور دارد نه
+    ردیاب. هر وقت خواستید «دریافتِ کپسول» را بزنید: پرونده‌ای به نامِ <code>answers.fa.md</code> می‌گیرید که جایش
+    <code>docs/ux/answers.fa.md</code> در مخزنِ ایکیکو است. برای ادامه روی دستگاهِ دیگر، همان پرونده را با
+    «ادامه از کپسولِ قبلی» باز کنید. نام، شماره یا نشانیِ هیچ آدمِ واقعی را در پاسخ‌ها ننویسید: این پرونده عمومی می‌شود.
+  </div>
+
+  <div id="loadfail" class="warn hidden">
+    پرسش‌ها از پروندهٔ <code>docs/handover/roshan-ux-questionnaire.fa.md</code> خوانده می‌شوند و این صفحه نتوانست آن را
+    بگیرد (وقتی صفحه مستقیم از روی دیسک باز شود چنین است). همان پرونده را اینجا انتخاب کنید:
+    <input type="file" id="pickmd" accept=".md,text/markdown,text/plain">
+  </div>
+
+  <div id="who" class="q hidden">
+    <label class="text" for="by">چه کسی پاسخ می‌دهد؟</label>
+    <input type="text" id="by" autocomplete="name">
+    <p class="muted">در کپسول به‌عنوانِ گویندهٔ هر پاسخ می‌آید. صفحه نمی‌تواند این را بیازماید؛ گفتهٔ شماست.</p>
+  </div>
+
+  <nav class="sections" id="nav" aria-label="بخش‌ها"></nav>
+  <div id="form"></div>
+  <p id="status" class="muted" role="status" aria-live="polite"></p>
+</main>
+
+<div class="bar hidden" id="bar">
+  <div class="in">
+    <div class="count"><span id="count"></span><progress id="prog" value="0" max="1"></progress></div>
+    <button type="button" class="main" id="export">دریافتِ کپسول</button>
+    <details class="more">
+      <summary>بیشتر</summary>
+      <div class="in">
+        <button type="button" id="copy">کپی</button>
+        <button type="button" id="import">ادامه از کپسولِ قبلی</button>
+        <button type="button" id="only">فقط بی‌پاسخ‌ها</button>
+        <button type="button" class="danger" id="clear">پاک‌کردن</button>
+      </div>
+    </details>
+    <input type="file" id="pickcapsule" accept=".md,text/markdown,text/plain" class="hidden">
+  </div>
+</div>
+
+<script>
+'use strict';
+var SOURCE = '../handover/roshan-ux-questionnaire.fa.md';
+var SOURCE_PATH = 'docs/handover/roshan-ux-questionnaire.fa.md';
+var STORE = 'ikiku-ux-questionnaire-v1';
+// The kinds of answer the questionnaire itself allows. Every one is the person's own word (asserted-by-human);
+// «حدس» is a guess by their own account, which the brief tells the assistant not to treat as a decision.
+var KINDS = [
+  {id:'answer',     fa:'پاسخ'},
+  {id:'guess',      fa:'حدس'},
+  {id:'unknown',    fa:'نمی‌دانم'},
+  {id:'ask-people', fa:'باید از آدم‌ها بپرسیم'},
+  {id:'omid',       fa:'با امید'}
+];
+var doc = null, state = {by:'', answers:{}}, sourceText = '', sourceHash = '';
+
+function fa(n){ return String(n).replace(/[0-9]/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'[d]; }); }
+function lat(s){ return s.replace(/[۰-۹]/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function inline(s){
+  return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+}
+// The clock, to the minute, with its offset: the form a daftar journal heading takes.
+function stamp(d){
+  d = d || new Date();
+  var p = function(n){ return (n<10?'0':'')+n; }, o = -d.getTimezoneOffset(), s = o<0?'-':'+'; o = Math.abs(o);
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+
+         s+p(Math.floor(o/60))+':'+p(o%60);
+}
+
+function parse(md){
+  var out = {title:'', lead:[], sections:[]}, cur = null, inHead = true;
+  md.split(/\r?\n/).forEach(function(line){
+    var m;
+    if ((m = /^# (.+)/.exec(line))) { out.title = m[1]; return; }
+    if ((m = /^## (.+)/.exec(line))) { cur = {title:m[1], notes:[], questions:[]}; out.sections.push(cur); inHead = false; return; }
+    if (/^---\s*$/.test(line) || !line.trim()) return;
+    if (inHead) { out.lead.push(line.replace(/^>\s?/, '')); return; }
+    if ((m = /^\*\*([۰-۹]+)\.\*\*\s*(.+)/.exec(line))) { cur.questions.push({n:parseInt(lat(m[1]),10), text:m[2]}); return; }
+    var last = cur.notes[cur.notes.length-1];
+    if (/^\s+\S/.test(line) && last) { cur.notes[cur.notes.length-1] = last+' '+line.trim(); return; }
+    cur.notes.push(line.replace(/^- /, ''));
+  });
+  out.sections = out.sections.filter(function(s){ return s.questions.length || s.notes.length; });
+  return out;
+}
+
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify(state)); say('ذخیره شد در همین مرورگر · '+fa(stamp().slice(11,16))); }
+  catch(e){ say('این مرورگر اجازهٔ ذخیره نمی‌دهد؛ پیش از بستنِ صفحه کپسول را بگیرید.'); }
+}
+function load(){ try { var s = JSON.parse(localStorage.getItem(STORE)||'null'); if (s && s.answers) state = s; } catch(e){} }
+function say(t){ document.getElementById('status').textContent = t; }
+
+function filled(a){ return !!(a && ((a.text||'').trim() || (a.kind && a.kind!=='answer'))); }
+function allQuestions(){ return doc.sections.reduce(function(a,s){ return a.concat(s.questions); }, []); }
+function tally(){
+  var qs = allQuestions(), n = qs.filter(function(q){ return filled(state.answers[q.n]); }).length;
+  document.getElementById('count').textContent = fa(n)+' از '+fa(qs.length)+' پاسخ داده شد';
+  var p = document.getElementById('prog'); p.max = qs.length || 1; p.value = n;
+  return {done:n, total:qs.length};
+}
+
+function render(){
+  document.getElementById('title').textContent = doc.title;
+  document.title = doc.title;
+  document.getElementById('lead').innerHTML = inline(doc.lead.join(' '));
+  var nav = document.getElementById('nav'), form = document.getElementById('form');
+  nav.innerHTML = ''; form.innerHTML = '';
+  doc.sections.forEach(function(sec, i){
+    var id = 'sec'+i, a = document.createElement('a');
+    a.href = '#'+id; a.textContent = sec.title.split(' — ')[0] + (sec.questions.length ? '' : ' ·'); nav.appendChild(a);
+    var h = document.createElement('h2'); h.id = id; h.innerHTML = inline(sec.title); form.appendChild(h);
+    sec.notes.forEach(function(t){ var p = document.createElement('p'); p.className = 'muted'; p.innerHTML = inline(t); form.appendChild(p); });
+    sec.questions.forEach(function(q){ form.appendChild(card(q)); });
+  });
+  document.getElementById('who').classList.remove('hidden');
+  document.getElementById('bar').classList.remove('hidden');
+  var by = document.getElementById('by'); by.value = state.by || '';
+  by.oninput = function(){ state.by = by.value; save(); };
+  tally();
+}
+
+function card(q){
+  var a = state.answers[q.n] || {}, box = document.createElement('div'), tid = 'q'+q.n;
+  box.className = 'q' + (filled(a) ? ' filled' : ''); box.dataset.n = q.n;
+  box.innerHTML = '<label class="text" for="'+tid+'"><span class="num">'+fa(q.n)+'.</span>'+inline(q.text)+'</label>'+
+    '<textarea id="'+tid+'" dir="auto"></textarea>'+
+    '<div class="kinds" role="radiogroup" aria-label="نوعِ پاسخ">'+KINDS.map(function(k){
+      return '<label><input type="radio" name="k'+q.n+'" value="'+k.id+'"><span>'+k.fa+'</span></label>'; }).join('')+'</div>';
+  var ta = box.querySelector('textarea'); ta.value = a.text || '';
+  var kind = a.kind || 'answer';
+  box.querySelectorAll('input[type=radio]').forEach(function(r){
+    r.checked = (r.value === kind);
+    r.onchange = function(){ touch(q.n, {kind:r.value}, box); };
+  });
+  ta.oninput = function(){ touch(q.n, {text:ta.value}, box); };
+  return box;
+}
+function touch(n, change, box){
+  var a = state.answers[n] || {kind:'answer', text:''};
+  Object.keys(change).forEach(function(k){ a[k] = change[k]; });
+  a.at = stamp(); state.answers[n] = a;
+  box.classList.toggle('filled', filled(a));
+  save(); tally();
+}
+
+function capsule(){
+  var t = tally(), now = stamp(), by = (state.by||'').trim(), L = [];
+  L.push('---');
+  L.push('# کپسولِ پاسخ‌های پرسش‌نامهٔ تجربه — ساختهٔ docs/questionnaire/index.html؛ جایش docs/ux/answers.fa.md است.');
+  L.push('# هر پاسخ گفتهٔ یک آدم است (asserted-by-human)، با دقیقه‌ای که نوشته شد. دستیار آن را پر، بازنویسی یا «بهتر» نمی‌کند.');
+  L.push('capsule: ux-answers');
+  L.push('facet: experience            # daftar: جنبهٔ «تجربه» از ikiku');
+  L.push('holder: roshan-norouzi       # daftar bean');
+  L.push('status: proposed             # proposed → (بررسی) → accepted | changes-requested');
+  L.push('exported_at: "'+now+'"');
+  L.push('provenance: { src: asserted-by-human, by: '+JSON.stringify(by || 'نام داده نشد')+', via: "the questionnaire page, in the person\'s own browser; the page cannot verify who typed" }');
+  L.push('source: "'+SOURCE_PATH+'"');
+  L.push('source_sha256: "'+(sourceHash || 'unavailable in this browser')+'"   # کلیدِ کهنگی: اگر پرسش‌نامه عوض شود این دیگر نمی‌خواند');
+  L.push('answered: '+t.done);
+  L.push('total: '+t.total);
+  KINDS.forEach(function(k){
+    L.push('count_'+k.id.replace('-','_')+': '+allQuestions().filter(function(q){ var a = state.answers[q.n]; return filled(a) && (a.kind||'answer')===k.id; }).length);
+  });
+  L.push('---');
+  L.push('');
+  L.push('# پاسخ‌های پرسش‌نامهٔ تجربهٔ ایکیکو');
+  L.push('');
+  doc.sections.forEach(function(sec){
+    if (!sec.questions.length) return;
+    L.push('## '+sec.title); L.push('');
+    sec.questions.forEach(function(q){
+      var a = state.answers[q.n], ok = filled(a);
+      L.push('### پ'+fa(q.n)+' · '+q.text);
+      L.push('- kind: '+(ok ? (a.kind||'answer') : 'empty'));
+      if (ok) L.push('- at: "'+a.at+'"');
+      L.push('');
+      if (ok && (a.text||'').trim()) { L.push(a.text.trim()); L.push(''); }
+      L.push('<!-- /پ'+fa(q.n)+' -->'); L.push('');
+    });
+  });
+  return L.join('\n');
+}
+
+function readCapsule(text){
+  var re = /^### پ([۰-۹]+) ·[^\n]*\n- kind: ([a-z-]+)\n(?:- at: "([^"]*)"\n)?\n?([\s\S]*?)<!-- \/پ\1 -->/gm, m, n = 0;
+  var by = /^provenance: \{ src: asserted-by-human, by: ("(?:[^"\\]|\\.)*")/m.exec(text);
+  while ((m = re.exec(text))) {
+    if (m[2] === 'empty') continue;
+    state.answers[parseInt(lat(m[1]),10)] = {kind:m[2], at:m[3]||stamp(), text:m[4].trim()}; n++;
+  }
+  if (by) { try { var v = JSON.parse(by[1]); if (v !== 'نام داده نشد') state.by = v; } catch(e){} }
+  return n;
+}
+
+function hash(text){
+  if (!(window.crypto && crypto.subtle)) return Promise.resolve('');
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){
+    return Array.prototype.map.call(new Uint8Array(buf), function(b){ return (b<16?'0':'')+b.toString(16); }).join('');
+  });
+}
+function start(text){
+  sourceText = text; doc = parse(text);
+  if (!allQuestions().length) { document.getElementById('loadfail').classList.remove('hidden'); say('در این پرونده پرسشی پیدا نشد.'); return; }
+  document.getElementById('loadfail').classList.add('hidden');
+  load(); render();
+  hash(text).then(function(h){ sourceHash = h; });
+}
+function readFile(input, then){
+  var f = input.files && input.files[0]; if (!f) return;
+  var r = new FileReader(); r.onload = function(){ then(String(r.result)); }; r.readAsText(f, 'utf-8'); input.value = '';
+}
+
+document.getElementById('pickmd').onchange = function(){ readFile(this, start); };
+document.getElementById('export').onclick = function(){
+  var blob = new Blob([capsule()], {type:'text/markdown;charset=utf-8'}), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'answers.fa.md'; document.body.appendChild(a); a.click(); a.remove();
+  say('کپسول ساخته شد: answers.fa.md ← docs/ux/answers.fa.md');
+};
+document.getElementById('copy').onclick = function(){
+  var t = capsule();
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function(){ say('کپسول کپی شد.'); }, function(){ say('کپی نشد؛ «دریافتِ کپسول» را بزنید.'); });
+  else say('این مرورگر کپی نمی‌کند؛ «دریافتِ کپسول» را بزنید.');
+};
+document.getElementById('import').onclick = function(){ document.getElementById('pickcapsule').click(); };
+document.getElementById('pickcapsule').onchange = function(){
+  readFile(this, function(text){ var n = readCapsule(text); save(); render(); say(fa(n)+' پاسخ از کپسول خوانده شد.'); });
+};
+document.getElementById('only').onclick = function(){
+  var on = this.getAttribute('aria-pressed') !== 'true'; this.setAttribute('aria-pressed', on);
+  this.textContent = on ? 'همهٔ پرسش‌ها' : 'فقط بی‌پاسخ‌ها';
+  document.querySelectorAll('.q[data-n]').forEach(function(b){ b.classList.toggle('hidden', on && b.classList.contains('filled')); });
+};
+document.getElementById('clear').onclick = function(){
+  if (!confirm('همهٔ پاسخ‌های این مرورگر پاک شود؟ اگر کپسول نگرفته‌اید، برنمی‌گردد.')) return;
+  state = {by:'', answers:{}}; try { localStorage.removeItem(STORE); } catch(e){} render(); say('پاک شد.');
+};
+
+fetch(SOURCE, {cache:'no-cache'}).then(function(r){ if (!r.ok) throw 0; return r.text(); }).then(start)
+  .catch(function(){ document.getElementById('loadfail').classList.remove('hidden'); });
+</script>
+<noscript><p style="padding:16px">این صفحه برای ساختنِ کپسول به جاوااسکریپت نیاز دارد. بدونِ آن، پرونده <a href="../handover/roshan-ux-questionnaire.fa.md">پرسش‌نامه</a> را بخوانید و در یک پروندهٔ متنی پاسخ بدهید.</p></noscript>
+</body>
+</html>
