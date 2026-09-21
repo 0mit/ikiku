@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>پرسش‌نامهٔ ظاهرِ ایکیکو</title>
+<!--
+  One page, no server, no external resource, no tracker: the rules the site itself keeps.
+  The questions and their options are NOT in this file: they are read from
+  ../handover/hessam-design-questionnaire.json, the one copy. An option may carry `set` (CSS variables) and
+  `attr` (data- attributes); the preview below is driven by nothing else, so what the person sees is exactly
+  what the capsule records. Answers are chosen, not typed; they stay in this browser until exported as
+  docs/design/answers.fa.md. The two logo paths are copied from addons/ikiku_portal/static/src/img/
+  ikiku-icon.svg and ikiku-horizontal.svg, which GitHub Pages does not serve.
+-->
+<style>
+  :root{ --ui-ground:#F3F5F8; --ui-sheet:#fff; --ui-ink:#14191B; --ui-ink2:#55606A; --ui-rule:#D6DCE4; --ui-blue:#2461C9; --ui-soft:#E8EFFB; --ui-done:#1E7A4C; --ui-warn-bg:#FBF1DC; --ui-warn-ink:#6B4A06 }
+  @media (prefers-color-scheme:dark){ :root{ --ui-ground:#0F1215; --ui-sheet:#171B20; --ui-ink:#E8ECEF; --ui-ink2:#9AA4AE; --ui-rule:#2B323A; --ui-blue:#7FAAF0; --ui-soft:#1A2433; --ui-done:#6CCB98; --ui-warn-bg:#2C2412; --ui-warn-ink:#E6C77A } }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ui-ground);color:var(--ui-ink);font-family:Vazirmatn,"Vazirmatn FD",Tahoma,"Noto Sans Arabic",sans-serif;font-size:17px;line-height:1.9}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px 120px}
+  h1{font-size:1.45rem;line-height:1.5;margin:16px 0 6px}
+  h2{font-size:1.15rem;margin:36px 0 6px;padding-block-start:14px;border-block-start:2px solid var(--ui-blue)}
+  .muted{color:var(--ui-ink2);font-size:.92rem} code{direction:ltr;unicode-bidi:embed;background:var(--ui-soft);padding:1px 5px;border-radius:4px;font-size:.86em}
+  .note{background:var(--ui-soft);border-radius:10px;padding:10px 14px;margin:10px 0}
+  .warn{background:var(--ui-warn-bg);color:var(--ui-warn-ink);border-radius:10px;padding:10px 14px;margin:12px 0}
+  .hidden{display:none !important}
+  .cols{display:block}
+  @media (min-width:940px){ .cols{display:grid;grid-template-columns:minmax(0,1fr) 392px;gap:28px;align-items:start} .side{position:sticky;top:12px;order:2} }
+  /* the preview dock on a phone: stuck to the top, folds away */
+  .side{position:sticky;top:0;z-index:5;background:var(--ui-ground);padding-block:8px;margin-inline:-16px;padding-inline:16px;border-block-end:1px solid var(--ui-rule)}
+  @media (min-width:940px){ .side{margin:0;padding:0;border:0;background:none} }
+  .dockbar{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .q{background:var(--ui-sheet);border:1px solid var(--ui-rule);border-radius:12px;padding:14px;margin:14px 0;scroll-margin-top:46vh}
+  .q.filled{border-inline-start:5px solid var(--ui-done)}
+  .q .text{font-weight:600} .q .num{color:var(--ui-blue);margin-inline-end:6px}
+  .tag{display:inline-block;font-size:.78rem;border:1px solid var(--ui-rule);border-radius:999px;padding:0 8px;margin-inline-start:6px;color:var(--ui-ink2)}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;margin-block-start:10px}
+  .opt{border:1.5px solid var(--ui-rule);border-radius:12px;padding:8px 14px;min-height:48px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:var(--ui-ground);font:inherit;color:inherit;text-align:start}
+  .opt[aria-pressed=true]{border-color:var(--ui-blue);background:var(--ui-soft);font-weight:700;box-shadow:inset 0 0 0 1.5px var(--ui-blue)}
+  .opt.meta{border-style:dashed;font-size:.9rem;min-height:44px}
+  .sw{display:inline-flex;border-radius:6px;overflow:hidden;border:1px solid rgba(0,0,0,.18);flex:0 0 auto} .sw i{width:22px;height:22px;display:block}
+  .scale{display:flex;align-items:center;gap:8px;margin-block-start:10px;flex-wrap:wrap} .scale .end{font-size:.88rem;color:var(--ui-ink2);flex:1 1 90px} .scale .end:last-child{text-align:end}
+  .scale .opt{min-width:48px;justify-content:center;border-radius:999px}
+  button:focus-visible,textarea:focus,input:focus{outline:3px solid var(--ui-blue);outline-offset:2px}
+  textarea,input[type=text]{width:100%;font:inherit;color:inherit;background:var(--ui-ground);border:1px solid var(--ui-rule);border-radius:10px;padding:8px 12px;margin-block-start:8px}
+  textarea{min-height:64px}
+  nav.sections{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  nav.sections a{border:1px solid var(--ui-rule);border-radius:8px;padding:4px 10px;text-decoration:none;font-size:.88rem;background:var(--ui-sheet);color:var(--ui-blue);min-height:44px;display:inline-flex;align-items:center}
+  .bar{position:fixed;inset-inline:0;inset-block-end:0;z-index:6;background:var(--ui-sheet);border-block-start:1px solid var(--ui-rule);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .bar .in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .bar .count{flex:1 1 56px;font-size:.85rem;line-height:1.4} progress{width:100%;height:8px;accent-color:var(--ui-blue)}
+  .bar .btn{padding-inline:12px}
+  .btn{font:inherit;min-height:44px;border-radius:10px;border:1px solid var(--ui-rule);background:var(--ui-ground);color:inherit;padding:6px 14px;cursor:pointer}
+  .btn.main{background:#2461C9;color:#fff;border-color:#2461C9;font-weight:700} .btn.danger{color:#B3261E}
+  details.more{flex:0 0 auto} details.more[open]{flex:1 0 100%} details.more summary{min-height:44px;display:inline-flex;align-items:center;padding:0 12px;cursor:pointer;border:1px solid var(--ui-rule);border-radius:10px;list-style:none} details.more summary::-webkit-details-marker{display:none} details.more .in{margin-block-start:8px}
+
+  /* ---------- the preview: an iKiKu screen drawn only from the variables and attributes the options set ---------- */
+  .pv{ --blue:#2461C9; --blue-deep:#173F86; --soft:#E9F1FD; --accent:#A8632A; --ground:#F6F8FB; --paper:#fff; --ink:#17181C; --ink2:#4B5361; --rule:#E3E8F0;
+       --ok:#1E7A55; --error:#B3261E; --wait:#8A5A0B; --wait-bg:#FBF1DC; --radius:14px; --radius-btn:var(--radius); --gap:16px; --gutter:16px; --bw:1px;
+       --shadow:0 10px 30px rgba(24,39,75,.08); --card-border:transparent; --base:17px; --lh:1.85; --h-weight:700; --h-size:1.45em; --help-size:.86em; --help-ink:var(--ink2); --btn-h:52px;
+       background:var(--ground);color:var(--ink);font-size:var(--base);line-height:var(--lh);border:1px solid var(--ui-rule);border-radius:18px;overflow:hidden;max-height:38vh;overflow-y:auto}
+  @media (max-width:939px){ .pv{zoom:.62;max-height:52vh} }
+  @media (min-width:940px){ .pv{max-height:calc(100vh - 120px)} }
+  .pv[data-theme=dark]{ --ground:#11151B; --paper:#1A2029; --ink:#E9EDF2; --ink2:#A3ADBA; --rule:#2A323D; --soft:#1B2740; --wait-bg:#2C2412; --wait:#E6C77A }
+  .pv .hd{display:flex;align-items:center;gap:10px;padding:10px var(--gutter);background:var(--paper);border-block-end:var(--bw) solid var(--rule);color:var(--blue)}
+  .pv[data-header=blue] .hd{background:var(--blue);color:#fff;border-color:transparent} .pv[data-header=ground] .hd{background:var(--ground);border-color:transparent}
+  .pv[data-logo=center] .hd{justify-content:center}
+  .pv .hd svg{height:26px;width:auto;fill:currentColor} .pv .hd .icon{display:none;height:30px}
+  .pv[data-mark=icon] .hd .word{display:none} .pv[data-mark=icon] .hd .icon{display:block}
+  .pv .body{padding:var(--gap) var(--gutter);display:grid;gap:var(--gap)}
+  .pv[data-pattern=soft] .body{background:repeating-linear-gradient(45deg,transparent 0 22px,color-mix(in srgb,var(--blue) 5%,transparent) 22px 24px)}
+  .pv .hero{display:none;height:64px;border-radius:var(--radius);background:repeating-linear-gradient(45deg,var(--blue) 0 18px,var(--blue-deep) 18px 36px)} .pv[data-pattern=hero] .hero{display:block}
+  .pv .prog{display:flex;gap:6px;align-items:center;font-size:.85em;color:var(--ink2)}
+  .pv .prog .barp{flex:1;height:6px;border-radius:99px;background:var(--rule);overflow:hidden} .pv .prog .barp i{display:block;width:40%;height:100%;background:var(--blue)}
+  .pv .prog .dots{display:none;gap:6px} .pv .prog .dots i{width:9px;height:9px;border-radius:50%;background:var(--rule)} .pv .prog .dots i.on{background:var(--blue)}
+  .pv .prog .frac{display:none}
+  .pv[data-progress=dots] .barp,.pv[data-progress=fraction] .barp,.pv[data-progress=none] .prog{display:none}
+  .pv[data-progress=dots] .dots{display:flex} .pv[data-progress=fraction] .frac{display:inline}
+  .pv h3{margin:0;font-size:var(--h-size);font-weight:var(--h-weight);line-height:1.5}
+  .pv .field{width:100%;min-height:52px;border:var(--bw) solid var(--rule);border-radius:var(--radius);background:var(--paper);padding:0 14px;display:flex;align-items:center;color:var(--ink2)}
+  .pv[data-field=filled] .field{background:color-mix(in srgb,var(--ink) 6%,var(--ground));border-color:transparent}
+  .pv[data-field=underline] .field{background:none;border-width:0 0 calc(var(--bw) + 1px);border-radius:0;padding-inline:2px}
+  .pv .field.on{border-color:var(--blue);color:var(--ink)}
+  .pv[data-focus=ring] .field.on{outline:3px solid var(--blue);outline-offset:2px} .pv[data-focus=glow] .field.on{box-shadow:0 0 0 5px color-mix(in srgb,var(--blue) 22%,transparent)}
+  .pv .help{font-size:var(--help-size);color:var(--help-ink);margin-block-start:6px} .pv .err{color:var(--error);font-size:.9em;margin-block-start:6px}
+  .pv .chips{display:flex;flex-wrap:wrap;gap:8px} .pv .chip{border:var(--bw) solid var(--rule);background:var(--paper);padding:6px 14px;border-radius:999px;min-height:44px;display:inline-flex;align-items:center}
+  .pv .chip.on{background:var(--soft);border-color:var(--blue);color:var(--blue-deep);font-weight:700} .pv[data-theme=dark] .chip.on{color:#fff}
+  .pv[data-chip=rounded] .chip{border-radius:var(--radius)} .pv[data-chip=check] .chips{display:grid} .pv[data-chip=check] .chip{border-radius:var(--radius);justify-content:space-between} .pv[data-chip=check] .chip.on::after{content:"✓"}
+  .pv .acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pv .b1{min-height:var(--btn-h);border-radius:var(--radius-btn);background:var(--blue);color:#fff;border:calc(var(--bw) + 1px) solid var(--blue);padding:0 22px;font:inherit;font-weight:700;flex:1 1 auto}
+  .pv[data-btnw=auto] .b1{flex:0 0 auto} .pv[data-btn=fillshadow] .b1{box-shadow:0 8px 20px color-mix(in srgb,var(--blue) 40%,transparent)} .pv[data-btn=outline] .b1{background:transparent;color:var(--blue)}
+  .pv .b2{min-height:44px;border-radius:var(--radius-btn);background:none;border:0;color:var(--blue);font:inherit;padding:0 14px}
+  .pv[data-btn2=outline] .b2{border:var(--bw) solid var(--blue)} .pv[data-btn2=soft] .b2{background:var(--soft)}
+  .pv .card{background:var(--paper);border:var(--bw) solid var(--card-border);box-shadow:var(--shadow);border-radius:var(--radius);padding:14px;display:grid;gap:8px}
+  .pv .card .top{display:flex;gap:12px;align-items:center} .pv .card .ph{display:none;height:96px;border-radius:calc(var(--radius) - 4px);background:linear-gradient(135deg,#C9A27A,#7A4E2F 55%,#2E2A26);position:relative;overflow:hidden}
+  .pv[data-card=photo] .card .ph{display:block} .pv[data-card=text] .card .ic,.pv[data-icon=none] .ic{display:none}
+  .pv[data-photo=gray] .ph{filter:grayscale(1)} .pv[data-photo=duo] .ph::after{content:"";position:absolute;inset:0;background:var(--blue);mix-blend-mode:color}
+  .pv .ic{width:40px;height:40px;flex:0 0 auto;color:var(--blue)} .pv .ic path{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .pv[data-icon=filled] .ic path{fill:currentColor} .pv[data-icon=duo] .ic path.f{fill:var(--soft)}
+  .pv .role{font-weight:var(--h-weight)} .pv .meta{color:var(--ink2);font-size:.9em}
+  .pv .badges{display:flex;gap:8px;flex-wrap:wrap} .pv .bd{font-size:.82em;border-radius:999px;padding:1px 10px;display:inline-flex;gap:6px;align-items:center}
+  .pv .bd.ok{background:color-mix(in srgb,var(--ok) 14%,var(--paper));color:var(--ok)} .pv .bd.wait{background:var(--wait-bg);color:var(--wait)} .pv .bd.priv{background:color-mix(in srgb,var(--accent) 14%,var(--paper));color:var(--accent)}
+  .pv[data-badge=solid] .bd.ok{background:var(--ok);color:#fff} .pv[data-badge=solid] .bd.wait{background:var(--wait);color:#fff} .pv[data-badge=solid] .bd.priv{background:var(--accent);color:#fff}
+  .pv[data-badge=dot] .bd{background:none;padding:0;color:var(--ink)} .pv[data-badge=dot] .bd::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor} .pv[data-badge=dot] .bd.ok::before{background:var(--ok)} .pv[data-badge=dot] .bd.wait::before{background:var(--wait)} .pv[data-badge=dot] .bd.priv::before{background:var(--accent)}
+  .pv .who{display:flex;gap:12px;align-items:center} .pv .av{width:48px;height:48px;border-radius:50%;background:var(--soft);color:var(--blue-deep);display:grid;place-items:center;font-weight:700;flex:0 0 auto;overflow:hidden}
+  .pv[data-avatar=squircle] .av{border-radius:30%} .pv[data-avatar=square] .av{border-radius:4px}
+  .pv .av svg{display:none;width:60%;fill:var(--blue)} .pv[data-noavatar=mark] .av b,.pv[data-noavatar=sil] .av b{display:none} .pv[data-noavatar=mark] .av svg.m{display:block} .pv[data-noavatar=sil] .av svg.s{display:block}
+  .pv a{color:var(--blue)} .pv[data-link=plain] a{text-decoration:none} .pv[data-link=bold] a{text-decoration:none;font-weight:700}
+  .pv .srcnote{font-size:.78em;color:var(--ink2);border-block-start:var(--bw) solid var(--rule);padding-block-start:8px}
+  .pv .spin{width:34px;height:34px;fill:var(--blue);justify-self:center} .pv[data-spin=spin] .spin{animation:pvspin 1.4s linear infinite} .pv[data-spin=pulse] .spin{animation:pvpulse 1.4s ease-in-out infinite}
+  @keyframes pvspin{to{transform:rotate(360deg)}} @keyframes pvpulse{50%{transform:scale(.8);opacity:.6}}
+  @media (prefers-reduced-motion:reduce){ .pv .spin{animation:none !important} }
+  #contrast{font-size:.86rem;margin:6px 2px 0} #contrast.bad{color:#B3261E;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title">پرسش‌نامهٔ ظاهرِ ایکیکو</h1>
+  <p class="muted" id="lead"></p>
+  <div class="note">
+    پاسخ‌ها <strong>فقط در همین مرورگر</strong> می‌مانند و به هیچ جایی فرستاده نمی‌شوند. هر وقت خواستید «دریافتِ کپسول» را
+    بزنید: پرونده‌ای به نامِ <code>design-answers.fa.md</code> می‌گیرید؛ همان را برای امید بفرستید. برای ادامه روی
+    دستگاهِ دیگر، همان پرونده را از «بیشتر ← ادامه از کپسولِ قبلی» باز کنید.
+  </div>
+  <div id="loadfail" class="warn hidden">
+    پرسش‌ها از پروندهٔ <code>docs/handover/hessam-design-questionnaire.json</code> خوانده می‌شوند و این صفحه نتوانست آن را بگیرد
+    (وقتی صفحه مستقیم از روی دیسک باز شود چنین است). همان پرونده را اینجا انتخاب کنید:
+    <input type="file" id="pickjson" accept=".json,application/json">
+  </div>
+
+  <div class="cols hidden" id="cols">
+    <aside class="side" aria-label="پیش‌نمایش">
+      <div class="dockbar"><strong class="muted">پیش‌نمایشِ زنده</strong><button type="button" class="btn" id="fold" aria-expanded="true">بستن</button></div>
+      <div id="pvbox">
+        <div class="pv" id="pv" aria-hidden="true">
+          <div class="hd">
+            <svg class="word" viewBox="40 40 905 256"><g transform="translate(40 40)" fill-rule="evenodd"><path d="M749 0h156v41h-156zM817 54h56v145h-56zM548 68L674 68L674 109L586 109L635 158L738 158L738 128L793 128L793 199L406 199L406 158L562 158L510 106zM322 129 H379 V205 A10 10 0 0 0 389 215 H516 V256 H369 A47 47 0 0 1 322 209 ZM671 215h122v41h-122zM175 48L316 48L316 89L212 89L280 157L280 199L134 199L134 158L208 158L137 86zM50 115 H120 V256 H58 V215 H50 A50 50 0 0 1 50 115 Z M44 165 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/></g></svg>
+            <svg class="icon" viewBox="0 40 320 224"><g fill-rule="evenodd"><path d="M175 48L316 48L316 89L212 89L280 157L280 199L134 199L134 158L208 158L137 86z"/><path d="M50 115 H120 V256 H58 V215 H50 A50 50 0 0 1 50 115 Z M44 165 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/></g></svg>
+          </div>
+          <div class="body">
+            <div class="hero"></div>
+            <div class="prog"><span class="barp"><i></i></span><span class="dots"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="frac">۲ از ۵</span></div>
+            <h3>محله‌تان کجاست؟</h3>
+            <div><div class="field on">نارمک، تهران</div><div class="help">فقط شهر را به دیگران نشان می‌دهیم، مگر خودتان بخواهید.</div></div>
+            <div><div class="field">شمارهٔ موبایل</div><div class="err">این شماره یازده رقم نیست.</div></div>
+            <div class="chips"><span class="chip on">باریستا</span><span class="chip">آشپز</span><span class="chip">شست‌وشوی ظرف</span></div>
+            <div class="acts"><button class="b1" type="button" id="pvb1" tabindex="-1">محله‌ام همین است</button><button class="b2" type="button" tabindex="-1">برگشت</button></div>
+            <div class="card">
+              <div class="ph"></div>
+              <div class="top"><svg class="ic" viewBox="0 0 24 24"><path class="f" d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h2a2 2 0 0 1 0 5h-2M8 3v2M12 3v2"/></svg>
+                <div><div class="role">باریستا</div><div class="meta">تهران · شیفتِ عصر · از ۵ مهر</div></div></div>
+              <div class="badges"><span class="bd ok">تأیید شد</span><span class="bd wait">در انتظار</span><span class="bd priv">فقط شما می‌بینید</span></div>
+            </div>
+            <div class="who"><div class="av"><b>ر</b><svg class="m" viewBox="0 100 130 160"><path fill-rule="evenodd" d="M50 115 H120 V256 H58 V215 H50 A50 50 0 0 1 50 115 Z M44 165 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/></svg><svg class="s" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 9a7 7 0 0 1 14 0z"/></svg></div>
+              <div><div class="role">رضا محمدی</div><div class="meta">نوبتِ ۷ در صفِ این مجموعه · <a href="#" tabindex="-1" onclick="return false">صف یعنی چه؟</a></div></div></div>
+            <svg class="spin" viewBox="0 100 130 160"><path fill-rule="evenodd" d="M50 115 H120 V256 H58 V215 H50 A50 50 0 0 1 50 115 Z M44 165 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/></svg>
+            <div class="srcnote">عنوانِ شغل‌ها از طبقه‌بندیِ ISCO-08 است؛ یادداشتِ منبع اینجا می‌آید.</div>
+          </div>
+        </div>
+        <p id="contrast" class="muted"></p>
+      </div>
+    </aside>
+
+    <main>
+      <div class="q" id="who"><div class="text">چه کسی پاسخ می‌دهد؟</div><input type="text" id="by" autocomplete="name" aria-label="نام"></div>
+      <nav class="sections" id="nav" aria-label="بخش‌ها"></nav>
+      <div id="form"></div>
+      <p id="status" class="muted" role="status" aria-live="polite"></p>
+    </main>
+  </div>
+</div>
+
+<div class="bar hidden" id="bar"><div class="in">
+  <div class="count"><span id="count"></span><progress id="prog" value="0" max="1"></progress></div>
+  <button type="button" class="btn" id="next">بعدی</button>
+  <button type="button" class="btn main" id="export">دریافتِ کپسول</button>
+  <details class="more"><summary>بیشتر</summary><div class="in">
+    <button type="button" class="btn" id="copy">کپی</button>
+    <button type="button" class="btn" id="import">ادامه از کپسولِ قبلی</button>
+    <button type="button" class="btn danger" id="clear">پاک‌کردن</button>
+  </div></details>
+  <input type="file" id="pickcapsule" accept=".md,text/markdown,text/plain" class="hidden">
+</div></div>
+
+<script>
+'use strict';
+var SOURCE = '../handover/hessam-design-questionnaire.json';
+var SOURCE_PATH = 'docs/handover/hessam-design-questionnaire.json';
+var STORE = 'ikiku-design-questionnaire-v1';
+var META = [{v:'none', fa:'هیچ‌کدام'}, {v:'unknown', fa:'نمی‌دانم'}];
+var doc = null, state = {by:'', answers:{}}, sourceHash = '', pv = document.getElementById('pv'), baseAttrs = [];
+
+function fa(n){ return String(n).replace(/[0-9]/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'[d]; }); }
+function lat(s){ return s.replace(/[۰-۹]/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function stamp(){ var d = new Date(), p = function(n){ return (n<10?'0':'')+n; }, o = -d.getTimezoneOffset(), s = o<0?'-':'+'; o = Math.abs(o);
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+s+p(Math.floor(o/60))+':'+p(o%60); }
+function say(t){ document.getElementById('status').textContent = t; }
+function all(){ return doc.sections.reduce(function(a,s){ return a.concat(s.questions); }, []); }
+function filled(a){ return !!(a && ((a.sel && a.sel.length) || a.kind === 'none' || a.kind === 'unknown')); }
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){ say('این مرورگر اجازهٔ ذخیره نمی‌دهد؛ پیش از بستنِ صفحه کپسول را بگیرید.'); } }
+function load(){ try { var s = JSON.parse(localStorage.getItem(STORE)||'null'); if (s && s.answers) state = s; } catch(e){} }
+
+// ---- the preview is a pure function of the chosen options, applied in question order
+function paint(){
+  pv.removeAttribute('style'); baseAttrs.forEach(function(a){ pv.removeAttribute(a); }); baseAttrs = [];
+  all().forEach(function(q){
+    var a = state.answers[q.n]; if (!a || !a.sel) return;
+    q.opts.forEach(function(op){
+      if (a.sel.indexOf(op.v) < 0) return;
+      Object.keys(op.set||{}).forEach(function(k){ pv.style.setProperty(k, op.set[k]); });
+      Object.keys(op.attr||{}).forEach(function(k){ pv.setAttribute('data-'+k, op.attr[k]); baseAttrs.push('data-'+k); });
+    });
+  });
+  contrast();
+}
+function rgb(s){ var m = /rgba?\(([^)]+)\)/.exec(s); if (!m) return null; var p = m[1].split(/[ ,\/]+/).map(parseFloat); return {r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1}; }
+function lum(c){ var f = function(v){ v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); }; return .2126*f(c.r)+.7152*f(c.g)+.0722*f(c.b); }
+function contrast(){
+  var b = document.getElementById('pvb1'), cs = getComputedStyle(b), fg = rgb(cs.color), bg = rgb(cs.backgroundColor), el = document.getElementById('contrast');
+  if (!bg || bg.a === 0) bg = rgb(getComputedStyle(pv).backgroundColor);
+  if (!fg || !bg) { el.textContent = ''; return; }
+  var a = lum(fg), c = lum(bg), r = (Math.max(a,c)+.05)/(Math.min(a,c)+.05), ok = r >= 4.5;
+  el.textContent = 'کنتراستِ نوشتهٔ دکمهٔ اصلی: '+fa(r.toFixed(1)).replace('.', '٫')+' به ۱ — '+(ok ? 'پذیرفته (AA)' : 'کم است؛ باید دست‌کم ۴٫۵ به ۱ باشد');
+  el.className = ok ? 'muted' : 'bad'; pv.dataset.contrast = r.toFixed(2);
+}
+
+function tally(){
+  var qs = all(), n = qs.filter(function(q){ return filled(state.answers[q.n]); }).length;
+  document.getElementById('count').textContent = fa(n)+' از '+fa(qs.length);
+  var p = document.getElementById('prog'); p.max = qs.length || 1; p.value = n; return {done:n, total:qs.length};
+}
+
+function render(){
+  document.getElementById('title').textContent = doc.title; document.title = doc.title;
+  document.getElementById('lead').textContent = doc.lead + ' ' + (doc.kinds_note||'');
+  var nav = document.getElementById('nav'), form = document.getElementById('form'); nav.innerHTML = ''; form.innerHTML = '';
+  doc.sections.forEach(function(sec){
+    var a = document.createElement('a'); a.href = '#s-'+sec.id; a.textContent = sec.title; nav.appendChild(a);
+    var h = document.createElement('h2'); h.id = 's-'+sec.id; h.textContent = sec.title; form.appendChild(h);
+    if (sec.note) { var p = document.createElement('p'); p.className = 'muted'; p.textContent = sec.note; form.appendChild(p); }
+    sec.questions.forEach(function(q){ form.appendChild(card(q)); });
+  });
+  ['cols','bar'].forEach(function(id){ document.getElementById(id).classList.remove('hidden'); });
+  var by = document.getElementById('by'); by.value = state.by||''; by.oninput = function(){ state.by = by.value; save(); };
+  paint(); tally();
+}
+
+function card(q){
+  var box = document.createElement('div'); box.className = 'q'; box.id = 'q'+q.n; box.dataset.n = q.n;
+  var tags = (q.omid ? '<span class="tag">تصمیمش با امید</span>' : '') + (q.roshan ? '<span class="tag">با روشن هماهنگ می‌شود</span>' : '') +
+             (q.type === 'multi' ? '<span class="tag">تا '+fa(q.max)+' انتخاب</span>' : '');
+  var h = '<div class="text"><span class="num">'+fa(q.n)+'.</span>'+esc(q.q)+tags+'</div>' + (q.hint ? '<div class="muted">'+esc(q.hint)+'</div>' : '');
+  var btn = function(op, cls){ return '<button type="button" class="opt '+(cls||'')+'" data-v="'+esc(op.v)+'" aria-pressed="false">'+
+      (op.sw ? '<span class="sw">'+op.sw.map(function(c){ return '<i style="background:'+esc(c)+'"></i>'; }).join('')+'</span>' : '')+'<span>'+esc(cls==='num'?fa(op.fa):op.fa)+'</span></button>'; };
+  if (q.type === 'scale') h += '<div class="scale"><span class="end">'+esc(q.ends[0])+'</span>'+q.opts.map(function(op){ return btn(op,'num'); }).join('')+'<span class="end">'+esc(q.ends[1])+'</span></div>';
+  else h += '<div class="opts">'+q.opts.map(function(op){ return btn(op); }).join('')+'</div>';
+  h += '<div class="opts">'+META.map(function(m){ return '<button type="button" class="opt meta" data-meta="'+m.v+'" aria-pressed="false">'+m.fa+'</button>'; }).join('')+
+       '<button type="button" class="opt meta" data-note="1" aria-expanded="false">یادداشت</button></div><textarea class="hidden" dir="auto" aria-label="یادداشت"></textarea>';
+  box.innerHTML = h;
+  var ta = box.querySelector('textarea');
+  box.querySelectorAll('[data-v]').forEach(function(b){ b.onclick = function(){ pick(q, b.dataset.v); sync(q, box); }; });
+  box.querySelectorAll('[data-meta]').forEach(function(b){ b.onclick = function(){
+    var a = get(q.n), k = b.dataset.meta; if (a.kind === k) { a.kind = 'choice'; } else { a.kind = k; a.sel = []; } a.at = stamp(); done(q, box); }; });
+  box.querySelector('[data-note]').onclick = function(){ ta.classList.toggle('hidden'); this.setAttribute('aria-expanded', !ta.classList.contains('hidden')); if (!ta.classList.contains('hidden')) ta.focus(); };
+  ta.oninput = function(){ var a = get(q.n); a.note = ta.value; a.at = stamp(); save(); };
+  sync(q, box); return box;
+}
+function get(n){ return state.answers[n] || (state.answers[n] = {kind:'choice', sel:[], note:''}); }
+function pick(q, v){
+  var a = get(q.n), i = a.sel.indexOf(v); a.kind = 'choice';
+  if (q.type === 'multi') { if (i >= 0) a.sel.splice(i,1); else if (a.sel.length < (q.max||99)) a.sel.push(v); else { say('در این پرسش تا '+fa(q.max)+' انتخاب؛ یکی را بردارید.'); return; } }
+  else a.sel = (i >= 0) ? [] : [v];
+  a.at = stamp(); done(q, document.getElementById('q'+q.n));
+}
+function done(q, box){ save(); sync(q, box); paint(); tally(); say(''); }
+function sync(q, box){
+  var a = state.answers[q.n] || {sel:[], kind:'choice', note:''};
+  box.querySelectorAll('[data-v]').forEach(function(b){ b.setAttribute('aria-pressed', a.sel.indexOf(b.dataset.v) >= 0); });
+  box.querySelectorAll('[data-meta]').forEach(function(b){ b.setAttribute('aria-pressed', a.kind === b.dataset.meta); });
+  var ta = box.querySelector('textarea'); if (ta.value !== (a.note||'')) ta.value = a.note||''; if (a.note) ta.classList.remove('hidden');
+  box.classList.toggle('filled', filled(a));
+}
+
+function tokens(){
+  var out = [], i; for (i = 0; i < pv.style.length; i++) out.push('  '+pv.style[i]+': '+pv.style.getPropertyValue(pv.style[i]).trim()+';');
+  var at = baseAttrs.filter(function(a,j){ return baseAttrs.indexOf(a) === j; }).map(function(a){ return '  '+a.slice(5)+': '+pv.getAttribute(a); });
+  return {vars:out, attrs:at};
+}
+function capsule(){
+  var t = tally(), tk = tokens(), by = (state.by||'').trim(), L = [], qs = all();
+  var cnt = function(k){ return qs.filter(function(q){ var a = state.answers[q.n]; return filled(a) && (k === 'choice' ? a.sel.length : a.kind === k); }).length; };
+  L.push('---');
+  L.push('# کپسولِ پاسخ‌های پرسش‌نامهٔ ظاهر — ساختهٔ docs/design-questionnaire/index.html؛ جایش docs/design/answers.fa.md است.');
+  L.push('# هر پاسخ انتخابِ یک آدم است (asserted-by-human)، با دقیقه‌ای که انتخاب شد. دستیار آن را پر، عوض یا «بهتر» نمی‌کند.');
+  L.push('capsule: design-answers');
+  L.push('layer: visual                # رنگ، نوشته، شکل، مؤلفه، آیکون، تصویر، حرکت');
+  L.push('by_person: hessam            # نامِ کامل و bean او در دفترِ خصوصی است، نه در این مخزنِ عمومی');
+  L.push('status: proposed             # proposed → (بررسی) → accepted | changes-requested');
+  L.push('exported_at: "'+stamp()+'"');
+  L.push('provenance: { src: asserted-by-human, by: '+JSON.stringify(by || 'نام داده نشد')+', via: "the design questionnaire page, in the person\'s own browser; the page cannot verify who chose" }');
+  L.push('source: "'+SOURCE_PATH+'"');
+  L.push('source_sha256: "'+(sourceHash || 'unavailable in this browser')+'"   # کلیدِ کهنگی: اگر پرسش‌نامه عوض شود این دیگر نمی‌خواند');
+  L.push('answered: '+t.done); L.push('total: '+t.total);
+  L.push('count_choice: '+cnt('choice')); L.push('count_none: '+cnt('none')); L.push('count_unknown: '+cnt('unknown'));
+  L.push('button_contrast: "'+(pv.dataset.contrast||'')+':1"   # نوشتهٔ دکمهٔ اصلی روی زمینه‌اش، با این انتخاب‌ها؛ کمتر از 4.5 پذیرفته نیست');
+  L.push('---'); L.push('');
+  L.push('# پاسخ‌های پرسش‌نامهٔ ظاهرِ ایکیکو'); L.push('');
+  L.push('## توکن‌ها، همان‌طور که پیش‌نمایش نشان داد'); L.push('');
+  L.push('فقط آنچه انتخاب شد؛ هر چه اینجا نیست دست‌نخورده مانده. این‌ها پیشنهادند، نه کدِ سایت.'); L.push('');
+  L.push('```css'); L.push('.ikiku-preview {'); tk.vars.forEach(function(x){ L.push(x); }); L.push('}'); L.push('```'); L.push('');
+  L.push('```yaml'); L.push('variants:'); tk.attrs.forEach(function(x){ L.push(x); }); L.push('```'); L.push('');
+  doc.sections.forEach(function(sec){
+    L.push('## '+sec.title); L.push('');
+    sec.questions.forEach(function(q){
+      var a = state.answers[q.n], ok = filled(a), lab = function(v){ var o = q.opts.filter(function(o){ return o.v === v; })[0]; return o ? (q.type==='scale' ? fa(o.fa)+' از ۵ ('+q.ends[0]+' ← → '+q.ends[1]+')' : o.fa) : v; };
+      L.push('### ط'+fa(q.n)+' · '+q.q);
+      L.push('- kind: '+(ok ? (a.sel.length ? 'choice' : a.kind) : 'empty'));
+      if (ok && a.sel.length) { L.push('- chosen: '+a.sel.join(', ')); L.push('- chosen_fa: '+a.sel.map(function(v){ return '«'+lab(v)+'»'; }).join('؛ ')); }
+      if (ok) L.push('- at: "'+a.at+'"');
+      if (q.omid) L.push('- decides: omid'); if (q.roshan) L.push('- with: roshan-norouzi');
+      L.push(''); if (a && (a.note||'').trim()) { L.push(a.note.trim()); L.push(''); }
+      L.push('<!-- /ط'+fa(q.n)+' -->'); L.push('');
+    });
+  });
+  return L.join('\n');
+}
+function readCapsule(text){
+  var re = /^### ط([۰-۹]+) ·[^\n]*\n- kind: ([a-z]+)\n(?:- chosen: ([^\n]*)\n- chosen_fa: [^\n]*\n)?(?:- at: "([^"]*)"\n)?(?:- decides: [^\n]*\n)?(?:- with: [^\n]*\n)?\n?([\s\S]*?)<!-- \/ط\1 -->/gm, m, n = 0;
+  while ((m = re.exec(text))) {
+    var note = m[5].trim(); if (m[2] === 'empty' && !note) continue;
+    state.answers[parseInt(lat(m[1]),10)] = {kind: m[2]==='empty' ? 'choice' : m[2], sel: m[3] ? m[3].split(', ') : [], at: m[4]||stamp(), note: note}; n++;
+  }
+  var by = /^provenance: \{ src: asserted-by-human, by: ("(?:[^"\\]|\\.)*")/m.exec(text);
+  if (by) { try { var v = JSON.parse(by[1]); if (v !== 'نام داده نشد') state.by = v; } catch(e){} }
+  return n;
+}
+function hash(text){ if (!(window.crypto && crypto.subtle)) return Promise.resolve('');
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){ return Array.prototype.map.call(new Uint8Array(buf), function(b){ return (b<16?'0':'')+b.toString(16); }).join(''); }); }
+function start(text){
+  try { doc = JSON.parse(text); } catch(e){ doc = null; }
+  if (!doc || !doc.sections) { document.getElementById('loadfail').classList.remove('hidden'); return; }
+  document.getElementById('loadfail').classList.add('hidden'); load(); render(); hash(text).then(function(h){ sourceHash = h; });
+}
+function readFile(input, then){ var f = input.files && input.files[0]; if (!f) return; var r = new FileReader(); r.onload = function(){ then(String(r.result)); }; r.readAsText(f, 'utf-8'); input.value = ''; }
+
+document.getElementById('pickjson').onchange = function(){ readFile(this, start); };
+document.getElementById('fold').onclick = function(){ var b = document.getElementById('pvbox'), on = b.classList.toggle('hidden'); this.textContent = on ? 'دیدنِ پیش‌نمایش' : 'بستن'; this.setAttribute('aria-expanded', !on); };
+document.getElementById('next').onclick = function(){ var q = all().filter(function(q){ return !filled(state.answers[q.n]); })[0];
+  if (!q) { say('همهٔ پرسش‌ها پاسخ دارند.'); return; } document.getElementById('q'+q.n).scrollIntoView({behavior:'smooth', block:'start'}); };
+document.getElementById('export').onclick = function(){ var blob = new Blob([capsule()], {type:'text/markdown;charset=utf-8'}), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'design-answers.fa.md'; document.body.appendChild(a); a.click(); a.remove(); say('کپسول ساخته شد: design-answers.fa.md'); };
+document.getElementById('copy').onclick = function(){ var t = capsule(); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function(){ say('کپسول کپی شد.'); }, function(){ say('کپی نشد؛ «دریافتِ کپسول» را بزنید.'); }); else say('این مرورگر کپی نمی‌کند؛ «دریافتِ کپسول» را بزنید.'); };
+document.getElementById('import').onclick = function(){ document.getElementById('pickcapsule').click(); };
+document.getElementById('pickcapsule').onchange = function(){ readFile(this, function(text){ var n = readCapsule(text); save(); render(); say(fa(n)+' پاسخ از کپسول خوانده شد.'); }); };
+document.getElementById('clear').onclick = function(){ if (!confirm('همهٔ پاسخ‌های این مرورگر پاک شود؟ اگر کپسول نگرفته‌اید، برنمی‌گردد.')) return;
+  state = {by:'', answers:{}}; try { localStorage.removeItem(STORE); } catch(e){} render(); say('پاک شد.'); };
+
+fetch(SOURCE, {cache:'no-cache'}).then(function(r){ if (!r.ok) throw 0; return r.text(); }).then(start).catch(function(){ document.getElementById('loadfail').classList.remove('hidden'); });
+</script>
+<noscript><p style="padding:16px">این صفحه به جاوااسکریپت نیاز دارد.</p></noscript>
+</body>
+</html>
