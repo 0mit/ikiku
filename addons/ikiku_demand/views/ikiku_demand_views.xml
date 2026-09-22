@@ -84,7 +84,7 @@
             decoration-info="state == 'open'">
         <field name="business_id"/><field name="position_id"/><field name="seats"/>
         <field name="date_start_fa" string="از"/><field name="date_end_fa" string="تا"/>
-        <field name="province_id"/><field name="season_factor"/><field name="state"/>
+        <field name="place_public_id" string="جا"/><field name="province_id"/><field name="season_factor"/><field name="state"/>
       </list>
     </field>
   </record>
@@ -107,6 +107,10 @@
             <group>
               <field name="date_start"/><field name="date_start_fa"/>
               <field name="date_end"/><field name="date_end_fa"/>
+              <field name="place_id" options="{'no_create': True}"/>
+              <field name="place_path" readonly="1"/>
+              <field name="place_hint" invisible="not place_hint"/>
+              <field name="place_public_id" readonly="1"/>
               <field name="province_id"/><field name="city"/>
               <field name="season_factor" readonly="1"/>
             </group>
