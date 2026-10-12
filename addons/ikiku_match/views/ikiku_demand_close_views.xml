@@ -34,9 +34,10 @@
     <field name="arch" type="xml">
       <xpath expr="//header/field[@name='state']" position="before">
         <button name="action_ikiku_mark_filled" type="object" string="نیرو پیدا شد"
-                invisible="state not in ('open', 'proposed')"/>
+                invisible="state not in ('open', 'proposed')" groups="ikiku_base.group_ikiku_staff"/>
         <button name="%(ikiku_match.action_ikiku_demand_cancel)d" type="action" string="لغو با دلیل"
-                context="{'default_demand_id': id}" invisible="state not in ('open', 'proposed')"/>
+                context="{'default_demand_id': id}" invisible="state not in ('open', 'proposed')"
+                groups="ikiku_base.group_ikiku_staff"/>
       </xpath>
       <xpath expr="//field[@name='note']" position="before">
         <group invisible="state not in ('filled', 'cancelled')">

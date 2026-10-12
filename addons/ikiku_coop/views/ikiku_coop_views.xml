@@ -7,7 +7,7 @@
       <form string="دورهٔ هزینه">
         <header>
           <button name="action_allocate" type="object" string="تقسیم میان کسب‌وکارها"
-                  class="btn-primary" invisible="state == 'closed'"/>
+                  class="btn-primary" invisible="state == 'closed'" groups="ikiku_base.group_ikiku_staff"/>
           <field name="state" widget="statusbar"/>
         </header>
         <sheet>

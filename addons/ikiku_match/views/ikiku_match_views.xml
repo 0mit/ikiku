@@ -20,7 +20,7 @@
       <form string="پیشنهاد">
         <header>
           <button name="action_accept" type="object" string="پذیرش و ثبتِ گمارش"
-                  class="btn-primary" invisible="state != 'proposed'"/>
+                  class="btn-primary" invisible="state != 'proposed'" groups="ikiku_base.group_ikiku_staff"/>
           <field name="state" widget="statusbar"/>
         </header>
         <sheet>

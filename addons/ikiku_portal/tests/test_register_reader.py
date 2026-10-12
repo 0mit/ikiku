@@ -196,6 +196,34 @@ class TestRegisterReader(TransactionCase):
                 challenge.read([name])
         self.assertEqual(challenge.mobile, '+989121110000', "the rest of the challenge is read")
 
+    def test_no_button_it_cannot_press(self):
+        """iKiKu's back-office forms, lists and kanbans: none offers the reader a button. The staff
+        see every button they saw before, exactly as the administrator does."""
+        views = self.env['ir.ui.view'].search([('type', 'in', ('form', 'list', 'kanban')), ('mode', '=', 'primary')])
+        mine = views.filtered(lambda view: ((view.xml_id or '').startswith('ikiku_')
+                                            and self.env[view.model].with_user(self.reader).has_access('read'))
+                              or view == self.env.ref('base.view_partner_form'))
+        self.assertIn(self.env.ref('ikiku_portal.ikiku_help_request_form'), mine)
+        admin = self.env.ref('base.user_admin')
+        offered = set()
+        for view in mine:
+            with self.subTest(view=view.xml_id):
+                def buttons(user):
+                    arch = self.env[view.model].with_user(user).get_views([(view.id, view.type)])['views'][view.type]['arch']
+                    return [(b.get('name'), b.get('type')) for b in etree.fromstring(arch).iter('button')]
+                as_staff, as_reader = buttons(self.staff), buttons(self.reader)
+                if view.model == 'res.partner':     # Odoo's own form: only iKiKu's link is checked
+                    change = '%d' % self.env.ref('ikiku_portal.action_ikiku_mobile_change').id
+                    self.assertNotIn((change, 'action'), as_reader)
+                    self.assertIn((change, 'action'), as_staff)
+                else:
+                    offered.update(name for name, _type in as_staff)
+                    self.assertEqual(sorted(as_staff, key=str), sorted(buttons(admin), key=str))
+                    self.assertEqual(as_reader, [], "%s offers the reader a button" % view.xml_id)
+        self.assertLessEqual({'action_open', 'action_ikiku_mark_filled', 'action_accept', 'action_approve',
+                              'action_reject', 'action_submit', 'action_activate', 'action_allocate',
+                              'action_called', 'action_close'}, offered, "the staff keep every button")
+
     def test_its_menus_open_what_it_reads_and_no_wizard(self):
         Menu = self.env['ir.ui.menu']
         visible = Menu.with_user(self.reader)._visible_menu_ids()

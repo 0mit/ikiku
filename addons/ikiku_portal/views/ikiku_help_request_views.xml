@@ -20,8 +20,9 @@
     <field name="arch" type="xml">
       <form>
         <header>
-          <button name="action_called" type="object" string="زنگ زدیم" invisible="state != 'new'" class="btn-primary"/>
-          <button name="action_close" type="object" string="بستن" invisible="state == 'closed'"/>
+          <button name="action_called" type="object" string="زنگ زدیم" invisible="state != 'new'" class="btn-primary"
+                  groups="ikiku_base.group_ikiku_staff"/>
+          <button name="action_close" type="object" string="بستن" invisible="state == 'closed'" groups="ikiku_base.group_ikiku_staff"/>
           <field name="state" widget="statusbar"/>
         </header>
         <sheet>
@@ -34,7 +35,7 @@
             <field name="matched_partner_id"/>
             <field name="matched_partner_state" string="وضعِ شماره"/>
             <button name="%(ikiku_portal.action_ikiku_mobile_change)d" type="action" class="btn btn-link p-0"
-                    string="تغییرِ شماره" context="{'default_partner_id': matched_partner_id}"/>
+                    string="تغییرِ شماره" context="{'default_partner_id': matched_partner_id}" groups="ikiku_base.group_ikiku_staff"/>
           </group>
           <field name="topic"/>
         </sheet>

@@ -28,8 +28,9 @@
       <form string="عکس" create="0">
         <header>
           <button name="action_approve" type="object" string="تأیید؛ برای همه دیده شود" class="btn-primary"
-                  invisible="state == 'approved'"/>
-          <button name="action_reject" type="object" string="رد" invisible="state == 'rejected'"/>
+                  invisible="state == 'approved'" groups="ikiku_base.group_ikiku_staff"/>
+          <button name="action_reject" type="object" string="رد" invisible="state == 'rejected'"
+                  groups="ikiku_base.group_ikiku_staff"/>
           <field name="state" widget="statusbar"/>
         </header>
         <sheet>

@@ -95,7 +95,7 @@
       <form string="اعلام نیاز">
         <header>
           <button name="action_open" type="object" string="باز کردن"
-                  class="btn-primary" invisible="state != 'draft'"/>
+                  class="btn-primary" invisible="state != 'draft'" groups="ikiku_base.group_ikiku_staff"/>
           <field name="state" widget="statusbar"/>
         </header>
         <sheet>

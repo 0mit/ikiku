@@ -26,7 +26,7 @@
       <form string="نیرو">
         <header>
           <button name="action_submit" type="object" string="ثبت برای بررسی"
-                  class="btn-primary" invisible="state != 'draft'"/>
+                  class="btn-primary" invisible="state != 'draft'" groups="ikiku_base.group_ikiku_staff"/>
           <button name="action_activate" type="object" string="فعال‌سازی"
                   class="btn-primary" invisible="state != 'submitted'"
                   groups="ikiku_base.group_ikiku_staff"/>
