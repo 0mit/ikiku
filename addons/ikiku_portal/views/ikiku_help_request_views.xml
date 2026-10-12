@@ -49,5 +49,5 @@
     <field name="context">{'search_default_state': 'new'}</field>
   </record>
   <menuitem id="menu_ikiku_help_request" parent="menu_ikiku_people_help" sequence="5"
-            action="action_ikiku_help_request" groups="ikiku_base.group_ikiku_staff"/>
+            action="action_ikiku_help_request" groups="ikiku_base.group_ikiku_staff,ikiku_base.group_ikiku_register_reader"/>
 </odoo>

@@ -10,7 +10,7 @@
             action="action_dispute" sequence="20"/>
 
   <menuitem id="menu_ikiku_standard" name="استاندارد" parent="menu_ikiku_root" sequence="30"
-            groups="ikiku_base.group_ikiku_staff"/>
+            groups="ikiku_base.group_ikiku_staff,ikiku_base.group_ikiku_register_reader"/>
   <menuitem id="menu_ikiku_spec_node" parent="menu_ikiku_standard"
             action="action_spec_node" sequence="10"/>
   <menuitem id="menu_ikiku_spec_requirement" parent="menu_ikiku_standard"

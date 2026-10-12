@@ -47,4 +47,20 @@
     <field name="privilege_id" ref="privilege_ikiku"/>
     <field name="implied_ids" eval="[(4, ref('group_ikiku_staff'))]"/>
   </record>
+
+  <!-- The register's reader: the staff's eyes without their hands, for an account that only reads
+       (a program outside Odoo holding an API key, or a person who only looks), so that a key
+       that leaks can change nothing. An internal user and nothing more: READ on every model the
+       staff group reads (each module's access rows; the wizards left out, they hold nothing to
+       read) and on the staff-only fields the staff's screens show; no record rule narrows it,
+       because iKiKu's rules belong to the portal groups and to the staff. It never reads the
+       national number's hash or a mobile challenge's secrets. What it reads is what بند ۷ keeps
+       from the public (phone numbers, the place a person gave, a shift's venue before it starts,
+       photos nobody has looked at yet), so it is given only to someone the co-op would show its
+       staff's screens to. -->
+  <record id="group_ikiku_register_reader" model="res.groups">
+    <field name="name">خوانندهٔ دفتر</field>
+    <field name="privilege_id" ref="privilege_ikiku"/>
+    <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+  </record>
 </odoo>

@@ -7,3 +7,7 @@ access_resume_line_portal,resume line own,model_ikiku_resume_line,ikiku_base.gro
 access_resume_line_staff,resume line staff,model_ikiku_resume_line,ikiku_base.group_ikiku_staff,1,1,1,0
 access_availability_portal,availability own,model_ikiku_availability,ikiku_base.group_ikiku_resource,1,0,0,0
 access_availability_staff,availability staff,model_ikiku_availability,ikiku_base.group_ikiku_staff,1,1,1,0
+access_resource_register_reader,resource register reader,model_ikiku_resource,ikiku_base.group_ikiku_register_reader,1,0,0,0
+access_resource_skill_register_reader,resource skill register reader,model_ikiku_resource_skill,ikiku_base.group_ikiku_register_reader,1,0,0,0
+access_resume_line_register_reader,resume line register reader,model_ikiku_resume_line,ikiku_base.group_ikiku_register_reader,1,0,0,0
+access_availability_register_reader,availability register reader,model_ikiku_availability,ikiku_base.group_ikiku_register_reader,1,0,0,0

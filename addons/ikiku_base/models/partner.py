@@ -47,7 +47,7 @@ class ResPartner(models.Model):
     # بند ۷: mail tracks `phone`, which would copy every number into the chatter.
     phone = fields.Char(tracking=False)
     ikiku_mobile_verified_on = fields.Datetime(
-        "تأییدِ موبایل", copy=False, readonly=True, groups='ikiku_base.group_ikiku_staff',
+        "تأییدِ موبایل", copy=False, readonly=True, groups='ikiku_base.group_ikiku_staff,ikiku_base.group_ikiku_register_reader',
         help="وقتی صاحبِ شماره کدِ پیامک را وارد کرد. مالکیتِ شماره را نشان می‌دهد، نه هویت را.")
     ikiku_nid_hash = fields.Char("اثرِ کدِ ملی", index=True, copy=False, groups='ikiku_base.group_ikiku_staff',
                                  help="درهم‌سازیِ نمک‌دار. خودِ کدِ ملی هرگز ذخیره نمی‌شود.")

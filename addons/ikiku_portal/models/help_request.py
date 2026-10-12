@@ -6,7 +6,8 @@ from the co-op's stated number. A published support line comes later. No SMS is 
 for a request, so it costs nothing and cannot drain the SMS credit.
 
 The number is the person's contact, restricted like every phone number (بند ۷): only
-staff read these records, and the page never shows one back.
+staff read these records -- they and the register's reader, which reads what staff read and
+writes nothing -- and the page never shows one back.
 """
 from datetime import timedelta
 

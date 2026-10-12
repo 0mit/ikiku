@@ -96,8 +96,10 @@
     <field name="target">new</field>
   </record>
 
+  <!-- The register's reader sees the call-back requests here; the three tools below act, and
+       stay the staff's. -->
   <menuitem id="menu_ikiku_people_help" name="کمک به آدم‌ها" parent="ikiku_base.menu_ikiku_root"
-            sequence="40" groups="ikiku_base.group_ikiku_staff"/>
+            sequence="40" groups="ikiku_base.group_ikiku_staff,ikiku_base.group_ikiku_register_reader"/>
   <menuitem id="menu_ikiku_staff_account" parent="menu_ikiku_people_help" sequence="10"
             action="action_ikiku_staff_account" groups="ikiku_base.group_ikiku_staff"/>
   <menuitem id="menu_ikiku_staff_role" parent="menu_ikiku_people_help" sequence="15"

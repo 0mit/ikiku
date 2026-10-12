@@ -6,3 +6,7 @@ access_position_staff,position staff,model_ikiku_position,ikiku_base.group_ikiku
 access_demand_portal,demand holder,model_ikiku_demand,ikiku_base.group_ikiku_business,1,0,0,0
 access_demand_staff,demand staff,model_ikiku_demand,ikiku_base.group_ikiku_staff,1,1,1,0
 access_photo_staff,photo staff,model_ikiku_photo,ikiku_base.group_ikiku_staff,1,1,1,1
+access_business_register_reader,business register reader,model_ikiku_business,ikiku_base.group_ikiku_register_reader,1,0,0,0
+access_position_register_reader,position register reader,model_ikiku_position,ikiku_base.group_ikiku_register_reader,1,0,0,0
+access_demand_register_reader,demand register reader,model_ikiku_demand,ikiku_base.group_ikiku_register_reader,1,0,0,0
+access_photo_register_reader,photo register reader,model_ikiku_photo,ikiku_base.group_ikiku_register_reader,1,0,0,0

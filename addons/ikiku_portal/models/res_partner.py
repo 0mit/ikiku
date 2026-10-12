@@ -18,10 +18,10 @@ class ResPartner(models.Model):
         ('staff', "نوشتهٔ همکار، هنوز تأییدنشده"),
         ('unproven', "تأییدنشده"),
     ], string="وضعِ شمارهٔ ورود", compute='_compute_ikiku_mobile_state', compute_sudo=True,
-        groups='ikiku_base.group_ikiku_staff')
+        groups='ikiku_base.group_ikiku_staff,ikiku_base.group_ikiku_register_reader')
     ikiku_mobile_lookup = fields.Char(
         "شمارهٔ ورود", compute='_compute_ikiku_mobile_lookup', search='_search_ikiku_mobile_lookup',
-        groups='ikiku_base.group_ikiku_staff',
+        groups='ikiku_base.group_ikiku_staff,ikiku_base.group_ikiku_register_reader',
         help="برای پیدا کردنِ شخص با شماره، به هر شکلی که نوشته شود: ۰۹۱۲…، ۹۸۹۱۲…، +۹۸۹۱۲…")
 
     @api.depends('ikiku_mobile', 'ikiku_mobile_verified_on', 'ikiku_mobile_set_by_id')

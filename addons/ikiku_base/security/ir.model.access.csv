@@ -36,3 +36,9 @@ access_spec_country_rule_master,spec country rule master,model_ikiku_spec_countr
 access_place_node_portal,place.node portal,place_graph.model_place_node,base.group_portal,1,0,0,0
 access_place_alias_portal,place.alias portal,place_graph.model_place_alias,base.group_portal,1,0,0,0
 access_place_node_master,place.node master,place_graph.model_place_node,group_ikiku_master,1,1,1,1
+access_season_window_register_reader,season window register reader,model_ikiku_season_window,group_ikiku_register_reader,1,0,0,0
+access_spec_overlay_register_reader,spec overlay register reader,model_ikiku_spec_overlay,group_ikiku_register_reader,1,0,0,0
+access_spec_candidate_register_reader,spec candidate register reader,model_ikiku_spec_candidate,group_ikiku_register_reader,1,0,0,0
+access_assertion_register_reader,assertion register reader,model_ikiku_assertion,group_ikiku_register_reader,1,0,0,0
+access_verification_register_reader,verification register reader,model_ikiku_verification,group_ikiku_register_reader,1,0,0,0
+access_dispute_register_reader,dispute register reader,model_ikiku_dispute,group_ikiku_register_reader,1,0,0,0
