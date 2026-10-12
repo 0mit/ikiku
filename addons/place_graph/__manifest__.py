@@ -35,7 +35,7 @@ everywhere, and a country's own places are data.
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Hidden/Tools',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.1.1',
     'license': 'AGPL-3',
     'depends': ['search_suggest'],
     'data': [

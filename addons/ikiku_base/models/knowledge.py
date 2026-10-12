@@ -59,6 +59,7 @@ class IkikuKnowledgeClass(models.Model):
     _inherit = ['search.suggest.mixin']
     _description = "ردهٔ دانش یا شغل"
     _suggest_fields = {'name': 1.0, 'name_en': 0.9, 'code': 0.8}
+    _suggest_name_search = True     # the back office's picker of a class, as the site searches them
     _parent_store = True
     _order = 'scheme_id, code'
     _rec_names_search = ['code', 'name', 'name_en']

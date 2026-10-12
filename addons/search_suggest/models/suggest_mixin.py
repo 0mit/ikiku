@@ -11,10 +11,16 @@
 Translated fields are read in every installed language, so a Persian page finds an English
 name and the other way round. `suggest_index` is the folded text of all of it, stored so SQL
 can narrow the candidates before the readable ranking in tools/text.py decides the order.
+
+A model may also have Odoo's own name search -- the box of a many2one, a search view's
+choices -- answer the same way, by opting in:
+
+    _suggest_name_search = True
 """
 import logging
 
 from odoo import api, fields, models
+from odoo.fields import Domain
 
 from odoo.addons.search_suggest.tools import text as suggest_text
 
@@ -33,6 +39,9 @@ class SearchSuggestMixin(models.AbstractModel):
 
     # field name -> weight (0..1). Override in the inheriting model.
     _suggest_fields = {}
+    # Opt in: Odoo's own name search answers with suggest() (see name_search). Off by default,
+    # because it changes what a model's pickers find: one or two letters only start a word here.
+    _suggest_name_search = False
 
     suggest_index = fields.Text(
         "Search index", compute='_compute_suggest_index', store=True, readonly=True, copy=False,
@@ -166,6 +175,30 @@ class SearchSuggestMixin(models.AbstractModel):
             if len(everything) > len(candidates):
                 results = self._suggest_rank(query, everything, limit, boost)
         return results
+
+    @api.model
+    @api.readonly
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        """Odoo's own name search, answered by suggest() where the model opted in.
+
+        For `ilike` and a name with something in it: suggest()'s records in suggest()'s order --
+        «اشپز» finds «آشپز», «ظرفشور» a hint, «باریسته» the barista -- where a plain `ilike` on the
+        name finds only what contains the letters as typed. Anything else is Odoo's own search,
+        unchanged: another operator (an import matching a name exactly), an empty name (the
+        first rows of a list), and no limit -- suggest() ranks the best `limit` records, it does
+        not list every match, so whoever asks for all of them gets all of them."""
+        if not (self._suggest_name_search and operator == 'ilike' and limit
+                and suggest_text.spaced(name or '')):
+            return super().name_search(name, domain, operator, limit)
+        domain = list(Domain(domain)) if domain else []
+        records = self._suggest_name_search_records(name, domain, limit)
+        return [(record.id, record.display_name) for record in records.sudo()]
+
+    @api.model
+    def _suggest_name_search_records(self, name, domain, limit):
+        """The records name_search answers, best first. A model whose own ranking sits on top of
+        suggest() answers with that here, so its pickers and its pages agree."""
+        return self.browse([result['record'].id for result in self.suggest(name, domain=domain, limit=limit)])
 
     @api.model
     def _suggest_whole_word(self, piece):

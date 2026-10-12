@@ -59,6 +59,8 @@ class PlaceNode(models.Model):
     _parent_store = True
     _order = 'sequence, name, id'
     _suggest_fields = {'name': 1.0, 'name_en': 0.8, 'code': 0.4}
+    # A place's box in the back office answers as the site's does (see _suggest_name_search_records).
+    _suggest_name_search = True
 
     name = fields.Char("Name", required=True, translate=True, index='trigram')
     name_en = fields.Char("English name")
@@ -235,6 +237,14 @@ class PlaceNode(models.Model):
         ordered = sorted(answers.values(), key=lambda r: (-r['score'], 'via' in r, r['record'].sequence,
                                                           r['record']._city_sequence(), r['record'].id))
         return ordered[:limit]
+
+    @api.model
+    def _suggest_name_search_records(self, name, domain, limit):
+        """A many2one's box is asked what the site's place box is asked, with no kind narrowed and
+        nobody's city around it: the same names, aliases, places above and neighbours, and the same
+        published order -- so «کاخ» typed by staff finds فلسطین, as it does for a person on the site."""
+        found = self.suggest_places(name, domain=domain, limit=limit)
+        return self.browse([result['record'].id for result in found])
 
     def _city_sequence(self):
         self.ensure_one()

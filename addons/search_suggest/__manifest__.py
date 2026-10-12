@@ -24,7 +24,7 @@ Nothing here names a model of any project: declare `_suggest_fields` and call `s
     'author': "شرکت تعاونی ایکیکو",
     'website': "https://ikiku.ir",
     'category': 'Hidden/Tools',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'license': 'AGPL-3',
     'depends': ['web'],
     'assets': {

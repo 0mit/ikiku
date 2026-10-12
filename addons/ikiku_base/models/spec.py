@@ -28,6 +28,8 @@ class IkikuSpecNode(models.Model):
     # What a person may type for a role or a skill, and how much each counts (search_suggest).
     _suggest_fields = {'plain_label': 1.0, 'name': 1.0, 'hint_terms': 0.9, 'name_en': 0.8,
                        'code': 0.6, 'description': 0.3}
+    # The back office's pickers of a role or a skill rank the same way the site does.
+    _suggest_name_search = True
 
     name = fields.Char("نام", required=True, translate=True)
     name_en = fields.Char("English name")
