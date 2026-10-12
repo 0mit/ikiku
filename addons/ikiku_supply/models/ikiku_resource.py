@@ -17,8 +17,15 @@ from odoo.addons.ikiku_base.models.jalali import format_jalali
 class IkikuResource(models.Model):
     _name = 'ikiku.resource'
     _description = "نیرو"
-    _inherit = ['mail.thread', 'ikiku.publishable']
+    _inherit = ['mail.thread', 'ikiku.publishable', 'search.suggest.mixin']
     _order = 'standing desc, id desc'
+    # The staff look a worker up by their name, typed as people type it (search_suggest). `name`
+    # is the person's own, kept on their partner, so the index follows a rename; the worker's
+    # side is this record and not res.partner, whose box every contact, user and company shares.
+    _suggest_fields = {'name': 1.0}
+    # Odoo's own name search -- a worker's many2one box -- answers the same way, where
+    # search_suggest offers the opt-in.
+    _suggest_name_search = True
 
     partner_id = fields.Many2one('res.partner', string="شخص", required=True,
                                  ondelete='restrict', index=True, tracking=True)

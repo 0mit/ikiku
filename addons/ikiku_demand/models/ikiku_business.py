@@ -13,11 +13,19 @@ from odoo.exceptions import UserError, ValidationError
 class IkikuBusiness(models.Model):
     _name = 'ikiku.business'
     _description = "کسب‌وکار"
-    _inherit = ['mail.thread', 'ikiku.publishable', 'place.located']
+    _inherit = ['mail.thread', 'ikiku.publishable', 'place.located', 'search.suggest.mixin']
     # A café is a place of business: at most its neighbourhood is public, never its street,
     # and only if its holder chooses so (place_visibility, default city -- operator, 2026-09-18).
     _place_public_kinds = ('neighbourhood', 'district', 'city', 'village', 'province')
     _order = 'name'
+    # The staff look a café up by the name on its door, typed as people type it (search_suggest).
+    # The index holds that name even while it is private, and is read where the name is: by whoever
+    # may read the café's record, never by a public page (no visibility row, so restricted).
+    # public_name is the name or nothing, so it would add no word.
+    _suggest_fields = {'name': 1.0}
+    # Odoo's own name search -- a business's many2one box -- answers the same way, where
+    # search_suggest offers the opt-in.
+    _suggest_name_search = True
 
     partner_id = fields.Many2one('res.partner', string="دارنده", required=True,
                                  ondelete='restrict', index=True, tracking=True,
